@@ -74,7 +74,6 @@ We made some updates to the doc in another thread, to add some progressive discl
 
   ## Key Documents
   - `Specs/FRAMEWORK_OVERVIEW.md` - Updated overview with our latest decisions
-  - `Specs/TECHNICAL_SPECIFICATION.md` - Detailed technical spec (needs updating - later on)
 
   ## Recent Key Decisions
   1. **Navigator Component**: Strategic decision maker that reconciles intent with reality and refines task definitions during execution
@@ -91,6 +90,49 @@ We made some updates to the doc in another thread, to add some progressive discl
   - Technical specification updates
 
   ## Current Focus
+I read through the overview spec come more and took some notes. Let's work through this together. First organize my thoughts into buckets of issues/decisions we need to tackle, and then let's go through them one by one. Act as a facilitator, allowing me to ponder the concepts and decisions, and make steady progress. We'll want to update the overview spec as we go, once a set of decisions are finalized. Let's wait to update the detailed spec until the time is right.
+
+  - I'm starting to get a better feel for the overall approach, which I love. And I like the way the approach is coming together
+  - Not completely sure about the flow "Execute → Verify → Navigate → Reconcile → Adapt". Nothing wrong per se, but it doesn't quite land somehow. We'll see what I discover as I continue to read. Some random alternatives to get the ideas flowing: act/do/modify,       
+  observe/measure/review, change course/re-plan. But let's clean this up. "reconcile intent with current reality" is part of the process of navigating. After verify it's almost a "steer" step, with reconciliation being part of the process of deciding where to
+  steer, and task/plan adaptation being the means to do the steering.
+
+  - This may be an unwarranted fear, but the idea of a "spec" being not just concrete text, but text with pointers to other text, needs to be reliable.
+  - Wondering now if we need to rename "verifier". What would the alternatives be? Feedback,  measure, ...?
+  - I'm kind of seen a sensors/controller pattern emerge. Not sure where to go with this, but just an observation for now.
+  - Not sure if we've captured this yet, or if we need to in any way, but I imagine, much like I've mentioned before about the "implementation" of verifiers, the orchestrator should explicitly loop through tasks/do some things "symbolically" based on the
+  explicit/symbolic input, in addition to potentially some "fuzzy" decision making. Which makes me wonder how the orchestrator and navigator play together. Are they the same thing given this perspective?
+  - How does the task format, or other things we have updated, affect our history tracking format? maybe we're good, just wondering about naming/organizing the files, the types (environment change/plan change), id's, etc.
+  - I wasn't thinking we'd keep an "original" task definition for anything other than the plan. I could see maybe. But I'd be concerned about first off, only the "project" instructions are user-defined, and secondly, I don't want to restrict plan changes to
+  conform to newer versions of sub-tasks/any tasks. A replan could just be a complete wipe out of the previous sub-tasks. Ok I guess, what we should retain, is the "original" documents, if they were originally provided by the user. If they were generated as part      
+  of the agential process, then no.
+
+
+
+
+
+I like the act->sense-adjust. It's very generic. Almost too much, but we can rename it later. Agreed, reconciliation is part of the implementation of adjust, and I think we can keep the conceptual hierarchy multi-level, to retain this important observation
+
+
+It might make sense to keep them different. The orchestrator is our code to set it all in motion, and keep it all going. It orchestrates the main 3-step outer loop. It is the engine. The navigator just refines the path for the engine to move along. So actually I think this aligns with your option C. And I think I'd lean towards controller as the name, although really it's just the guts of the main actual method, FWIW, I believe.
+
+Yes! I love the how vs. what observation. I'm questioning my decision from earlier. Sense is just so abstract. Act I'm kind of ok with, sense, not so much, adjust a little more so. But I'm really wondering if there are better terms. I want to hover on this all for a moment. I want something that converys generality, but still hints at it being something flavored for a intellectual work workflow. Not literal, physical acting and sensing and adjusting.
+
+
+
+Act → Assess → Adapt. Controller is good. Sensors just doesn't quite land. Reviewers, analyzers, are ok. Observers??  I need some more ideas.
+
+Let's go with observers for now. I'm coming closer to that concept.
+
+
+
+Not sure I have a concern. If you don't have a concern, I don't, and we can dive into the details later. Was just a thought. Let me know what you think would work and we can move on.
+
+
+- Seems ok overall. Just wondering if we want to name these to be consistent with our other terminology. Act/Assess/Adapt, and so on. I had basically called what we call "Act" now, "Runs" before. Also I'm contemplating the hierarchical structure of the runs file/folder organization. Wondering if flat is better. Not sure I have an opinion yet, but it came to mind.
+- Somewhat tangential topic, and I'm not sure if this was retained in our current conversation's context, but I kind of like the idea of having the navigator being a potentially "complex" set of more than 1, maybe even more than 2, distinct personalities/personas/stakeholder roles all doing an "evaluation" of the re-planning/navigation step, much like the framework is set up for the "verifiers" or whatever we're calling it now.
+- Maybe it makes sense to structure the outputs based on our Act/Asses/Adapt terminology? We wouldn't have anything to commit after assess, but the history tracking via files could retain it in that organizational structure.
+
 
 
 

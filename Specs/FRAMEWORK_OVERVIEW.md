@@ -2,7 +2,7 @@
 
 ## Executive Summary
 
-The Task Execution Framework (TEF) is a robust orchestration system that maximizes execution robustness through progressive elaboration and continuous reconciliation. Rather than requiring perfect upfront specifications, it adapts and refines plans during execution based on discovered reality, embodying the principle of "continuous course correction through comprehensive pre-planning."
+The Task Execution Framework (TEF) is a robust control system that maximizes execution robustness through progressive elaboration and continuous reconciliation. Rather than requiring perfect upfront specifications, it adapts and refines plans during execution based on discovered reality, embodying the principle of "continuous course correction through iterative assessment."
 
 <details>
 <summary>💡 <strong>What does this actually mean?</strong></summary>
@@ -35,9 +35,9 @@ These are the core beliefs that drive how the framework operates. Think of them 
     │ CodeTaskAgent │ ← Single entry point for ALL tasks
     └───────────────┘
            ↓
-    ┌──────────────────────────────────────────────────────┐
-    │  Execute → Verify → Navigate → Reconcile → Adapt     │ ← Core execution loop
-    └──────────────────────────────────────────────────────┘
+    ┌────────────────────────────┐
+    │  Act → Assess → Adapt      │ ← Core control loop
+    └────────────────────────────┘
            ↓
     [Continue | Retry | Split | Refine Plan | Complete]
 ```
@@ -84,11 +84,11 @@ Instead of trying to plan everything perfectly from the start, the system starts
 **🎨 ELI5:** Like painting a picture where you start with a rough sketch and add more details as you go. You don't need to know exactly what the final painting will look like before you start - you figure it out as you paint.
 </details>
 
-### 3. Information-Gathering Verifiers
-Verifiers gather facts and observations rather than make decisions:
+### 3. Information-Gathering Observers
+Observers gather facts and observations rather than make decisions:
 ```json
 {
-  "verifier": "alignment",
+  "observer": "requirements",
   "observations": [...],
   "evidence": {...},
   "perspective": "product_requirements"
@@ -99,13 +99,13 @@ The Navigator uses these observations to make strategic decisions about task evo
 <details>
 <summary>👀 <strong>Observers, Not Judges</strong></summary>
 
-Verifiers are like reporters - they observe and report what they see without making decisions. They gather facts from different perspectives, and then a separate component (the Navigator) makes decisions based on all the gathered information.
+Observers are like reporters - they observe and report what they see without making decisions. They gather facts from different perspectives, and then a separate component (the Navigator) makes decisions based on all the gathered information.
 
-**👀 ELI5:** Imagine you have friends watching a soccer game from different seats in the stadium. Each friend sees the game from their angle and tells you what they observe. Then you (the Navigator) decide what to do based on all their different perspectives.
+**👀 ELI5:** Imagine you have friends watching a soccer game from different seats in the stadium. Each friend sees the game from their angle and tells you what they observe. Then you (the Navigator) consult with your coaching staff (Strategists) to decide what to do based on all their different perspectives.
 </details>
 
-### 4. Multi-Perspective Verification
-Verifiers provide different lenses on the current state:
+### 4. Multi-Perspective Assessment
+Observers provide different lenses on the current state:
 - **Build**: Compilation and technical feasibility
 - **Requirements**: Alignment with acceptance criteria
 - **Integration**: Compatibility with broader system context
@@ -137,8 +137,8 @@ The Navigator is like a ship's captain who takes in reports from all the crew me
 ## Key Architectural Decisions
 
 ### Decision 1: No Built-in Sub-agents
-**Choice**: Custom verifier framework instead of Claude Code sub-agents  
-**Rationale**: Provides finer control over verification logic and enables recursive verification patterns
+**Choice**: Custom observer framework instead of Claude Code sub-agents  
+**Rationale**: Provides finer control over assessment logic and enables recursive observation patterns
 
 <details>
 <summary>🔧 <strong>Custom Framework vs. Ready-Made Tools</strong></summary>
@@ -166,7 +166,7 @@ Python was chosen because it has great support for AI/ML tools, the Claude SDK w
 
 ### Decision 3: No Testing Infrastructure (Initially)
 **Choice**: No unit tests, integration tests, or test frameworks  
-**Rationale**: Focus on verification of actual behavior rather than test proxies
+**Rationale**: Focus on assessment of actual behavior rather than test proxies
 
 <details>
 <summary>🚗 <strong>Real Behavior vs. Test Behavior</strong></summary>
@@ -189,8 +189,8 @@ Every time the framework tries to do something, it saves a complete record of wh
 </details>
 
 ### Decision 5: State-First, Not Code-First
-**Choice**: Verifiers emit state; orchestrator decides  
-**Rationale**: Separation of observation from decision-making enables policy evolution without verifier changes
+**Choice**: Observers emit state; controller decides  
+**Rationale**: Separation of observation from decision-making enables policy evolution without observer changes
 
 <details>
 <summary>👁️ <strong>Observe First, Decide Later</strong></summary>
@@ -204,11 +204,10 @@ The system separates "what happened" from "what to do about it". Verifiers just 
 
 ### Core Execution Loop
 1. **Load** task/project specification
-2. **Execute** via Claude Code SDK
-3. **Verify** through parallel verifiers (Build, Alignment, Integration, Quality)
-4. **Navigate** - reconcile intent with current reality
-5. **Adapt** - update task definition if needed
-6. **Commit** execution results and plan changes
+2. **Act** - execute via Claude Code SDK
+3. **Assess** - gather observations through parallel observers (Build, Requirements, Integration, Quality)
+4. **Adapt** - reconcile intent with reality and evolve plan as needed
+5. **Commit** execution results and plan changes
 
 <details>
 <summary>🔄 <strong>The Main Work Cycle</strong></summary>
@@ -249,50 +248,57 @@ The framework doesn't just execute a fixed plan - it actively improves and refin
 
 ## Core Components
 
-### 1. Orchestrator (`orchestrator.py`)
-- Manages the execution loop
-- Coordinates execution, verification, and navigation phases
+### 1. Controller (`controller.py`)
+- Manages the Act→Assess→Adapt loop
+- Coordinates all three phases mechanically
 - Handles budgets and depth limits
 - Manages git commits and artifacts
 
 <details>
-<summary>🎭 <strong>The Director of Operations</strong></summary>
+<summary>🎭 <strong>The Control Engine</strong></summary>
 
-The Orchestrator is like the conductor of an orchestra - it doesn't play any instruments itself, but it coordinates all the different parts to work together in harmony.
+The Controller is like the engine of a car - it provides the mechanical power and coordination to move through the Act→Assess→Adapt cycle reliably and consistently.
 
 **🎭 ELI5:** Like a teacher organizing a class project - they make sure everyone does their part at the right time, keep track of progress, and handle any problems that come up.
 </details>
 
 ### 2. Navigator (`navigator.py`)
-- **Strategic decision making** based on verifier observations
-- **Task definition refinement** during execution
+- **Multi-strategist architecture** for robust decision making
+- **Strategic decision synthesis** based on observer reports and strategist perspectives
+- **Task definition refinement** during the Adapt phase
 - **Plan evolution tracking** with git commits for changes
 - **Intent-reality reconciliation** to maintain alignment with goals
+
+The Navigator employs multiple strategist functions:
+- **Technical Strategist**: Evaluates decomposition and implementation approaches
+- **Requirements Strategist**: Ensures alignment with user intent
+- **Risk Strategist**: Identifies potential obstacles and failure modes
+- **Efficiency Strategist**: Seeks simpler, more direct solutions
 
 <details>
 <summary>🧭 <strong>The Strategic Brain</strong></summary>
 
-The Navigator is the strategic decision-maker that takes all the information gathered and decides what to do next. It's responsible for keeping the execution aligned with the original goals while adapting to reality.
+The Navigator is the strategic decision-maker that takes all the information gathered and decides what to do next. It employs multiple strategist perspectives to ensure robust decision-making. It's responsible for keeping the execution aligned with the original goals while adapting to reality.
 
-**🧭 ELI5:** Like a ship's captain who listens to reports from the crew about weather, supplies, and navigation, then decides whether to stay on course, change direction, or stop at a port.
+**🧭 ELI5:** Like a ship's captain who listens to reports from the crew about weather, supplies, and navigation, then consults with different officers (navigation officer, safety officer, efficiency officer) before deciding whether to stay on course, change direction, or stop at a port.
 </details>
 
-### 3. Verifiers
-Parallel information-gathering modules that provide different perspectives:
+### 3. Observers
+Parallel information-gathering modules that provide different perspectives during the Assess phase:
 
-| Verifier | Perspective | Information Gathered | Implementation |
+| Observer | Perspective | Information Gathered | Implementation |
 |----------|-------------|---------------------|----------------|
 | Build | Technical | Compilation status, errors | Shell commands or model analysis |
-| Alignment | Requirements | Acceptance criteria progress | Model evaluation |
+| Requirements | Acceptance | Criteria satisfaction progress | Model evaluation |
 | Integration | System | Parent/child task compatibility | Model analysis |
 | Quality | Standards | Code style, maintainability | Configurable (shell/model) |
 
 <details>
-<summary>🔬 <strong>The Inspection Team</strong></summary>
+<summary>🔬 <strong>The Observation Team</strong></summary>
 
-Verifiers are like quality inspectors at different stations, each checking specific aspects of the work. They run in parallel to save time and provide comprehensive feedback.
+Observers are like specialized sensors at different stations, each monitoring specific aspects of the work. They run in parallel to save time and provide comprehensive feedback.
 
-**🔬 ELI5:** Like having different coaches for a sports team - one watches your form, another checks your strategy, another monitors your fitness. Each gives feedback from their expertise, and the head coach (Navigator) decides what to work on.
+**🔬 ELI5:** Like having different coaches for a sports team - one watches your form, another checks your strategy, another monitors your fitness. Each gives feedback from their expertise, and the head coach (Navigator) consults with assistant coaches (Strategists) to decide what to work on.
 </details>
 
 ### 4. Task Specifications
@@ -304,7 +310,8 @@ Markdown files with YAML frontmatter, supporting both structured tasks and proje
 type: project
 id: order-management-v2
 title: Implement order management system
-original_intent: preserved_separately  # Immutable reference
+source: user  # or "generated"
+original_preserved: true  # only if source=user
 subtasks:
   - parallel:
     - tasks/order-api.md
@@ -337,12 +344,28 @@ Task specifications are like detailed work orders that describe what needs to be
 </details>
 
 ### 5. Artifacts & Logging
-Every attempt produces:
-- `runs/<run-id>/attempt-<n>/verifier_outputs.json`
-- `runs/<run-id>/attempt-<n>/navigator_decision.json`
-- `tasks/original/` ← Immutable original specifications
-- `tasks/current/` ← Evolved specifications
-- Git commits: `[task-id] attempt n: decision` and `[task-id] PLAN UPDATE: reason`
+Every attempt produces organized artifacts following the Act→Assess→Adapt structure:
+```
+runs/<run-id>/
+  attempt-001/
+    act/
+      execution.json
+      stdout.log
+    assess/
+      build_observer.json
+      requirements_observer.json
+      integration_observer.json
+      quality_observer.json
+    adapt/
+      strategist_perspectives.json
+      navigator_decision.json
+      plan_updates.json
+```
+
+Task organization:
+- `tasks/original/` ← User-authored specifications only (immutable)
+- `tasks/current/` ← All current specifications (evolved)
+- Git commits: `[task-id] attempt n: <decision>` and `[task-id] ADAPT: <reason>`
 
 <details>
 <summary>📚 <strong>The Paper Trail</strong></summary>
@@ -354,11 +377,11 @@ The framework keeps detailed records of everything it does - like a scientist's 
 
 ## Configuration Philosophy
 
-### Global Defaults (`verifiers.yml`)
-Define stakeholders and default verifier configurations centrally.
+### Global Defaults (`observers.yml`)
+Define stakeholders and default observer configurations centrally.
 
 ### Per-Task Overrides
-Tasks can override specific verifier settings in their frontmatter.
+Tasks can override specific observer settings in their frontmatter.
 
 ### Runtime Flags
 Manual overrides and operational controls via CLI arguments.
@@ -373,16 +396,17 @@ The framework uses a layered configuration approach - global defaults that apply
 
 ## Extension Points
 
-### Adding New Verifiers
+### Adding New Observers
 1. Define stakeholder and purpose
-2. Implement verifier returning state JSON
-3. Register in `verifiers.yml`
+2. Implement observer returning state JSON
+3. Register in `observers.yml`
 4. Set criticality level and retry behavior
 
 ### Adding New Decision Rules
-1. Modify aggregator logic in orchestrator
-2. Update fingerprinting if needed
-3. Adjust thresholds in configuration
+1. Add new strategist functions to Navigator
+2. Modify synthesis logic in controller
+3. Update fingerprinting if needed
+4. Adjust thresholds in configuration
 
 <details>
 <summary>🔌 <strong>How to Extend the Framework</strong></summary>
@@ -400,20 +424,20 @@ The framework is designed to be extended with new capabilities. You can add new 
 pip install -r requirements.txt
 
 # Run a task
-python orchestrator.py --task tasks/task-001.md
+python controller.py --task tasks/task-001.md
 
 # With parallel child execution
-python orchestrator.py --task tasks/task-001.md --parallel 3
+python controller.py --task tasks/task-001.md --parallel 3
 
 # With manual override
-python orchestrator.py --task tasks/task-001.md --override DONE --why "Verified manually"
+python controller.py --task tasks/task-001.md --override DONE --why "Verified manually"
 ```
 
 ### Creating Your First Task
 1. Copy `tasks/task-template.md`
 2. Define acceptance criteria and constraints
 3. Set appropriate budgets and policies
-4. Run with orchestrator
+4. Run with controller
 
 <details>
 <summary>🚀 <strong>Getting Up and Running</strong></summary>
@@ -426,7 +450,7 @@ Starting with the framework is straightforward - install the dependencies, creat
 ## Design Principles
 
 1. **Explicit over Implicit**: All decisions are logged and traceable
-2. **Verification over Specification**: Comprehensive checking beats perfect planning
+2. **Assessment over Specification**: Frequent, comprehensive observations and adaptations beats perfect planning
 3. **Simplicity over Features**: Start minimal, add only proven needs
 4. **Deterministic over Learned**: Predictable behavior for debugging
 5. **State over Decisions**: Separate observation from judgment
@@ -458,12 +482,14 @@ These principles guide every design decision in the framework. They prioritize c
 
 ## Glossary
 
-- **CodeTaskAgent**: The single-entry orchestration function for all tasks
-- **Navigator**: Strategic decision maker that reconciles intent with reality
-- **Project**: Top-level task that preserves original immutable intent
-- **Verifier**: Information-gathering module providing different perspectives
+- **CodeTaskAgent**: The single-entry control function for all tasks
+- **Controller**: The mechanical engine that runs the Act→Assess→Adapt loop
+- **Navigator**: Strategic decision maker with multiple strategist perspectives that reconciles intent with reality
+- **Observers**: Information-gathering modules providing different perspectives during assessment
+- **Strategists**: Specialized decision-making functions within the Navigator providing diverse perspectives
+- **Project**: Top-level task that preserves original user intent when user-authored
 - **Environment**: Runtime context and state information
-- **Reconciliation**: Process of aligning current reality with intended goals
+- **Reconciliation**: Process of aligning current reality with intended goals (part of Adapt phase)
 - **Progressive Elaboration**: Refining plans through execution rather than upfront planning
 
 ## Next Steps
