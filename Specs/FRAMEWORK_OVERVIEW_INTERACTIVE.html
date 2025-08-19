@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Execution Framework - Interactive Overview</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a1a;
+            color: #e0e0e0;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px 0;
+            border-bottom: 2px solid #333;
+        }
+
+        h1 {
+            color: #4CAF50;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        h2 {
+            color: #81C784;
+            font-size: 1.8em;
+            margin: 30px 0 15px 0;
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        h3 {
+            color: #A5D6A7;
+            font-size: 1.4em;
+            margin: 25px 0 10px 0;
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        h4 {
+            color: #C8E6C9;
+            font-size: 1.2em;
+            margin: 20px 0 8px 0;
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .info-icon {
+            cursor: pointer;
+            color: #64B5F6;
+            font-size: 0.8em;
+            padding: 4px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .info-icon:hover {
+            background: #64B5F6;
+            color: #1a1a1a;
+            transform: scale(1.1);
+        }
+
+        .popout {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            min-width: 400px;
+            max-width: 600px;
+            background: #2d2d2d;
+            border: 1px solid #555;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+
+        .popout.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .popout-title {
+            color: #64B5F6;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .popout-explanation {
+            margin-bottom: 15px;
+            color: #e0e0e0;
+        }
+
+        .popout-eli5 {
+            background: #333;
+            padding: 15px;
+            border-radius: 6px;
+            border-left: 4px solid #FFC107;
+        }
+
+        .popout-eli5-title {
+            color: #FFC107;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        p {
+            margin-bottom: 15px;
+        }
+
+        ul, ol {
+            margin: 15px 0 15px 30px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        strong {
+            color: #81C784;
+        }
+
+        code {
+            background: #333;
+            color: #FFC107;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+        }
+
+        pre {
+            background: #2d2d2d;
+            border: 1px solid #555;
+            border-radius: 6px;
+            padding: 20px;
+            overflow-x: auto;
+            margin: 15px 0;
+            position: relative;
+        }
+
+        pre code {
+            background: none;
+            color: #e0e0e0;
+            padding: 0;
+        }
+
+        .diagram {
+            background: #2d2d2d;
+            border: 1px solid #555;
+            border-radius: 6px;
+            padding: 20px;
+            font-family: 'Courier New', monospace;
+            white-space: pre;
+            color: #A5D6A7;
+            margin: 15px 0;
+            text-align: center;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            background: #2d2d2d;
+        }
+
+        th, td {
+            border: 1px solid #555;
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background: #333;
+            color: #81C784;
+            font-weight: bold;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .toc {
+            background: #2d2d2d;
+            border: 1px solid #555;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .toc h3 {
+            color: #64B5F6;
+            margin-bottom: 15px;
+        }
+
+        .toc ul {
+            list-style: none;
+            margin: 0;
+        }
+
+        .toc a {
+            color: #e0e0e0;
+            text-decoration: none;
+            padding: 5px 0;
+            display: block;
+            transition: color 0.3s ease;
+        }
+
+        .toc a:hover {
+            color: #64B5F6;
+        }
+
+        @media (max-width: 768px) {
+            .popout {
+                min-width: 300px;
+                max-width: 90vw;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Task Execution Framework</h1>
+            <p style="font-size: 1.2em; color: #A5D6A7;">Interactive Overview Documentation</p>
+        </div>
+
+        <div class="toc">
+            <h3>Table of Contents</h3>
+            <ul>
+                <li><a href="#executive-summary">Executive Summary</a></li>
+                <li><a href="#system-mental-model">System Mental Model</a></li>
+                <li><a href="#key-concepts">Key Concepts</a></li>
+                <li><a href="#architectural-decisions">Key Architectural Decisions</a></li>
+                <li><a href="#system-flow">System Flow</a></li>
+                <li><a href="#core-components">Core Components</a></li>
+                <li><a href="#configuration">Configuration Philosophy</a></li>
+                <li><a href="#extension-points">Extension Points</a></li>
+                <li><a href="#getting-started">Getting Started</a></li>
+                <li><a href="#design-principles">Design Principles</a></li>
+                <li><a href="#future-roadmap">Future Roadmap</a></li>
+                <li><a href="#glossary">Glossary</a></li>
+            </ul>
+        </div>
+
+        <div class="section" id="executive-summary">
+            <h2>
+                Executive Summary
+                <span class="info-icon" data-popout="executive-summary-popout">ℹ️</span>
+            </h2>
+            <div class="popout" id="executive-summary-popout">
+                <div class="popout-title">What is this framework about?</div>
+                <div class="popout-explanation">
+                    This framework is like a smart assistant that helps execute complex software tasks. Instead of needing a perfect plan upfront, it figures things out as it goes, making course corrections along the way.
+                </div>
+                <div class="popout-eli5">
+                    <div class="popout-eli5-title">🚀 ELI5:</div>
+                    Imagine you're building a LEGO castle but don't have the exact instructions. This framework is like having a smart friend who helps you build it piece by piece, checking if it looks right and adjusting the plan as you discover new pieces or better ways to build it.
+                </div>
+            </div>
+            
+            <p>The Task Execution Framework (TEF) is a robust orchestration system that maximizes execution robustness through progressive elaboration and continuous reconciliation. Rather than requiring perfect upfront specifications, it adapts and refines plans during execution based on discovered reality, embodying the principle of "continuous course correction through comprehensive pre-planning."</p>
+
+            <h3>
+                Core Philosophy
+                <span class="info-icon" data-popout="core-philosophy-popout">ℹ️</span>
+            </h3>
+            <div class="popout" id="core-philosophy-popout">
+                <div class="popout-title">The Framework's Guiding Principles</div>
+                <div class="popout-explanation">
+                    These are the core beliefs that drive how the framework operates. Think of them as the "personality traits" of the system.
+                </div>
+                <div class="popout-eli5">
+                    <div class="popout-eli5-title">🎯 ELI5:</div>
+                    Like a GPS that recalculates your route when you take a wrong turn, this framework constantly adjusts its plan based on what it learns while working. It's better to adapt quickly than to plan perfectly from the start.
+                </div>
+            </div>
+
+            <ul>
+                <li><strong>Maximize execution robustness</strong> through progressive elaboration</li>
+                <li><strong>Reconcile continuously</strong> between intent and discovered reality</li>
+                <li><strong>Adapt frequently</strong> with small course corrections rather than major pivots</li>
+                <li><strong>Single-entry recursive architecture</strong> for all task complexity levels</li>
+            </ul>
+        </div>
+
+        <div class="section" id="system-mental-model">
+            <h2>
+                System Mental Model
+                <span class="info-icon" data-popout="mental-model-popout">ℹ️</span>
+            </h2>
+            <div class="popout" id="mental-model-popout">
+                <div class="popout-title">How to Think About This System</div>
+                <div class="popout-explanation">
+                    This diagram shows the high-level flow of how tasks move through the system. Everything flows through one central function, which ensures consistent handling.
+                </div>
+                <div class="popout-eli5">
+                    <div class="popout-eli5-title">🏭 ELI5:</div>
+                    Think of this like a factory assembly line where every product (task) goes through the same stations in the same order, ensuring quality and consistency no matter how complex the product is.
+                </div>
+            </div>
+
+            <div class="diagram">
+    Project/Task Specification
+           ↓
+    ┌───────────────┐
+    │ CodeTaskAgent │ ← Single entry point for ALL tasks
+    └───────────────┘
+           ↓
+    ┌──────────────────────────────────────────────────────┐
+    │  Execute → Verify → Navigate → Reconcile → Adapt     │ ← Core execution loop
+    └──────────────────────────────────────────────────────┘
+           ↓
+    [Continue | Retry | Split | Refine Plan | Complete]
+            </div>
+
+            <p>Every task, from simple edits to complex multi-step operations, flows through the same <code>CodeTaskAgent</code> function, ensuring uniform handling, logging, and control.</p>
+        </div>
+
+        <div class="section" id="key-concepts">
+            <h2>
+                Key Concepts
+                <span class="info-icon" data-popout="key-concepts-popout">ℹ️</span>
+            </h2>
+            <div class="popout" id="key-concepts-popout">
+                <div class="popout-title">The Big Ideas Behind This Framework</div>
+                <div class="popout-explanation">
+                    These are the fundamental concepts that make this framework work. Understanding these will help you grasp how all the pieces fit together.
+                </div>
+                <div class="popout-eli5">
+                    <div class="popout-eli5-title">🧩 ELI5:</div>
+                    Think of these as the "rules of the game" - they define how the framework behaves and makes decisions. Like knowing that in chess, bishops move diagonally, these concepts define how this system operates.
+                </div>
+            </div>
+
+            <h3>
+                1. Single-Entry Recursive Orchestration
+                <span class="info-icon" data-popout="single-entry-popout">ℹ️</span>
+            </h3>
+            <div class="popout" id="single-entry-popout">
+                <div class="popout-title">One Door In, Consistent Processing</div>
+                <div class="popout-explanation">
+                    No matter what task you want to do, it all goes through the same entry point. This ensures every task gets the same quality of handling, logging, and error recovery.
+                </div>
+                <div class="popout-eli5">
+                    <div class="popout-eli5-title">🚪 ELI5:</div>
+                    Like having one front door to a house - whether you're delivering mail, visiting friends, or coming home, everyone uses the same entrance. This way, security, logging, and house rules are applied consistently to everyone.
+                </div>
+            </div>
+            
+            <p>All agent calls go through <code>CodeTaskAgent(spec, environment)</code> - whether it's the initial project or a deeply nested subtask. This provides:</p>
+            <ul>
+                <li>Uniform error handling and recovery</li>
+                <li>Consistent audit trails</li>
+                <li>Predictable resource management</li>
+                <li>Simplified debugging</li>
+            </ul>
+
+            <h3>
+                2. Progressive Elaboration Architecture
+                <span class="info-icon" data-popout="progressive-elaboration-popout">ℹ️</span>
+            </h3>
+            <div class="popout" id="progressive-elaboration-popout">
+                <div class="popout-title">Learning and Improving As You Go</div>
+                <div class="popout-explanation">
+                    Instead of trying to plan everything perfectly from the start, the system starts with a reasonable guess and gets smarter with each attempt. It's like learning to cook a new recipe - you get better each time you make it.
+                </div>
+                <div class="popout-eli5">
+                    <div class="popout-eli5-title">🎨 ELI5:</div>
+                    Like painting a picture where you start with a rough sketch and add more details as you go. You don't need to know exactly what the final painting will look like before you start - you figure it out as you paint.
+                </div>
+            </div>
+
+            <p>Rather than requiring perfect specifications upfront, the system:</p>
+            <ul>
+                <li>Executes with initial reasonable assumptions</li>
+                <li>Refines understanding through each attempt</li>
+                <li>Uses the Navigator to reconcile intent with discovered reality</li>
+                <li>Evolves task definitions as execution reveals new information</li>
+            </ul>
+
+            <h3>
+                3. Information-Gathering Verifiers
+                <span class="info-icon" data-popout="verifiers-popout">ℹ️</span>
+            </h3>
+            <div class="popout" id="verifiers-popout">
+                <div class="popout-title">Observers, Not Judges</div>
+                <div class="popout-explanation">
+                    Verifiers are like reporters - they observe and report what they see without making decisions. They gather facts from different perspectives, and then a separate component (the Navigator) makes decisions based on all the gathered information.
+                </div>
+                <div class="popout-eli5">
+                    <div class="popout-eli5-title">👀 ELI5:</div>
+                    Imagine you have friends watching a soccer game from different seats in the stadium. Each friend sees the game from their angle and tells you what they observe. Then you (the Navigator) decide what to do based on all their different perspectives.
+                </div>
+            </div>
+
+            <p>Verifiers gather facts and observations rather than make decisions:</p>
+            <pre><code>{
+  "verifier": "alignment",
+  "observations": [...],
+  "evidence": {...},
+  "perspective": "product_requirements"
+}</code></pre>
+            <p>The Navigator uses these observations to make strategic decisions about task evolution.</p>
+
+            <h3>
+                4. Multi-Perspective Verification
+                <span class="info-icon" data-popout="multi-perspective-popout">ℹ️</span>
+            </h3>
+            <div class="popout" id="multi-perspective-popout">
+                <div class="popout-title">Looking at Problems from Different Angles</div>
+                <div class="popout-explanation">
+                    Different verifiers check different aspects of the work, like having specialists examine different parts of a car - one checks the engine, another checks the brakes, another checks the electronics.
+                </div>
+                <div class="popout-eli5">
+                    <div class="popout-eli5-title">🔍 ELI5:</div>
+                    Like having different doctors look at you during a checkup - an eye doctor checks your vision, a dentist checks your teeth, and a general doctor checks your overall health. Each one knows what to look for in their specialty.
+                </div>
+            </div>
+
+            <p>Verifiers provide different lenses on the current state:</p>
+            <ul>
+                <li><strong>Build</strong>: Compilation and technical feasibility</li>
+                <li><strong>Requirements</strong>: Alignment with acceptance criteria</li>
+                <li><strong>Integration</strong>: Compatibility with broader system context</li>
+                <li><strong>Quality</strong>: Code standards and maintainability</li>
+            </ul>
+
+            <h3>
+                5. Navigator-Driven Flow Control
+                <span class="info-icon" data-popout="navigator-popout">ℹ️</span>
+            </h3>
+            <div class="popout" id="navigator-popout">
+                <div class="popout-title">The Strategic Decision Maker</div>
+                <div class="popout-explanation">
+                    The Navigator is like a ship's captain who takes in reports from all the crew members and decides what course to take. It doesn't just follow rigid rules - it makes intelligent decisions based on the current situation.
+                </div>
+                <div class="popout-eli5">
+                    <div class="popout-eli5-title">🧭 ELI5:</div>
+                    Like a smart GPS that doesn't just say "recalculating" when you miss a turn, but actually thinks about whether there's a better route based on current traffic, road conditions, and your destination.
+                </div>
+            </div>
+
+            <p>The Navigator makes strategic decisions based on reconciling all information:</p>
+            <ul>
+                <li><strong>Minor gaps</strong> → Adjust current approach</li>
+                <li><strong>Significant misalignment</strong> → Refine task definition</li>
+                <li><strong>Fundamental obstacles</strong> → Decompose into subtasks</li>
+                <li><strong>Goal completion</strong> → Advance to next phase</li>
+            </ul>
+        </div>
+
+        <div class="section" id="architectural-decisions">
+            <h2>
+                Key Architectural Decisions
+                <span class="info-icon" data-popout="decisions-popout">ℹ️</span>
+            </h2>
+            <div class="popout" id="decisions-popout">
+                <div class="popout-title">Important Design Choices</div>
+                <div class="popout-explanation">
+                    These are the major decisions made when designing this framework. Each choice has trade-offs, and understanding the reasoning helps you understand why the system works the way it does.
+                </div>
+                <div class="popout-eli5">
+                    <div class="popout-eli5-title">⚖️ ELI5:</div>
+                    Like choosing to build a house with wood vs. brick - each choice has pros and cons. These decisions explain why the framework was built this way instead of other possible ways.
+                </div>
+            </div>
+
+            <h3>
+                Decision 1: No Built-in Sub-agents
+                <span class="info-icon" data-popout="decision1-popout">ℹ️</span>
+            </h3>
+            <div class="popout" id="decision1-popout">
+                <div class="popout-title">Custom Framework vs. Ready-Made Tools</div>
+                <div class="popout-explanation">
+                    Instead of using Claude Code's built-in helper agents, this framework builds its own verification system. This gives more control over how verification works and allows for custom logic.
+                </div>
+                <div class="popout-eli5">
+                    <div class="popout-eli5-title">🔧 ELI5:</div>
+                    Like choosing to build your own bicycle instead of buying one from the store. It takes more work, but you can customize it exactly how you want it to work.
+                </div>
+            </div>
+            <p><strong>Choice</strong>: Custom verifier framework instead of Claude Code sub-agents<br>
+            <strong>Rationale</strong>: Provides finer control over verification logic and enables recursive verification patterns</p>
+
+            <h3>
+                Decision 2: Python Implementation
+                <span class="info-icon" data-popout="decision2-popout">ℹ️</span>
+            </h3>
+            <div class="popout" id="decision2-popout">
+                <div class="popout-title">Why Python?</div>
+                <div class="popout-explanation">
+                    Python was chosen because it has great support for AI/ML tools, the Claude SDK works well with it, and it keeps the code simple and readable.
+                </div>
+                <div class="popout-eli5">
+                    <div class="popout-eli5-title">🐍 ELI5:</div>
+                    Like choosing English to write a book that will be read by people from many countries - Python is widely understood and has good tools for this type of work.
+                </div>
+            </div>
+            <p><strong>Choice</strong>: Python with Claude Code SDK<br>
+            <strong>Rationale</strong>:</p>
+            <ul>
+                <li>Native SDK support</li>
+                <li>Minimal glue code</li>
+                <li>ML/AI ecosystem compatibility</li>
+                <li>Forces architectural simplicity</li>
+            </ul>
+
+            <h3>
+                Decision 3: No Testing Infrastructure (Initially)
+                <span class="info-icon" data-popout="decision3-popout">ℹ️</span>
+            </h3>
+            <div class="popout" id="decision3-popout">
+                <div class="popout-title">Real Behavior vs. Test Behavior</div>
+                <div class="popout-explanation">
+                    Instead of writing traditional unit tests, this framework verifies that the actual code does what it's supposed to do in the real environment. It's like testing a car by driving it instead of just checking that all the parts are installed correctly.
+                </div>
+                <div class="popout-eli5">
+                    <div class="popout-eli5-title">🚗 ELI5:</div>
+                    Instead of just checking if a cake recipe has the right ingredients listed, you actually bake the cake and taste it to see if it's good.
+                </div>
+            </div>
+            <p><strong>Choice</strong>: No unit tests, integration tests, or test frameworks<br>
+            <strong>Rationale</strong>: Focus on verification of actual behavior rather than test proxies</p>
+
+            <h3>
+                Decision 4: Commit Every Attempt
+                <span class="info-icon" data-popout="decision4-popout">ℹ️</span>
+            </h3>
+            <div class="popout" id="decision4-popout">
+                <div class="popout-title">Complete History Tracking</div>
+                <div class="popout-explanation">
+                    Every time the framework tries to do something, it saves a complete record of what happened. This means you can see exactly what was tried, when, and what the results were.
+                </div>
+                <div class="popout-eli5">
+                    <div class="popout-eli5-title">📸 ELI5:</div>
+                    Like taking a photo after each move in a chess game. If something goes wrong, you can look back at any point and see exactly what the board looked like and what move was made.
+                </div>
+            </div>
+            <p><strong>Choice</strong>: Git commit after each attempt with full artifacts<br>
+            <strong>Rationale</strong>: Complete traceability and ability to rewind/replay any step</p>
+
+            <h3>
+                Decision 5: State-First, Not Code-First
+                <span class="info-icon" data-popout="decision5-popout">ℹ️</span>
+            </h3>
+            <div class="popout" id="decision5-popout">
+                <div class="popout-title">Observe First, Decide Later</div>
+                <div class="popout-explanation">
+                    The system separates "what happened" from "what to do about it". Verifiers just report what they observe, and a separate component makes decisions based on those observations.
+                </div>
+                <div class="popout-eli5">
+                    <div class="popout-eli5-title">👁️ ELI5:</div>
+                    Like having weather reporters who just tell you "it's raining and 60 degrees" instead of "you should wear a raincoat". Someone else (you) decides what to wear based on the weather report.
+                </div>
+            </div>
+            <p><strong>Choice</strong>: Verifiers emit state; orchestrator decides<br>
+            <strong>Rationale</strong>: Separation of observation from decision-making enables policy evolution without verifier changes</p>
+        </div>
+
+        <div class="section" id="system-flow">
+            <h2>
+                System Flow
+                <span class="info-icon" data-popout="system-flow-popout">ℹ️</span>
+            </h2>
+            <div class="popout" id="system-flow-popout">
+                <div class="popout-title">How Work Flows Through the System</div>
+                <div class="popout-explanation">
+                    This describes the step-by-step process of how the framework handles tasks, from start to finish. Think of it as the "workflow" or "procedure" the system follows.
+                </div>
+                <div class="popout-eli5">
+                    <div class="popout-eli5-title">🏃 ELI5:</div>
+                    Like a recipe for making dinner - first you gather ingredients, then you cook, then you taste and adjust seasoning, then you decide if it's done or needs more cooking.
+                </div>
+            </div>
+
+            <h3>
+                Core Execution Loop
+                <span class="info-icon" data-popout="execution-loop-popout">ℹ️</span>
+            </h3>
+            <div class="popout" id="execution-loop-popout">
+                <div class="popout-title">The Main Work Cycle</div>
+                <div class="popout-explanation">
+                    This is the basic cycle that repeats for every task. Each step builds on the previous one, and the cycle continues until the task is complete or can't be completed.
+                </div>
+                <div class="popout-eli5">
+                    <div class="popout-eli5-title">🔄 ELI5:</div>
+                    Like the process of learning to ride a bike: try to balance, see what happened, adjust your approach, try again. You keep doing this cycle until you can ride successfully.
+                </div>
+            </div>
+            <ol>
+                <li><strong>Load</strong> task/project specification</li>
+                <li><strong>Execute</strong> via Claude Code SDK</li>
+                <li><strong>Verify</strong> through parallel verifiers (Build, Alignment, Integration, Quality)</li>
+                <li><strong>Navigate</strong> - reconcile intent with current reality</li>
+                <li><strong>Adapt</strong> - update task definition if needed</li>
+                <li><strong>Commit</strong> execution results and plan changes</li>
+            </ol>
+
+            <h3>
+                Navigation Decisions
+                <span class="info-icon" data-popout="navigation-decisions-popout">ℹ️</span>
+            </h3>
+            <div class="popout" id="navigation-decisions-popout">
+                <div class="popout-title">What the Navigator Can Decide</div>
+                <div class="popout-explanation">
+                    Based on what it observes, the Navigator can choose from several different actions. Each action represents a different strategy for moving forward.
+                </div>
+                <div class="popout-eli5">
+                    <div class="popout-eli5-title">🛣️ ELI5:</div>
+                    Like a driver who can choose to keep going straight, take a slight detour, make a U-turn, ask for help, or declare they've arrived at their destination.
+                </div>
+            </div>
+            <ul>
+                <li><strong>Continue</strong>: Minor progress, stay on current path</li>
+                <li><strong>Refine</strong>: Update task definition based on discoveries</li>
+                <li><strong>Decompose</strong>: Split into parallel or sequential subtasks</li>
+                <li><strong>Escalate</strong>: Fundamental mismatch requiring higher-level guidance</li>
+                <li><strong>Complete</strong>: Goals achieved, advance to next phase</li>
+            </ul>
+
+            <h3>
+                Plan Evolution
+                <span class="info-icon" data-popout="plan-evolution-popout">ℹ️</span>
+            </h3>
+            <div class="popout" id="plan-evolution-popout">
+                <div class="popout-title">How Plans Change Over Time</div>
+                <div class="popout-explanation">
+                    The framework doesn't just execute a fixed plan - it actively improves and refines the plan as it learns more about what's needed. All changes are tracked so you can see how understanding evolved.
+                </div>
+                <div class="popout-eli5">
+                    <div class="popout-eli5-title">📋 ELI5:</div>
+                    Like planning a vacation where you start with "visit Italy" but as you research, it becomes "visit Rome for 3 days, then Florence for 2 days, then take a day trip to Pisa." The plan gets more detailed and better as you learn more.
+                </div>
+            </div>
+            <ul>
+                <li>Navigator updates task specifications in real-time</li>
+                <li>Changes tracked through separate git commits</li>
+                <li>Original intent preserved as immutable reference</li>
+                <li>Task tree modifications cascade through dependent tasks</li>
+            </ul>
+        </div>
+
+        <div class="section" id="core-components">
+            <h2>
+                Core Components
+                <span class="info-icon" data-popout="components-popout">ℹ️</span>
+            </h2>
+            <div class="popout" id="components-popout">
+                <div class="popout-title">The Main Parts of the System</div>
+                <div class="popout-explanation">
+                    These are the major pieces that make up the framework. Each component has a specific job, and they work together to execute tasks reliably.
+                </div>
+                <div class="popout-eli5">
+                    <div class="popout-eli5-title">🏗️ ELI5:</div>
+                    Like the main parts of a car: the engine makes it go, the steering wheel controls direction, the brakes make it stop, and the dashboard shows you information. Each part does its job, and together they make the car work.
+                </div>
+            </div>
+
+            <h3>1. Orchestrator (<code>orchestrator.py</code>)</h3>
+            <ul>
+                <li>Manages the execution loop</li>
+                <li>Coordinates execution, verification, and navigation phases</li>
+                <li>Handles budgets and depth limits</li>
+                <li>Manages git commits and artifacts</li>
+            </ul>
+
+            <h3>2. Navigator (<code>navigator.py</code>)</h3>
+            <ul>
+                <li><strong>Strategic decision making</strong> based on verifier observations</li>
+                <li><strong>Task definition refinement</strong> during execution</li>
+                <li><strong>Plan evolution tracking</strong> with git commits for changes</li>
+                <li><strong>Intent-reality reconciliation</strong> to maintain alignment with goals</li>
+            </ul>
+
+            <h3>3. Verifiers</h3>
+            <p>Parallel information-gathering modules that provide different perspectives:</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Verifier</th>
+                        <th>Perspective</th>
+                        <th>Information Gathered</th>
+                        <th>Implementation</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Build</td>
+                        <td>Technical</td>
+                        <td>Compilation status, errors</td>
+                        <td>Shell commands or model analysis</td>
+                    </tr>
+                    <tr>
+                        <td>Alignment</td>
+                        <td>Requirements</td>
+                        <td>Acceptance criteria progress</td>
+                        <td>Model evaluation</td>
+                    </tr>
+                    <tr>
+                        <td>Integration</td>
+                        <td>System</td>
+                        <td>Parent/child task compatibility</td>
+                        <td>Model analysis</td>
+                    </tr>
+                    <tr>
+                        <td>Quality</td>
+                        <td>Standards</td>
+                        <td>Code style, maintainability</td>
+                        <td>Configurable (shell/model)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>4. Task Specifications</h3>
+            <p>Markdown files with YAML frontmatter, supporting both structured tasks and projects:</p>
+
+            <h4>Project (Top-level)</h4>
+            <pre><code>---
+type: project
+id: order-management-v2
+title: Implement order management system
+original_intent: preserved_separately  # Immutable reference
+subtasks:
+  - parallel:
+    - tasks/order-api.md
+    - tasks/order-validation.md
+  - tasks/integration-tests.md
+---
+Project description and context...</code></pre>
+
+            <h4>Task (Recursive)</h4>
+            <pre><code>---
+id: task-001
+title: Add order cancellation endpoint
+constraints: [...]
+acceptance: [...]
+policy:
+  max_attempts: 3
+  max_depth: 3
+---
+Implementation details...</code></pre>
+
+            <h3>5. Artifacts & Logging</h3>
+            <p>Every attempt produces:</p>
+            <ul>
+                <li><code>runs/&lt;run-id&gt;/attempt-&lt;n&gt;/verifier_outputs.json</code></li>
+                <li><code>runs/&lt;run-id&gt;/attempt-&lt;n&gt;/navigator_decision.json</code></li>
+                <li><code>tasks/original/</code> ← Immutable original specifications</li>
+                <li><code>tasks/current/</code> ← Evolved specifications</li>
+                <li>Git commits: <code>[task-id] attempt n: decision</code> and <code>[task-id] PLAN UPDATE: reason</code></li>
+            </ul>
+        </div>
+
+        <div class="section" id="configuration">
+            <h2>Configuration Philosophy</h2>
+            
+            <h3>Global Defaults (<code>verifiers.yml</code>)</h3>
+            <p>Define stakeholders and default verifier configurations centrally.</p>
+
+            <h3>Per-Task Overrides</h3>
+            <p>Tasks can override specific verifier settings in their frontmatter.</p>
+
+            <h3>Runtime Flags</h3>
+            <p>Manual overrides and operational controls via CLI arguments.</p>
+        </div>
+
+        <div class="section" id="extension-points">
+            <h2>Extension Points</h2>
+            
+            <h3>Adding New Verifiers</h3>
+            <ol>
+                <li>Define stakeholder and purpose</li>
+                <li>Implement verifier returning state JSON</li>
+                <li>Register in <code>verifiers.yml</code></li>
+                <li>Set criticality level and retry behavior</li>
+            </ol>
+
+            <h3>Adding New Decision Rules</h3>
+            <ol>
+                <li>Modify aggregator logic in orchestrator</li>
+                <li>Update fingerprinting if needed</li>
+                <li>Adjust thresholds in configuration</li>
+            </ol>
+        </div>
+
+        <div class="section" id="getting-started">
+            <h2>Getting Started</h2>
+            
+            <h3>Quick Start</h3>
+            <pre><code># Install dependencies
+pip install -r requirements.txt
+
+# Run a task
+python orchestrator.py --task tasks/task-001.md
+
+# With parallel child execution
+python orchestrator.py --task tasks/task-001.md --parallel 3
+
+# With manual override
+python orchestrator.py --task tasks/task-001.md --override DONE --why "Verified manually"</code></pre>
+
+            <h3>Creating Your First Task</h3>
+            <ol>
+                <li>Copy <code>tasks/task-template.md</code></li>
+                <li>Define acceptance criteria and constraints</li>
+                <li>Set appropriate budgets and policies</li>
+                <li>Run with orchestrator</li>
+            </ol>
+        </div>
+
+        <div class="section" id="design-principles">
+            <h2>Design Principles</h2>
+            
+            <ol>
+                <li><strong>Explicit over Implicit</strong>: All decisions are logged and traceable</li>
+                <li><strong>Verification over Specification</strong>: Comprehensive checking beats perfect planning</li>
+                <li><strong>Simplicity over Features</strong>: Start minimal, add only proven needs</li>
+                <li><strong>Deterministic over Learned</strong>: Predictable behavior for debugging</li>
+                <li><strong>State over Decisions</strong>: Separate observation from judgment</li>
+            </ol>
+        </div>
+
+        <div class="section" id="future-roadmap">
+            <h2>Future Roadmap</h2>
+            
+            <h3>Near Term</h3>
+            <ul>
+                <li>Security verifier (stakeholder model ready)</li>
+                <li>Performance verifier (metrics collection)</li>
+                <li>Enhanced fingerprinting algorithms</li>
+            </ul>
+
+            <h3>Medium Term</h3>
+            <ul>
+                <li>Personality consistency via stakeholder prompts</li>
+                <li>Learned advisory layers (never gating)</li>
+                <li>Distributed execution support</li>
+            </ul>
+
+            <h3>Long Term</h3>
+            <ul>
+                <li>Multi-repository task coordination</li>
+                <li>Cross-language support beyond Python</li>
+                <li>IDE integrations</li>
+            </ul>
+        </div>
+
+        <div class="section" id="glossary">
+            <h2>Glossary</h2>
+            
+            <ul>
+                <li><strong>CodeTaskAgent</strong>: The single-entry orchestration function for all tasks</li>
+                <li><strong>Navigator</strong>: Strategic decision maker that reconciles intent with reality</li>
+                <li><strong>Project</strong>: Top-level task that preserves original immutable intent</li>
+                <li><strong>Verifier</strong>: Information-gathering module providing different perspectives</li>
+                <li><strong>Environment</strong>: Runtime context and state information</li>
+                <li><strong>Reconciliation</strong>: Process of aligning current reality with intended goals</li>
+                <li><strong>Progressive Elaboration</strong>: Refining plans through execution rather than upfront planning</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Next Steps</h2>
+            <p>For detailed technical specifications, contracts, and implementation guidelines, see <a href="TECHNICAL_SPECIFICATION.md" style="color: #64B5F6;"><code>TECHNICAL_SPECIFICATION.md</code></a>.</p>
+            <p>For hands-on examples and patterns, explore the <code>tasks/</code> directory and run the included examples.</p>
+        </div>
+    </div>
+
+    <script>
+        // Popout functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const infoIcons = document.querySelectorAll('.info-icon');
+            const popouts = document.querySelectorAll('.popout');
+
+            // Add click listeners to info icons
+            infoIcons.forEach(icon => {
+                icon.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const popoutId = this.getAttribute('data-popout');
+                    const popout = document.getElementById(popoutId);
+                    
+                    // Hide all other popouts
+                    popouts.forEach(p => {
+                        if (p.id !== popoutId) {
+                            p.classList.remove('show');
+                        }
+                    });
+                    
+                    // Toggle current popout
+                    popout.classList.toggle('show');
+                    
+                    // Position popout to avoid going off-screen
+                    setTimeout(() => {
+                        const rect = popout.getBoundingClientRect();
+                        const viewportWidth = window.innerWidth;
+                        const viewportHeight = window.innerHeight;
+                        
+                        if (rect.right > viewportWidth) {
+                            popout.style.left = 'auto';
+                            popout.style.right = '0';
+                        }
+                        
+                        if (rect.bottom > viewportHeight) {
+                            popout.style.top = 'auto';
+                            popout.style.bottom = '100%';
+                        }
+                    }, 10);
+                });
+            });
+
+            // Close popouts when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.popout') && !e.target.closest('.info-icon')) {
+                    popouts.forEach(popout => {
+                        popout.classList.remove('show');
+                    });
+                }
+            });
+
+            // Smooth scrolling for table of contents links
+            document.querySelectorAll('.toc a').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href').substring(1);
+                    const targetElement = document.getElementById(targetId);
+                    if (targetElement) {
+                        targetElement.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
