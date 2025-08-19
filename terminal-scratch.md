@@ -53,6 +53,46 @@ Any last thoughts before we update the overview spec with what we've discussed s
 
 
 
+We made some updates to the doc in another thread, to add some progressive disclosure, mainly for the human reader. Let's keep this format. But continuing on where we were, I have some more thoughts and comments:
+
+- I'm starting to get a better feel for the overall approach, which I love. And I like the way the approach is coming together
+- Not completely sure about the flow "Execute → Verify → Navigate → Reconcile → Adapt". Nothing wrong per se, but it doesn't quite land somehow. We'll see what I discover as I continue to read. Some random alternatives to get the ideas flowing: act/do/modify, observe/measure/review, change course/re-plan. But let's clean this up. "reconcile intent with current reality" is part of the process of navigating. After verify it's almost a "steer" step, with reconciliation being part of the process of deciding where to steer, and task/plan adaptation being the means to do the steering.
+
+- This may be an unwarranted fear, but the idea of a "spec" being not just concrete text, but text with pointers to other text, needs to be reliable.
+- Wondering now if we need to rename "verifier". What would the alternatives be? Feedback,  measure, ...?
+- I'm kind of seen a sensors/controller pattern emerge. Not sure where to go with this, but just an observation for now.
+- Not sure if we've captured this yet, or if we need to in any way, but I imagine, much like I've mentioned before about the "implementation" of verifiers, the orchestrator should explicitly loop through tasks/do some things "symbolically" based on the explicit/symbolic input, in addition to potentially some "fuzzy" decision making. Which makes me wonder how the orchestrator and navigator play together. Are they the same thing given this perspective?
+- How does the task format, or other things we have updated, affect our history tracking format? maybe we're good, just wondering about naming/organizing the files, the types (environment change/plan change), id's, etc.
+- I wasn't thinking we'd keep an "original" task definition for anything other than the plan. I could see maybe. But I'd be concerned about first off, only the "project" instructions are user-defined, and secondly, I don't want to restrict plan changes to conform to newer versions of sub-tasks/any tasks. A replan could just be a complete wipe out of the previous sub-tasks. Ok I guess, what we should retain, is the "original" documents, if they were originally provided by the user. If they were generated as part of the agential process, then no.
+
+
+
+# Task Execution Framework - Continued Development
+
+  ## Context
+  Working on the Task Execution Framework (TEF) - a robust orchestration system that maximizes execution robustness through progressive elaboration and continuous reconciliation.
+
+  ## Key Documents
+  - `Specs/FRAMEWORK_OVERVIEW.md` - Updated overview with our latest decisions
+  - `Specs/TECHNICAL_SPECIFICATION.md` - Detailed technical spec (needs updating - later on)
+
+  ## Recent Key Decisions
+  1. **Navigator Component**: Strategic decision maker that reconciles intent with reality and refines task definitions during execution
+  2. **Progressive Elaboration**: Plans evolve during execution rather than requiring perfect upfront specification
+  3. **Parallel Verifiers**: Information gatherers, not decision makers
+  4. **Project/Task Structure**: Top-level "project" preserves original intent; all tasks can evolve
+  5. **Terminology**: "environment" (not context), "reconciliation" as core concept
+
+  ## Remaining Topics to Discuss
+  - Fingerprinting complexity vs. simple failure counting
+  - Verifier implementation details (model selection, coded functions)
+  - Natural language input → formal spec conversion
+  - Handling hierarchical tasks with implied/explicit ordering
+  - Technical specification updates
+
+  ## Current Focus
+
+
 
 
 
