@@ -1,0 +1,58 @@
+
+
+
+I read through the overview spec and took some notes. Let's work through this together. First organize my thoughts into buckets of issues/decisions we need to tackle, and then let's go through them one by one. Act as a facilitator, allowing me to ponder the concepts and decisions, and make steady progress. We'll want to update the overview spec as we go, once a set of decisions are finalized. Let's wait to update the detailed spec until later.
+
+- The philosophy is less "minimize upfront planning while maximizing execution robustness" and more just "maximizing execution robustness". Although in lower-level calls, maybe it is more fuzzy.
+- Let's rename the concept of the "context" in the main function to "environment"
+- Not sure how much I like the idea of "fingerprinting" to detect duplicate errors. I guess I just viewed it as a simple "if any given verifier fails more than n times, split up the task". But I guess as long as it doesn't introduce unecessary complexity, and can give a strong gaurantee that it won't do any worse than the naive approach (and might do better), then I will accept this design
+- I am really still not satisfied with the stakeholder verification thing, I think. From an abstraction standpoint. And I think my point isn't getting through strong enough about the need to "re-plan as you go". I'm thinking a very agile approach, and I mean agile in the true, conceptual sense. The best metaphor for this is a football player fielding a kickoff and having a plan even before the ball is kicked, and potentially updating it as the ball is in the air, up until the point of catching the kickoff, at which point he starts "executing his plan", but in reality, is still constantly updating the plan based on the new state of the state - where he is, where his teammates and opponents are. The quicker he can adapt, the better his end result will be. From the perspective of this robust task execution framework, one of the key ideas is to put more compute into the process, but mostly directed towards the most valuable areas. I view "constant re-planning" as the key to automatically moving closer to the desired goal with a combination of effort and skill. "work hard and work smart". Alongside, also includin a somewhat basic, common verification approach where different entities review the new state of the environment, in relation to thier perceived desired state, and providing feedback, and something reconciling all the different perspectives. This being the other key means of applying "more compute the problem", in an effective/not completely brute force way.
+- Decision 1: No Built-in Sub-agents, Choice: Custom verifier framework instead of Claude Code sub-agents. To clarify, a verifier could be implemented via a sub-agent, but not necessarily.
+- Verifiers should be run in parallel, not be a pipeline/staged
+- I want to be able to specify the model used in verifiers. In fact, I haven't really seen any detail yet around how to even "implement" a verifier. I fully intend each verifier to be a coded function somewhere, that is called symbolically, which could be as simple as calling an agent/model, or could itself have its own looping and aggregation and voting or whatever.
+- I think something that might be missing with this is that the intended "task" fed in at the top level will usually be a task consisting of sub-tasks, and possibly even deeper. So the flow isn't just to try the task and only go deeper if failures lead to splitting, but to feed it a larger, potentially ambiguous task, that has an implied order (or maybe we can find a simple way to specify some tasks can be run in parallel.) And we'd have to have a means of either providing the broken-down sub-tasks in the expected format (I kind of like the idea of "pointers" to files that define the full "spec" for the task), or providing a less structured, potentially inline using natural language as the initial spec, with a model/agent call doing the work of turning it into the expected formal structure.
+
+
+
+
+
+
+explain the choice of yaml over json. In general, but also here. Does it work better for structured interfaces between components and function callse
+
+
+Re-plan after every attempt. Obviously I don't want to go too overboard, so if there's some way to do simple light reviews most of the time, maybe that's what we need, but I need to make sure it's constantly reviewed. Although I'm torn. Retrying based on our policies is a form of adaptation. Maybe we only re-evaluate the plan when we don't have an explicit rule/control flow managing some sub-step. What am I going for here? "gobal consistency"? I also want to make sure we're not completely changing the plan every time. It's more of a "frequent quick re-evaluation with small adjustments". If we were potentially super far of course, the idea is we'd get back on track with a few smaller course corrections. Vs. one big one when we need it, or way to big of one in the majority of cases when we don't.
+The "more compute strategically" is really just the philosophy I'm trying to accomplish by the techniques I'm brainstorming here.
+
+
+1) Basically. Maybe more generically "are the sub-tasks still aligned with the higher level goals/tasks". Because I want everything to be a candidate for change, although, some sense of the original intent has to remain. I guess it's more a realization that the original intent to "change the environment" (what you're trying to "do") could have been incomplete or somewhat inconsistent with the actual state of the environment, therefore, to keep things going automatically, something needs to be reconciled. Maybe that's the most general way of conceptualizing it - reconciliation of currently understood intent against realities of the situation/environment/higher-level objectives.
+2) Yeah the "deeper re-evaluation needed" is kind of the idea. I kind of want to incorporate that into the "split task?" decision logic too. Homogonize it. Maybe.
+3) I don't know how exactly to implement these ideas that I have, but in general I would say not to this, just because I don't want to get too explicit or rigid 
+
+
+
+
+- Maybe I'm just moving more towards a "softer judge" approach (model/agent call) for making decision. But notably, with as much hard-and-true, exact information, as we have available. With the hope being that if we have a reasonably small set of data, and a focused intent/system prompt/whatever, a model should almost always not do worse than a hard-coded decider, and sometimes do better, or be more complete, or more flexible in its "change of direction" or whatever.
+- I almost want to have the "re-planner" verifier/step (maybe it shouldn't be a verifier? Maybe it's so special I should just call it something else?) be, itself, a 2-pass thing, where I figure out some neuro-symbolic algorithm to try, then give it a "you are a hyper-critical engineer who values consistency of the current plan with inferred higher-level intent and you really want to make sure the path we are going down is the right path towards the true goal, and understand that the original words of the original plan may have been typed hastily, without all known knowledge, but in there somewhere is the true intent, or a true best intent based on the misinformed state when capturing the intent". Or, yeah, something like that or better. Basically I want to inject "me" into the pipeline.
+
+
+
+I want to emphasize that it's not just about an imperfect original hasty specification. It's about the only way of being able to specify everything up-front is to spend a bunch of cycles before subitting the spec, to make sure you have every detail, all accurate, etc. It's about kicking it off in some direction, and more, better, clearer direction and detail is always better, but it's not the most efficient to scout out every direction up-front. Ooh I like the Navigator. But also strategist. For sure this strategic navigator (maybe we just call it navigator since it's the one steering/driving) should actually modify the plan/task definitions as part of its core role. And we'll want to track a history of this. These plans/task definitions absolutely need to be tracked as files in the repo, so we can commit and track changes in the plan itself this way. Not sure if it's a separate commit for plan changes, or goes along with the other standard commits.
+And I don't know for sure, but maybe we do want to keep the "original plan", or literally the exact input provided at the top-level beginning of the run, just to make sure we don't go completely off the rails.
+
+
+
+Yep. Just need make sure the "task tree" is fully handled. i.e. if the contents of sub task-001_1 changes, we need to understand/evaluate/modify that. But again, this top-level task is the only special one that keeps the original. We should almost call it something different.
+Agreed, separate commits for plan changes.
+Yes, let's move onto how it affects the verifier architecture. To start, provide me a summary of the key realizations/decisions so far.
+
+
+
+Wonder if the navigator needs to be the official "decider". But maybe this just works, because control flow is purely based on project/task definition structure? I think I really like that. Could we find a way to homogonize this completely, without making it crazy complicated? If we could find a way to specify tasks that can be kicked off in parallel, that would be amazing. But hmm...wonder how that would affect replanning/navigator logic? I guess we could just control the navigation updates to only happen after completion of any "Task/Task.WhenAll"?
+Maybe we just call the top-level task the "project"? Maybe with a special schema? But maybe not, the recursive, same function for everything approach appeals to me in many ways. But I've already deviated in this one way, so, maybe...I mean the actual original user-provided input is a very special thing...
+Any last thoughts before we update the overview spec with what we've discussed so far? I'd like to do that soon, and then move onto the next conversation topics.
+
+
+
+
+
+
