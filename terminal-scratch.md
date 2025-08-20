@@ -170,7 +170,10 @@ This adapt phase that's actually right now a "decision" or a "refine" ("replan"?
 
 
 
+I like the "entire **remaining** plan" note. That's critical. Obviously in hindsight, but you can't change your past actions (or at least not with the context of this - maybe in the future we could have a "reset" option to "go back in time").
 
+
+I want incorporate the idea that the in these real-world examples, the "plan" typically includes the most concrete specificity for the near-term task(s), and a rougher outline for the most distant ones, but any good plan involves, or essentially is, a best-guess for how to get from point A (current situation) to point B (end goal), and, notably, point B might not be super concrete (e.g. "42 yard line"), if it's only a sub-goal to a larger concrete goal ("win the game"), hence the need for re-planning risk/reward evaluation calculations in the attempt to improve the probability of achieving the end-goal. Granted, modeling this flow could potentially be very complicated and difficult, but I can't help but wonder if we can get pretty close. Let's update our document to attempt to capture this flow for both our examples in the mermaid diagrams. Let's remove the pseudo code for now.
 
 
 
