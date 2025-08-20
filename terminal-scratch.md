@@ -195,9 +195,11 @@ Some other notes:
 
 
 
-- Leaf tasks->atomic tasks
+That was really good. Some more thoughts to help me reconcile:
+
+- Leaf tasks->atomic tasks, I think. Let me know if you agree or have any really good alternatives.
 - I want to make it clear that task specs should not be updated after act/completion
-- Execution Assessment->Action Assessment
+- Execution Assessment->Action Assessment? Not sure, let me know if you find improvement/changes here worth the cost of our attention.
 - "Phase" is definitely the right word for Act/Assess/Adapt
 - These assessment/observer types...I feel like the "plugin" approach could just be them sitting in an "observers" (or whatever) folder, and the behavior can come from their name, specified intent. Maybe there's some structure here, and maybe could even include some pseudo-code, or actual code, that essentially instructs to act/flow in a certain way, or maybe literally tries to write and execute its own code in the loop/whatever that's described.
 - The Navigator Decision Types section...I think I'm leaning less towards this tiered type of approach, and more towards a normalized abstraction, where even simple retries are potentially realized by, in simple terms, "copying the existing task, adding 1 to the attempt counter, putting it to the front of the task list, marking the last one as complete (+finishing it off like any other, e.g. commit, etc.), providing the condensed/summarized/analyzed/all feedback from the assess step, maybe tweaking the goal but probably not, and just trying again with the new state of the state and the feedback. Or maybe in some cases, reverting the change from the act step, and just going into the copy of the task with a heads-up of what happened when it tried something the first time. Although, it would probably be good for it to know what it tried, so why revert then, if it can essentially inspect the diff for that and try again with the feedback."
@@ -205,15 +207,15 @@ Some other notes:
 - Adapt Phase Decisions: I think this needs to be softer. Or maybe it just doesn't align with the homogenized abstraction where the adapt just modifies the plan (or not if there's nothing to modify), and control flow always occurs by continuing on with the next step in the plan after this re-plan step. Unless it's literally the last task, in which case, the whole process completes.
 
 
-- "Navigator"...
+- Still struggling with "Navigator"...
   - Scout
   - Trailblazer
-  - ...
+  - ...Maybe, so we don't get pulled too far off track, provide me with what you think the right question to ask is, as it relates to my pursuit of the correct terminology and componentization here...
 
 
 
 
-
+I made a few manual edits to the doc. Otherwise, it's getting closer. And I finally landed on my preferred term for navigator: Pathfinder. I want it to convey that the best plan is produced by a "search" for the optimal plan, based on what we know right now. So let's go with Pathfinder. Let's update the document to reflect. And also help me asses whether any of the current language in the doc might be worth tweaking, given this new, potentially slight different concept, or abstraction.
 
 
 

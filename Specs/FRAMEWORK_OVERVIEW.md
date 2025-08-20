@@ -39,7 +39,7 @@ These are the core beliefs that drive how the framework operates. Think of them 
     ┌─────────────────────────────────────┐
     │         Act → Assess → Adapt        │ ← Core control loop
     │                                     │
-    │  Leaf Tasks: Direct execution       │
+    │  Atomic Tasks: Direct execution     │
     │  Parent Tasks: Orchestrate subtasks │
     └─────────────────────────────────────┘
            ↓
@@ -47,7 +47,7 @@ These are the core beliefs that drive how the framework operates. Think of them 
 ```
 
 **Key Distinction**: 
-- **Leaf tasks** (no children) perform the actual Act phase - executing changes to the environment
+- **Atomic tasks** (no children) perform the actual Act phase - executing changes to the environment
 - **Parent tasks** orchestrate their subtasks without direct execution, coordinating the overall workflow
 - Both task types go through Assess and Adapt phases
 
@@ -78,7 +78,7 @@ Plans are not rigid specifications but "trenches in sand" - probable paths that 
 ### Task Execution Hierarchy
 
 **Critical distinction**:
-- **Leaf tasks** (no children): These are the only tasks that perform the Act phase, directly modifying the environment
+- **Atomic tasks** (no children): These are the only tasks that perform the Act phase, directly modifying the environment
 - **Parent tasks** (have children): These orchestrate subtasks, going through Assess and Adapt but not Act
 - **All tasks**: Participate in Assess and Adapt phases, enabling multi-level adaptation
 
@@ -104,16 +104,16 @@ No matter what task you want to do, it all goes through the same entry point. Th
 #### Task Specification Lifecycle
 Tasks evolve through a natural lifecycle as they approach execution:
 1. **Initial Sketch**: Simple description or goal statement
-2. **Progressive Refinement**: Navigator adds detail as task nears execution
+2. **Progressive Refinement**: Pathfinder adds detail as task nears execution
 3. **Complete Specification**: Fully structured schema ready for execution
 4. **Post-execution Evolution**: Specifications updated based on learnings
 
-**Attention Proximity**: The Navigator pays closest attention to immediately upcoming tasks, ensuring the next task has the highest quality specification before execution begins.
+**Attention Proximity**: The Pathfinder searches most intensively for optimal specifications for immediately upcoming tasks, ensuring the next task has the highest quality specification before execution begins.
 
 Rather than requiring perfect specifications upfront, the system:
 - Accepts tasks as simple descriptions initially
 - Refines specifications as tasks approach execution
-- Uses the Navigator to build complete specs for immediate next tasks
+- Uses the Pathfinder to search for and build complete specs for immediate next tasks
 - Evolves task definitions based on execution discoveries
 
 <details>
@@ -134,20 +134,20 @@ Observers gather facts and observations rather than make decisions:
   "perspective": "product_requirements"
 }
 ```
-The Navigator uses these observations to make strategic decisions about task evolution.
+The Pathfinder uses these observations to search for optimal plan modifications and task evolution strategies.
 
 <details>
 <summary>👀 <strong>Observers, Not Judges</strong></summary>
 
-Observers are like reporters - they observe and report what they see without making decisions. They gather facts from different perspectives, and then a separate component (the Navigator) makes decisions based on all the gathered information.
+Observers are like scouts reporting terrain conditions - they observe and report what they see without making decisions. They gather facts from different perspectives, and then the Pathfinder searches for the best path forward based on all the gathered intelligence.
 
-**👀 ELI5:** Imagine you have friends watching a soccer game from different seats in the stadium. Each friend sees the game from their angle and tells you what they observe. Then you (the Navigator) consult with your coaching staff (Strategists) to decide what to do based on all their different perspectives.
+**👀 ELI5:** Imagine you have scouts exploring different parts of a forest. Each scout reports what they find - rivers, cliffs, clear paths. Then you (the Pathfinder) use all their reports to search for and mark the best trail through the forest.
 </details>
 
 ### 4. Multi-Perspective Assessment
 
-#### Execution Assessment (Assess Phase)
-Observers provide different lenses on execution results:
+#### Action Assessment (Assess Phase)
+Observers provide different lenses on the results of the Act phase:
 - **Build**: Compilation and technical feasibility
 - **Requirements**: Alignment with acceptance criteria
 - **Integration**: Compatibility with broader system context
@@ -160,7 +160,7 @@ The Adapt phase employs multiple perspectives to evaluate and refine the plan it
 - **Task Refinement Evaluator**: "Which upcoming tasks need more detail?"
 - **Intent Alignment Evaluator**: "How well does the current plan align with original goals?"
 
-This dual assessment approach ensures both execution quality and plan quality continuously improve.
+This dual assessment approach ensures both action quality and plan quality continuously improve.
 
 <details>
 <summary>🔍 <strong>Looking at Problems from Different Angles</strong></summary>
@@ -170,25 +170,26 @@ Different verifiers check different aspects of the work, like having specialists
 **🔍 ELI5:** Like having different doctors look at you during a checkup - an eye doctor checks your vision, a dentist checks your teeth, and a general doctor checks your overall health. Each one knows what to look for in their specialty.
 </details>
 
-### 5. Navigator-Driven Flow Control
+### 5. Navigator as Plan Refiner
 
 #### The Centerpoint of Adaptation
-The Navigator is the centerpoint of the agential workflow, responsible for continuous plan refinement. Think of it as creating "trenches in sand" - probable paths that guide water (execution) flow but are easily revised when better paths emerge.
+The Navigator (perhaps better named the "Planner" or "Cultivator") is the centerpoint of the agential workflow, responsible for continuous plan refinement. Think of it as creating "trenches in sand" - probable paths that guide water (execution) flow but are easily revised when better paths emerge.
 
 #### Dual Responsibilities
 1. **Strategic Decision Making**: Based on assessment results, decides next actions
 2. **Proactive Task Refinement**: Continuously improves upcoming task specifications
 
-#### Decision Types
-- **Minor gaps** → Adjust current approach, possibly with retry (attempt counter + 1)
-- **Significant misalignment** → Refine task definition in-place
-- **Fundamental obstacles** → Decompose into subtasks or create new front-of-queue tasks
-- **Goal completion** → Advance to next phase
+#### Plan Modification Patterns
+All decisions result in plan modifications:
+- **Retry needed** → Copy task, increment attempt counter, add to front of queue
+- **Refinement needed** → Modify task specifications in-place (pre-execution only)
+- **Decomposition needed** → Replace task with subtasks in plan
+- **Success** → Mark complete, continue with next task in plan
 
 <details>
-<summary>🧭 <strong>The Strategic Decision Maker</strong></summary>
+<summary>🧭 <strong>The Strategic Path Searcher</strong></summary>
 
-The Navigator is like a ship's captain who takes in reports from all the crew members and decides what course to take. It doesn't just follow rigid rules - it makes intelligent decisions based on the current situation.
+The Pathfinder is like an expedition leader exploring unknown territory - gathering reports from scouts, searching for the best route forward, and continuously updating the trail markers as new information reveals better paths.
 
 **🧭 ELI5:** Like a smart GPS that doesn't just say "recalculating" when you miss a turn, but actually thinks about whether there's a better route based on current traffic, road conditions, and your destination.
 </details>
@@ -271,15 +272,15 @@ Every time the framework tries to do something, it saves a complete record of wh
 
 ### Core Execution Loop
 1. **Load** task/project specification (however complete and detailed it might be)
-2. **Act** - ONLY for leaf tasks: execute via Claude Code SDK; Parent tasks skip to Assess
-3. **Assess** - gather observations through parallel observers (all task types)
-4. **Adapt** - the re-planning centerpoint: reconcile intent with reality, modify plan in-place
-5. **Commit** - dual purpose: commit after EVERY action AND after EVERY plan change
+2. **Act** phase - ONLY for atomic tasks: execute via Claude Code SDK; Commit all changes, every time; Parent tasks skip to Assess. 
+3. **Assess** phase - gather observations through parallel observers (all task types)
+4. **Adapt** phase - the re-planning centerpoint: modify plan in-place based on assessment. Commit plan changes, if any. every time.
 
 **Key behaviors:**
-- **Leaf vs Parent distinction**: Only leaf tasks Act; parent tasks orchestrate
+- **Atomic vs Parent distinction**: Only atomic tasks Act; parent tasks orchestrate
 - **In-place plan modification**: Adapt modifies existing plan, may add new tasks at front of queue
-- **Attempt tracking**: Failed tasks may be retried with incremented attempt counter
+- **Task spec immutability**: Once a task completes, its specification becomes a frozen historical record
+- **Homogenized retry mechanism**: Retries are just new tasks (copy + increment attempt counter)
 - **Local failure handling**: Subtask failures trigger parent's Adapt phase, not project failure
 - **Continuous reconciliation**: Re-planning happens at every level, not just on failures
 - **Progressive specification**: Tasks evolve from sketches to complete specs as they near execution
@@ -292,20 +293,24 @@ This is the basic cycle that repeats for every task. Each step builds on the pre
 **🔄 ELI5:** Like the process of learning to ride a bike: try to balance, see what happened, adjust your approach, try again. You keep doing this cycle until you can ride successfully.
 </details>
 
-### Adapt Phase Decisions
-- **Continue**: Minor progress, stay on current path
-- **Retry**: Create new task at front of queue with incremented attempt counter
-- **Refine**: Update task specifications in-place based on discoveries
-- **Decompose**: Split into parallel or sequential subtasks
-- **Escalate**: Fundamental mismatch requiring higher-level guidance
-- **Complete**: Goals achieved, advance to next phase
+### Adapt Phase: Plan Modification
+
+The Adapt phase operates through a homogenized abstraction - all adaptations are plan modifications:
+
+- **Retry**: Copy task, increment attempt counter, add to front of queue
+- **Refine**: Modify task specifications in-place (before execution only)
+- **Decompose**: Replace task with subtasks in the plan
+- **Continue**: Leave plan unchanged, proceed to next task
+- **Complete**: Mark task complete, continue with plan
+
+Every adaptation is essentially answering: "How should the plan be modified based on what we learned?"
 
 <details>
-<summary>🛣️ <strong>What the Navigator Can Decide</strong></summary>
+<summary>🛣️ <strong>Plan Modification as Universal Mechanism</strong></summary>
 
-Based on what it observes, the Navigator can choose from several different actions. Each action represents a different strategy for moving forward.
+Rather than discrete decision types, the Adapt phase simply modifies the plan (or doesn't). Even retries are just plan modifications - creating a new task with lessons learned from the previous attempt.
 
-**🛣️ ELI5:** Like a driver who can choose to keep going straight, take a slight detour, make a U-turn, ask for help, or declare they've arrived at their destination.
+**🛣️ ELI5:** Like editing a recipe while cooking - you might add a step, repeat a step with adjustments, break a complex step into simpler ones, or just continue as written. It's all just editing the recipe.
 </details>
 
 ### Plan Evolution
@@ -337,7 +342,8 @@ The framework doesn't just execute a fixed plan - it actively improves and refin
 - Manages the Act→Assess→Adapt loop
 - Coordinates all three phases mechanically
 - Handles budgets and depth limits
-- Manages git commits and artifacts
+- Manages dual git commits: after Act and after Adapt
+- Tracks execution artifacts and logs
 
 <details>
 <summary>🎭 <strong>The Control Engine</strong></summary>
@@ -361,35 +367,66 @@ The Navigator employs multiple strategist functions:
 - **Efficiency Strategist**: Seeks simpler, more direct solutions
 
 <details>
-<summary>🧭 <strong>The Plan Refinement Engine</strong></summary>
+<summary>🧭 <strong>The Plan Search Engine</strong></summary>
 
-The Navigator is the centerpoint of continuous plan refinement. It doesn't just navigate a fixed route - it actively reshapes the planned path based on what's discovered during execution. Think of it as continuously smoothing out old paths in the sand and creating new, better ones.
+The Pathfinder is the centerpoint of continuous plan search and optimization. It doesn't follow a fixed route - it actively searches for better paths through the problem space based on what's discovered during execution. Think of it as an explorer continuously searching for and marking better trails through unexplored terrain.
 
-**🧭 ELI5:** Like a trail guide who not only follows the map but also updates it as they go - marking better paths, noting obstacles, and refining the route for the rest of the journey. They consult with different experts (strategists) and evaluate the trail from multiple angles (plan assessment personas) to ensure the best possible path forward.
+**🧭 ELI5:** Like an explorer searching for the best path through a jungle - they don't just follow one trail, they actively search for better routes, mark promising paths, abandon dead ends, and continuously update their trail markers. They consult with different experts (strategists) and search from multiple vantage points to find the optimal path forward.
 </details>
 
 ### 3. Observers
-Parallel information-gathering modules that provide different perspectives during the Assess phase:
+Parallel information-gathering modules that provide different perspectives during the Assess phase.
 
-| Observer | Perspective | Information Gathered | Implementation | Max Retries |
-|----------|-------------|---------------------|----------------|-------------|
-| Build | Technical | Compilation status, errors | Shell commands or model analysis | 4 |
-| Requirements | Acceptance | Criteria satisfaction progress | Model evaluation | 2 |
-| Integration | System | Parent/child task compatibility | Model analysis | 2 |
-| Quality | Standards | Code style, maintainability | Configurable (shell/model) | 3 |
+#### Plugin Architecture
+Observers are implemented as plugins in an `observers/` directory:
 
-**Implementation approach:**
-- Start with hard-coded functions returning status and observations
-- Clean interface: `observe(execution_result, environment) -> ObserverReport`
-- Future evolution to support hybrid explicit/LLM-based observation
-- Per-observer retry limits prevent infinite loops
+```
+observers/
+  build_observer.py
+  requirements_observer.py
+  integration_observer.py
+  quality_observer.py
+  custom_observer.py
+```
+
+Each observer implements a standard interface:
+```python
+def observe(execution_result, environment, task_spec) -> ObserverReport:
+    """
+    Gather observations about the execution result.
+    
+    Returns:
+        ObserverReport: {
+            'status': 'pass/fail/warning',
+            'observations': [...],
+            'evidence': {...},
+            'confidence': 0.0-1.0
+        }
+    """
+    # Observer-specific logic here
+    pass
+```
+
+#### Standard Observers
+
+| Observer | Perspective | Information Gathered | Behavior |
+|----------|-------------|---------------------|----------|
+| Build | Technical | Compilation status, errors | Runs build commands, checks outputs |
+| Requirements | Acceptance | Criteria satisfaction | Evaluates against task acceptance criteria |
+| Integration | System | Task compatibility | Checks parent/child consistency |
+| Quality | Standards | Code quality metrics | Runs linters, style checks |
+
+**Observer behaviors can be:**
+- **Explicit**: Run specific commands and check outputs
+- **Model-based**: Use LLM to evaluate against criteria
+- **Hybrid**: Combine explicit checks with model interpretation
 
 <details>
 <summary>🔬 <strong>The Observation Team</strong></summary>
 
 Observers are like specialized sensors at different stations, each monitoring specific aspects of the work. They run in parallel to save time and provide comprehensive feedback.
 
-**🔬 ELI5:** Like having different coaches for a sports team - one watches your form, another checks your strategy, another monitors your fitness. Each gives feedback from their expertise, and the head coach (Navigator) consults with assistant coaches (Strategists) to decide what to work on.
+**🔬 ELI5:** Like having different scouts for an expedition - one checks the terrain, another monitors supplies, another watches for dangers. Each gives their report, and the expedition leader (Pathfinder) uses all their intelligence to search for the best path forward.
 </details>
 
 ### 4. Task Specifications
@@ -449,7 +486,7 @@ runs/<run-id>/
       quality_observer.json
     adapt/
       strategist_perspectives.json
-      navigator_decision.json
+      pathfinder_decision.json
       plan_updates.json
 ```
 
@@ -515,7 +552,7 @@ def build_observer(execution_result, environment) -> ObserverReport:
 ```
 
 ### Adding New Decision Rules
-1. Add new strategist functions to Navigator
+1. Add new strategist functions to Pathfinder
 2. Modify synthesis logic in controller
 3. Update fingerprinting if needed
 4. Adjust thresholds in configuration
@@ -600,16 +637,17 @@ These principles guide every design decision in the framework. They prioritize c
 - **Controller**: The mechanical engine that runs the Act→Assess→Adapt loop
 - **Environment**: The folder/repo being modified by the framework
 - **ExecuteTask**: The single-entry control function for all tasks
-- **Leaf Task**: Task with no children that performs direct Act execution
-- **Navigator**: The plan refinement engine that continuously evolves task specifications and makes strategic decisions
-- **Observers**: Information-gathering modules providing different perspectives during execution assessment
+- **Atomic Task**: Task with no children that performs direct Act execution
+- **Observers**: Information-gathering modules providing different perspectives during action assessment
 - **Parent Task**: Task with children that orchestrates subtasks without direct execution
+- **Path Search**: The process of exploring the solution space to find optimal plan modifications
+- **Pathfinder**: The plan search engine that continuously searches for optimal task specifications and path decisions through the problem space
 - **Plan Assessment**: Multi-perspective evaluation of the plan itself during Adapt phase
-- **Plan Assessment Personas**: Specialized evaluators (Next Step, Coherence, Refinement, Alignment) that assess plan quality
+- **Plan Search Perspectives**: Specialized vantage points (Next Step, Coherence, Refinement, Alignment) from which the Pathfinder searches for optimal paths
 - **Progressive Elaboration**: Evolution of tasks from simple descriptions to complete specifications
 - **Project Plan**: Top-level task with hierarchy defining goals and initial path
 - **Reconciliation**: Process of aligning current reality with intended goals
-- **Strategists**: Specialized decision-making functions within the Navigator
+- **Strategists**: Specialized search-guiding functions within the Pathfinder
 - **Task Specification Lifecycle**: The progression from initial sketch to complete specification
 - **Trench in Sand**: Metaphor for plans as easily revisable probable paths
 
@@ -622,7 +660,7 @@ For hands-on examples and patterns, explore the `tasks/` directory and run the i
 The following topics require further discussion and decision-making:
 
 ### 1. Hierarchical Execution Flow
-- How do parent tasks orchestrate vs leaf tasks that actually act?
+- How do parent tasks orchestrate vs atomic tasks that actually act?
 - Where does continuous re-planning occur in the execution hierarchy?
 - How do we balance local adaptation with global plan coherence?
 
@@ -641,12 +679,7 @@ The following topics require further discussion and decision-making:
 - Implicit vs explicit dependency management
 - Dynamic reordering based on discovered dependencies
 
-### 5. Navigator Naming and Scope
-- Is "Navigator" the right term for the strategic decision maker?
-- Should we split navigation from strategic planning?
-- How do multiple strategists coordinate within the Navigator?
-
-### 6. Technical Specification Updates
+### 5. Technical Specification Updates
 - Detailed contracts and interfaces
 - Implementation guidelines
 - To be completed after core design decisions are finalized
