@@ -134,6 +134,73 @@ Not sure I have a concern. If you don't have a concern, I don't, and we can dive
 - Maybe it makes sense to structure the outputs based on our Act/Asses/Adapt terminology? We wouldn't have anything to commit after assess, but the history tracking via files could retain it in that organizational structure.
 
 
+Let's the the hierarchical option you suggested. And yes, let's formalize the multi-persona navigator like you've suggested. And note that any of these could/should be explictly defined functions we create, much like the observers. We'll have to come up with a standard way to configure these in the future, but to start, my own hard-coded logic + my own calls to agents and my own hard-coded flows will suffice.
+
+
+I'm just not sure hashing will work. This will be very free-form, for most observer feedback. I hear you on option C, but I think the more natural buckets are the type of observers themselves. Which themselves should just be a simple count of failures. So if build fails 4 times, something is wrong, and the whole action itself should be backed out - but notably, not the whole entire "project". The failure of any sub-task should just trigger another "adapt" and subsequent next action, whatever that is. Anyway, not sure we if captured that clearly yet or not. But then back to our example, maybe build has 4 max retries, but other types have fewer. Or more. Not sure how we'd configure that, but that's how I see it right now.
+
+
+
+
+It's worth noting though that observers don't really retry, they just observe. So something in the controller/navigator has to decide that. I guess what we're talking about here is the navigator following some explicit programming here to do retries, in addition to whatever other pieces of an algorithm it implements, explicit or soft. But notably the observers should be the ones declaring their retry count, I think. Or some global config maybe.
+
+Speaking of that, we have some more terminology reconciliation to do. Symbolic/neural. Explicit/soft. Logic/intuition.
+
+And now I'm seeing your comment about observer implementation details. I just don't really know right now. I need some help exploring this. It kind of relates to the previous topic and my notes I just captured above.
+
+
+
+Yeah I suppose if we have explicit logic, it kind of always needs to be followed. It's just that the explicit logic could account for "in-between" cases where, maybe again, based on configuration, something falls under some retry/whatever threshold, and above another, but we allow these middle ground cases to be judged softer by feeding whatever data we have towards an LLM to decide. But maybe this is too complicated to start out. It should probably be either explicit or softly judged. I'm not even sure what the soft judge case would look like - I guess that means, what to we feed into the context of the llm? In what order? How do we build all the up and present the right question. It's all doable. So maybe we can note these options as implementation considerations for observers, but start off with just this simple explicit retry logic. Yeah I don't know. Maybe I'm getting too far ahead. Or maybe I'm not thinking of this right. It's the navigator that has to do this. That's it's job. Ok yeah now I'm confused - what does the re-planning again? The navigator? I think I'm just confused because I never really loved that term given the recent terminology decisions. After reading the rest of your response though, maybe you're on the right track with the controller/navigator collaboration thoughts? I don't know, I need some help getting my thoughts back on track here, to really hone in on the correct parts of this to attend to right now.
+
+
+How does the controller get fed what it's working on though? Does the navigator call the main function/the controller based on its new next first step in the newly determined/potentially modified plan of attack? Does the controller just take the output from observe and feed that into the navigator call? I'm actually struggling with that, and the fact that the pseudo navigate method you have is hard-coded to make decisions based on build observations, and presumably other, but I feel like this should be more of a plugin design. But no idea how that would work. The observer would have to observe, but then also provide an implementation for how to decide what to do about the errors/warnings/whatever. Or maybe not the observer itself, but some handler for that type of observer. And in most cases, that would be something like, if there's an error, feed back that feedback to another "act" call to try again. But would this be accomplished via creating a new head task, and then looping back to the start, the same old generic workflow, but with the new plan that includes the first step with the instructions generated with the feedback from the observer. I mean that all makes good sense I think, so where does this retry thing come in? It's possible I'm just discovering holes in my initial ideas, and that's fine, but maybe I'm just forgetting something.
+
+
+Let's rename CodeTaskAgent to ExecuteTask. But this helped me see some of the flow. But I feel like we're missing the top-level loop that loops through all sub-tasks. Or maybe there has to be some special handling of non-root node tasks, where they don't actually do any acting themselves (or I guess they could, but probably not, that wouldn't make sense), but they could have some top-level verification/observation checks.
+I also feel like we've lost the key feature of frequent, constant re-planning with this flow. Or maybe I'm missing something. It looks like we're not adapting the plan itself by looking far and wide for consistency and alignment with goals. We're just calling a "decide" function.
+
+
+We've been working on the @Specs\FRAMEWORK_OVERVIEW spec together, and are making some progress. You are acting as a facilitator, allowing me to ponder the concepts and decisions. We've been making steady progress as we untangle and re-arrange the concepts, and periodically update the spec by interweaving the updated concepts into it.
+
+Let's work on the first pending topic. I'm struggling to reconcile the ideas I have in my head for how the general execution flow will go with the realities of coding it up. I'm wondering if we need to somehow create a system where you/I can capture the flow, the sequences if you will, that would allow me to review it more concretely. Maybe mermaid diagrams, or pseudo code. What do you think?
+
+
+I wonder what the "environment" concretely actually is here. A diff, a pointer to the base directory? Claude code already inherently runs based on a base directory, and I suppose that's something we're probably even required to pass in when we call the sdk, so maybe that's the answer?
+This adapt phase that's actually right now a "decision" or a "refine" ("replan"?)...the core idea here is that we want a re-evaluation of the whole plan after every step we take. This idea is so fundamental that we should call it out in the spec, in detail.  Regarding these fundamental ideas/metaphors: (The football player fielding a kickoff and planning from the start before he even gets the ball and re-planning based on the changing environment of the players on the field coming towards him and the moving forward with the plan once he catches the ball and the constant re-planning as he change position and the objects in his environment change position) and (the not-paint by numbers metaphor where you start with a vague idea, and instead of planning out exactly what you want to paint before you get started, you start with a fuzzy sketch, an outline and fill in the details as you go). I want these actually concretely spelled out in the spec, because they are fundamental metaphors. I might even want to start with modeling these sequences with actual mermaid and pseudo code. I think the football one is more true to the ideas we've come up with so far, and the non-paint by numbers is different, but maybe it's worth exploring both before I proceed any further. Actually maybe the painting one works The user-provided project/task hierarchy is the high-level sketch and then any details, their vision, that they happen to feel confident about up-front. Yeah, I think we need to deviate for a bit to explore these flows from a mermaid/pseudo code perspective.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

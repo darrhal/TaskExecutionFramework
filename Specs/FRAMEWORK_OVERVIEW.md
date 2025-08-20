@@ -31,9 +31,9 @@ These are the core beliefs that drive how the framework operates. Think of them 
 ```
     Project/Task Specification
            ↓
-    ┌───────────────┐
-    │ CodeTaskAgent │ ← Single entry point for ALL tasks
-    └───────────────┘
+    ┌──────────────┐
+    │ ExecuteTask  │ ← Single entry point for ALL tasks
+    └──────────────┘
            ↓
     ┌────────────────────────────┐
     │  Act → Assess → Adapt      │ ← Core control loop
@@ -42,7 +42,7 @@ These are the core beliefs that drive how the framework operates. Think of them 
     [Continue | Retry | Split | Refine Plan | Complete]
 ```
 
-Every task, from simple edits to complex multi-step operations, flows through the same `CodeTaskAgent` function, ensuring uniform handling, logging, and control.
+Every task, from simple edits to complex multi-step operations, flows through the same `ExecuteTask` function, ensuring uniform handling, logging, and control.
 
 <details>
 <summary>🏭 <strong>How to Think About This System</strong></summary>
@@ -55,7 +55,7 @@ This diagram shows the high-level flow of how tasks move through the system. Eve
 ## Key Concepts
 
 ### 1. Single-Entry Recursive Orchestration
-All agent calls go through `CodeTaskAgent(spec, environment)` - whether it's the initial project or a deeply nested subtask. This provides:
+All agent calls go through `ExecuteTask(spec, environment)` - whether it's the initial project or a deeply nested subtask. This provides:
 - Uniform error handling and recovery
 - Consistent audit trails
 - Predictable resource management
@@ -180,6 +180,14 @@ Instead of writing traditional unit tests, this framework verifies that the actu
 **Choice**: Git commit after each attempt with full artifacts  
 **Rationale**: Complete traceability and ability to rewind/replay any step
 
+### Decision 6: Failure Handling is Local
+**Choice**: Subtask failures don't cascade; parent tasks handle recovery  
+**Rationale**: Enables resilient execution where each level can adapt to failures below it
+
+### Decision 7: Simple Failure Counting
+**Choice**: Count failures per observer type, not complex fingerprinting  
+**Rationale**: Simplicity and predictability over sophisticated deduplication
+
 <details>
 <summary>📸 <strong>Complete History Tracking</strong></summary>
 
@@ -204,10 +212,16 @@ The system separates "what happened" from "what to do about it". Verifiers just 
 
 ### Core Execution Loop
 1. **Load** task/project specification
-2. **Act** - execute via Claude Code SDK
-3. **Assess** - gather observations through parallel observers (Build, Requirements, Integration, Quality)
-4. **Adapt** - reconcile intent with reality and evolve plan as needed
+2. **Act** - execute via Claude Code SDK (leaf tasks) or orchestrate subtasks (parent tasks)
+3. **Assess** - gather observations through parallel observers
+4. **Adapt** - reconcile intent with reality, handle failures locally, evolve plan as needed
 5. **Commit** execution results and plan changes
+
+**Key behaviors:**
+- **Hierarchical orchestration**: Parent tasks coordinate subtasks, leaf tasks perform actual work
+- **Local failure handling**: Subtask failures trigger parent's Adapt phase, not project failure
+- **Continuous reconciliation**: Re-planning happens before each subtask and after failures
+- **Failure counting**: Simple per-observer type counting with configurable retry limits
 
 <details>
 <summary>🔄 <strong>The Main Work Cycle</strong></summary>
@@ -286,12 +300,18 @@ The Navigator is the strategic decision-maker that takes all the information gat
 ### 3. Observers
 Parallel information-gathering modules that provide different perspectives during the Assess phase:
 
-| Observer | Perspective | Information Gathered | Implementation |
-|----------|-------------|---------------------|----------------|
-| Build | Technical | Compilation status, errors | Shell commands or model analysis |
-| Requirements | Acceptance | Criteria satisfaction progress | Model evaluation |
-| Integration | System | Parent/child task compatibility | Model analysis |
-| Quality | Standards | Code style, maintainability | Configurable (shell/model) |
+| Observer | Perspective | Information Gathered | Implementation | Max Retries |
+|----------|-------------|---------------------|----------------|-------------|
+| Build | Technical | Compilation status, errors | Shell commands or model analysis | 4 |
+| Requirements | Acceptance | Criteria satisfaction progress | Model evaluation | 2 |
+| Integration | System | Parent/child task compatibility | Model analysis | 2 |
+| Quality | Standards | Code style, maintainability | Configurable (shell/model) | 3 |
+
+**Implementation approach:**
+- Start with hard-coded functions returning status and observations
+- Clean interface: `observe(execution_result, environment) -> ObserverReport`
+- Future evolution to support hybrid explicit/LLM-based observation
+- Per-observer retry limits prevent infinite loops
 
 <details>
 <summary>🔬 <strong>The Observation Team</strong></summary>
@@ -378,7 +398,18 @@ The framework keeps detailed records of everything it does - like a scientist's 
 ## Configuration Philosophy
 
 ### Global Defaults (`observers.yml`)
-Define stakeholders and default observer configurations centrally.
+Define stakeholders and default observer configurations centrally, including retry limits:
+```yaml
+observers:
+  build:
+    max_retries: 4
+  requirements:
+    max_retries: 2
+  quality:
+    max_retries: 3
+  integration:
+    max_retries: 2
+```
 
 ### Per-Task Overrides
 Tasks can override specific observer settings in their frontmatter.
@@ -398,9 +429,19 @@ The framework uses a layered configuration approach - global defaults that apply
 
 ### Adding New Observers
 1. Define stakeholder and purpose
-2. Implement observer returning state JSON
-3. Register in `observers.yml`
+2. Implement observer function with standard interface
+3. Register in `observers.yml` with retry limits
 4. Set criticality level and retry behavior
+
+Example observer implementation:
+```python
+def build_observer(execution_result, environment) -> ObserverReport:
+    return {
+        "status": "pass/fail",
+        "observations": [...],
+        "evidence": {...}
+    }
+```
 
 ### Adding New Decision Rules
 1. Add new strategist functions to Navigator
@@ -450,7 +491,7 @@ Starting with the framework is straightforward - install the dependencies, creat
 ## Design Principles
 
 1. **Explicit over Implicit**: All decisions are logged and traceable
-2. **Assessment over Specification**: Frequent, comprehensive observations and adaptations beats perfect planning
+2. **Assessment over Specification**: Comprehensive observation beats perfect planning
 3. **Simplicity over Features**: Start minimal, add only proven needs
 4. **Deterministic over Learned**: Predictable behavior for debugging
 5. **State over Decisions**: Separate observation from judgment
@@ -466,9 +507,9 @@ These principles guide every design decision in the framework. They prioritize c
 ## Future Roadmap
 
 ### Near Term
-- Security verifier (stakeholder model ready)
-- Performance verifier (metrics collection)
-- Enhanced fingerprinting algorithms
+- Security observer (stakeholder model ready)
+- Performance observer (metrics collection)
+- Failure tracking implementation (per-observer counting)
 
 ### Medium Term
 - Personality consistency via stakeholder prompts
@@ -482,7 +523,7 @@ These principles guide every design decision in the framework. They prioritize c
 
 ## Glossary
 
-- **CodeTaskAgent**: The single-entry control function for all tasks
+- **ExecuteTask**: The single-entry control function for all tasks (formerly CodeTaskAgent)
 - **Controller**: The mechanical engine that runs the Act→Assess→Adapt loop
 - **Navigator**: Strategic decision maker with multiple strategist perspectives that reconciles intent with reality
 - **Observers**: Information-gathering modules providing different perspectives during assessment
@@ -494,6 +535,38 @@ These principles guide every design decision in the framework. They prioritize c
 
 ## Next Steps
 
-For detailed technical specifications, contracts, and implementation guidelines, see [`TECHNICAL_SPECIFICATION.md`](TECHNICAL_SPECIFICATION.md).
+For hands-on examples and patterns, explore the `tasks/` directory and run the included examples. (TBD)
 
-For hands-on examples and patterns, explore the `tasks/` directory and run the included examples.
+## Pending Design Decisions
+
+The following topics require further discussion and decision-making:
+
+### 1. Hierarchical Execution Flow
+- How do parent tasks orchestrate vs leaf tasks that actually act?
+- Where does continuous re-planning occur in the execution hierarchy?
+- How do we balance local adaptation with global plan coherence?
+
+### 2. Observer Implementation Details
+- Plugin architecture for observers - how to make them truly configurable?
+- Balance between explicit coded logic and LLM-based observation
+- Standard interface for observer registration and configuration
+
+### 3. Natural Language to Formal Spec Conversion
+- How do users naturally describe tasks vs our internal structure?
+- Automated conversion from informal descriptions to structured specs
+- Preserving user intent through the formalization process
+
+### 4. Task Ordering and Dependencies
+- Handling parallel vs sequential execution declaratively
+- Implicit vs explicit dependency management
+- Dynamic reordering based on discovered dependencies
+
+### 5. Navigator Naming and Scope
+- Is "Navigator" the right term for the strategic decision maker?
+- Should we split navigation from strategic planning?
+- How do multiple strategists coordinate within the Navigator?
+
+### 6. Technical Specification Updates
+- Detailed contracts and interfaces
+- Implementation guidelines
+- To be completed after core design decisions are finalized
