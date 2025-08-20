@@ -2,7 +2,7 @@
 
 ## Executive Summary
 
-The Task Execution Framework (TEF) is a robust control system that maximizes execution robustness through progressive elaboration and continuous reconciliation. Rather than requiring perfect upfront specifications, it adapts and refines plans during execution based on discovered reality, embodying the principle of "continuous course correction through iterative assessment."
+The Task Execution Framework (TEF) is an agential workflow system that transforms an environment according to a project plan through continuous adaptation. Given an environment (folder/repo) and a project plan (hierarchical task specification), the framework executes an **Act→Assess→Adapt** loop at every level, modifying the environment to achieve the specified goals while continuously refining the plan based on discovered reality.
 
 <details>
 <summary>💡 <strong>What does this actually mean?</strong></summary>
@@ -13,9 +13,10 @@ The Task Execution Framework (TEF) is a robust control system that maximizes exe
 </details>
 
 ### Core Philosophy
-- **Maximize execution robustness** through progressive elaboration
+- **Act→Assess→Adapt** as the primary control loop at every level
+- **Progressive task elaboration** from simple descriptions to complete specifications
+- **Continuous plan refinement** treating plans as probable paths, easily revisable
 - **Reconcile continuously** between intent and discovered reality
-- **Adapt frequently** with small course corrections rather than major pivots
 - **Single-entry recursive architecture** for all task complexity levels
 
 <details>
@@ -29,20 +30,26 @@ These are the core beliefs that drive how the framework operates. Think of them 
 ## System Mental Model
 
 ```
-    Project/Task Specification
+    Environment + Project Plan
            ↓
     ┌──────────────┐
     │ ExecuteTask  │ ← Single entry point for ALL tasks
     └──────────────┘
            ↓
-    ┌────────────────────────────┐
-    │  Act → Assess → Adapt      │ ← Core control loop
-    └────────────────────────────┘
+    ┌─────────────────────────────────────┐
+    │         Act → Assess → Adapt        │ ← Core control loop
+    │                                     │
+    │  Leaf Tasks: Direct execution       │
+    │  Parent Tasks: Orchestrate subtasks │
+    └─────────────────────────────────────┘
            ↓
-    [Continue | Retry | Split | Refine Plan | Complete]
+    [Continue | Retry | Decompose | Refine Plan | Complete]
 ```
 
-Every task, from simple edits to complex multi-step operations, flows through the same `ExecuteTask` function, ensuring uniform handling, logging, and control.
+**Key Distinction**: 
+- **Leaf tasks** (no children) perform the actual Act phase - executing changes to the environment
+- **Parent tasks** orchestrate their subtasks without direct execution, coordinating the overall workflow
+- Both task types go through Assess and Adapt phases
 
 <details>
 <summary>🏭 <strong>How to Think About This System</strong></summary>
@@ -51,6 +58,29 @@ This diagram shows the high-level flow of how tasks move through the system. Eve
 
 **🏭 ELI5:** Think of this like a factory assembly line where every product (task) goes through the same stations in the same order, ensuring quality and consistency no matter how complex the product is.
 </details>
+
+## Agential Workflow Principles
+
+### The Core Loop: Act→Assess→Adapt
+
+The framework operates as an agential workflow that takes:
+- **Input**: An environment (folder/local repo) and a project plan (top-level task with hierarchy)
+- **Process**: Continuous Act→Assess→Adapt cycles until success or failure
+- **Output**: Environment modified according to the project goals
+
+### Plan as Probable Path
+
+Plans are not rigid specifications but "trenches in sand" - probable paths that guide execution but are easily smoothed over and redrawn as better paths emerge. This philosophy embraces:
+- **Imperfect initial plans** that contain the general direction
+- **Implicit goal information** distributed throughout the task hierarchy
+- **Continuous refinement** as execution reveals the true nature of the work
+
+### Task Execution Hierarchy
+
+**Critical distinction**:
+- **Leaf tasks** (no children): These are the only tasks that perform the Act phase, directly modifying the environment
+- **Parent tasks** (have children): These orchestrate subtasks, going through Assess and Adapt but not Act
+- **All tasks**: Participate in Assess and Adapt phases, enabling multi-level adaptation
 
 ## Key Concepts
 
@@ -70,11 +100,21 @@ No matter what task you want to do, it all goes through the same entry point. Th
 </details>
 
 ### 2. Progressive Elaboration Architecture
+
+#### Task Specification Lifecycle
+Tasks evolve through a natural lifecycle as they approach execution:
+1. **Initial Sketch**: Simple description or goal statement
+2. **Progressive Refinement**: Navigator adds detail as task nears execution
+3. **Complete Specification**: Fully structured schema ready for execution
+4. **Post-execution Evolution**: Specifications updated based on learnings
+
+**Attention Proximity**: The Navigator pays closest attention to immediately upcoming tasks, ensuring the next task has the highest quality specification before execution begins.
+
 Rather than requiring perfect specifications upfront, the system:
-- Executes with initial reasonable assumptions
-- Refines understanding through each attempt
-- Uses the Navigator to reconcile intent with discovered reality
-- Evolves task definitions as execution reveals new information
+- Accepts tasks as simple descriptions initially
+- Refines specifications as tasks approach execution
+- Uses the Navigator to build complete specs for immediate next tasks
+- Evolves task definitions based on execution discoveries
 
 <details>
 <summary>🎨 <strong>Learning and Improving As You Go</strong></summary>
@@ -105,11 +145,22 @@ Observers are like reporters - they observe and report what they see without mak
 </details>
 
 ### 4. Multi-Perspective Assessment
-Observers provide different lenses on the current state:
+
+#### Execution Assessment (Assess Phase)
+Observers provide different lenses on execution results:
 - **Build**: Compilation and technical feasibility
 - **Requirements**: Alignment with acceptance criteria
 - **Integration**: Compatibility with broader system context
 - **Quality**: Code standards and maintainability
+
+#### Plan Assessment (Adapt Phase)
+The Adapt phase employs multiple perspectives to evaluate and refine the plan itself:
+- **Next Step Evaluator**: "What's the immediate next action needed?"
+- **Plan Coherence Evaluator**: "Do all tasks maintain consistency as a whole?"
+- **Task Refinement Evaluator**: "Which upcoming tasks need more detail?"
+- **Intent Alignment Evaluator**: "How well does the current plan align with original goals?"
+
+This dual assessment approach ensures both execution quality and plan quality continuously improve.
 
 <details>
 <summary>🔍 <strong>Looking at Problems from Different Angles</strong></summary>
@@ -120,10 +171,18 @@ Different verifiers check different aspects of the work, like having specialists
 </details>
 
 ### 5. Navigator-Driven Flow Control
-The Navigator makes strategic decisions based on reconciling all information:
-- **Minor gaps** → Adjust current approach
-- **Significant misalignment** → Refine task definition
-- **Fundamental obstacles** → Decompose into subtasks
+
+#### The Centerpoint of Adaptation
+The Navigator is the centerpoint of the agential workflow, responsible for continuous plan refinement. Think of it as creating "trenches in sand" - probable paths that guide water (execution) flow but are easily revised when better paths emerge.
+
+#### Dual Responsibilities
+1. **Strategic Decision Making**: Based on assessment results, decides next actions
+2. **Proactive Task Refinement**: Continuously improves upcoming task specifications
+
+#### Decision Types
+- **Minor gaps** → Adjust current approach, possibly with retry (attempt counter + 1)
+- **Significant misalignment** → Refine task definition in-place
+- **Fundamental obstacles** → Decompose into subtasks or create new front-of-queue tasks
 - **Goal completion** → Advance to next phase
 
 <details>
@@ -176,9 +235,21 @@ Instead of writing traditional unit tests, this framework verifies that the actu
 **🚗 ELI5:** Instead of just checking if a cake recipe has the right ingredients listed, you actually bake the cake and taste it to see if it's good.
 </details>
 
-### Decision 4: Commit Every Attempt
-**Choice**: Git commit after each attempt with full artifacts  
-**Rationale**: Complete traceability and ability to rewind/replay any step
+### Decision 4: Dual-Purpose Commit Strategy
+**Choice**: Git commit after EVERY action AND after EVERY plan change  
+**Rationale**: Complete traceability of both execution changes and planning evolution
+
+### Decision 5: State-First, Not Code-First
+**Choice**: Observers emit state; controller decides  
+**Rationale**: Separation of observation from decision-making enables policy evolution without observer changes
+
+<details>
+<summary>👁️ <strong>Observe First, Decide Later</strong></summary>
+
+The system separates "what happened" from "what to do about it". Verifiers just report what they observe, and a separate component makes decisions based on those observations.
+
+**👁️ ELI5:** Like having weather reporters who just tell you "it's raining and 60 degrees" instead of "you should wear a raincoat". Someone else (you) decides what to wear based on the weather report.
+</details>
 
 ### Decision 6: Failure Handling is Local
 **Choice**: Subtask failures don't cascade; parent tasks handle recovery  
@@ -196,32 +267,22 @@ Every time the framework tries to do something, it saves a complete record of wh
 **📸 ELI5:** Like taking a photo after each move in a chess game. If something goes wrong, you can look back at any point and see exactly what the board looked like and what move was made.
 </details>
 
-### Decision 5: State-First, Not Code-First
-**Choice**: Observers emit state; controller decides  
-**Rationale**: Separation of observation from decision-making enables policy evolution without observer changes
-
-<details>
-<summary>👁️ <strong>Observe First, Decide Later</strong></summary>
-
-The system separates "what happened" from "what to do about it". Verifiers just report what they observe, and a separate component makes decisions based on those observations.
-
-**👁️ ELI5:** Like having weather reporters who just tell you "it's raining and 60 degrees" instead of "you should wear a raincoat". Someone else (you) decides what to wear based on the weather report.
-</details>
-
 ## System Flow
 
 ### Core Execution Loop
-1. **Load** task/project specification
-2. **Act** - execute via Claude Code SDK (leaf tasks) or orchestrate subtasks (parent tasks)
-3. **Assess** - gather observations through parallel observers
-4. **Adapt** - reconcile intent with reality, handle failures locally, evolve plan as needed
-5. **Commit** execution results and plan changes
+1. **Load** task/project specification (however complete and detailed it might be)
+2. **Act** - ONLY for leaf tasks: execute via Claude Code SDK; Parent tasks skip to Assess
+3. **Assess** - gather observations through parallel observers (all task types)
+4. **Adapt** - the re-planning centerpoint: reconcile intent with reality, modify plan in-place
+5. **Commit** - dual purpose: commit after EVERY action AND after EVERY plan change
 
 **Key behaviors:**
-- **Hierarchical orchestration**: Parent tasks coordinate subtasks, leaf tasks perform actual work
+- **Leaf vs Parent distinction**: Only leaf tasks Act; parent tasks orchestrate
+- **In-place plan modification**: Adapt modifies existing plan, may add new tasks at front of queue
+- **Attempt tracking**: Failed tasks may be retried with incremented attempt counter
 - **Local failure handling**: Subtask failures trigger parent's Adapt phase, not project failure
-- **Continuous reconciliation**: Re-planning happens before each subtask and after failures
-- **Failure counting**: Simple per-observer type counting with configurable retry limits
+- **Continuous reconciliation**: Re-planning happens at every level, not just on failures
+- **Progressive specification**: Tasks evolve from sketches to complete specs as they near execution
 
 <details>
 <summary>🔄 <strong>The Main Work Cycle</strong></summary>
@@ -231,9 +292,10 @@ This is the basic cycle that repeats for every task. Each step builds on the pre
 **🔄 ELI5:** Like the process of learning to ride a bike: try to balance, see what happened, adjust your approach, try again. You keep doing this cycle until you can ride successfully.
 </details>
 
-### Navigation Decisions
+### Adapt Phase Decisions
 - **Continue**: Minor progress, stay on current path
-- **Refine**: Update task definition based on discoveries
+- **Retry**: Create new task at front of queue with incremented attempt counter
+- **Refine**: Update task specifications in-place based on discoveries
 - **Decompose**: Split into parallel or sequential subtasks
 - **Escalate**: Fundamental mismatch requiring higher-level guidance
 - **Complete**: Goals achieved, advance to next phase
@@ -247,10 +309,19 @@ Based on what it observes, the Navigator can choose from several different actio
 </details>
 
 ### Plan Evolution
-- Navigator updates task specifications in real-time
-- Changes tracked through separate git commits
-- Original intent preserved as immutable reference
-- Task tree modifications cascade through dependent tasks
+
+#### The "Trench in Sand" Philosophy
+Plans are treated as probable paths - easily created, easily revised. The Navigator continuously:
+- **Refines upcoming tasks** with increasing detail as they approach execution
+- **Updates specifications in-place** based on execution discoveries
+- **Creates new tasks** at the front of the queue when retries are needed
+- **Modifies task hierarchy** as better decompositions emerge
+
+#### Commit Strategy
+- **After every Act**: Ensures complete record of all environment changes
+- **After every Adapt**: Tracks all plan modifications and refinements
+- **Dual-purpose commits**: Provide full traceability of both execution and planning
+- **Original intent preservation**: User-authored specs remain immutable reference
 
 <details>
 <summary>📋 <strong>How Plans Change Over Time</strong></summary>
@@ -290,11 +361,11 @@ The Navigator employs multiple strategist functions:
 - **Efficiency Strategist**: Seeks simpler, more direct solutions
 
 <details>
-<summary>🧭 <strong>The Strategic Brain</strong></summary>
+<summary>🧭 <strong>The Plan Refinement Engine</strong></summary>
 
-The Navigator is the strategic decision-maker that takes all the information gathered and decides what to do next. It employs multiple strategist perspectives to ensure robust decision-making. It's responsible for keeping the execution aligned with the original goals while adapting to reality.
+The Navigator is the centerpoint of continuous plan refinement. It doesn't just navigate a fixed route - it actively reshapes the planned path based on what's discovered during execution. Think of it as continuously smoothing out old paths in the sand and creating new, better ones.
 
-**🧭 ELI5:** Like a ship's captain who listens to reports from the crew about weather, supplies, and navigation, then consults with different officers (navigation officer, safety officer, efficiency officer) before deciding whether to stay on course, change direction, or stop at a port.
+**🧭 ELI5:** Like a trail guide who not only follows the map but also updates it as they go - marking better paths, noting obstacles, and refining the route for the rest of the journey. They consult with different experts (strategists) and evaluate the trail from multiple angles (plan assessment personas) to ensure the best possible path forward.
 </details>
 
 ### 3. Observers
@@ -523,15 +594,24 @@ These principles guide every design decision in the framework. They prioritize c
 
 ## Glossary
 
-- **ExecuteTask**: The single-entry control function for all tasks (formerly CodeTaskAgent)
+- **Act→Assess→Adapt**: The core control loop executed at every task level
+- **Agential Workflow**: The overall system that transforms environments based on project plans through continuous adaptation
+- **Attempt Counter**: Tracking mechanism for retry attempts on tasks
 - **Controller**: The mechanical engine that runs the Act→Assess→Adapt loop
-- **Navigator**: Strategic decision maker with multiple strategist perspectives that reconciles intent with reality
-- **Observers**: Information-gathering modules providing different perspectives during assessment
-- **Strategists**: Specialized decision-making functions within the Navigator providing diverse perspectives
-- **Project**: Top-level task that preserves original user intent when user-authored
-- **Environment**: Runtime context and state information
-- **Reconciliation**: Process of aligning current reality with intended goals (part of Adapt phase)
-- **Progressive Elaboration**: Refining plans through execution rather than upfront planning
+- **Environment**: The folder/repo being modified by the framework
+- **ExecuteTask**: The single-entry control function for all tasks
+- **Leaf Task**: Task with no children that performs direct Act execution
+- **Navigator**: The plan refinement engine that continuously evolves task specifications and makes strategic decisions
+- **Observers**: Information-gathering modules providing different perspectives during execution assessment
+- **Parent Task**: Task with children that orchestrates subtasks without direct execution
+- **Plan Assessment**: Multi-perspective evaluation of the plan itself during Adapt phase
+- **Plan Assessment Personas**: Specialized evaluators (Next Step, Coherence, Refinement, Alignment) that assess plan quality
+- **Progressive Elaboration**: Evolution of tasks from simple descriptions to complete specifications
+- **Project Plan**: Top-level task with hierarchy defining goals and initial path
+- **Reconciliation**: Process of aligning current reality with intended goals
+- **Strategists**: Specialized decision-making functions within the Navigator
+- **Task Specification Lifecycle**: The progression from initial sketch to complete specification
+- **Trench in Sand**: Metaphor for plans as easily revisable probable paths
 
 ## Next Steps
 

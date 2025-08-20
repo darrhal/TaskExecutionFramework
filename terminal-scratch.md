@@ -195,6 +195,48 @@ Some other notes:
 
 
 
+- Leaf tasks->atomic tasks
+- I want to make it clear that task specs should not be updated after act/completion
+- Execution Assessment->Action Assessment
+- "Phase" is definitely the right word for Act/Assess/Adapt
+- These assessment/observer types...I feel like the "plugin" approach could just be them sitting in an "observers" (or whatever) folder, and the behavior can come from their name, specified intent. Maybe there's some structure here, and maybe could even include some pseudo-code, or actual code, that essentially instructs to act/flow in a certain way, or maybe literally tries to write and execute its own code in the loop/whatever that's described.
+- The Navigator Decision Types section...I think I'm leaning less towards this tiered type of approach, and more towards a normalized abstraction, where even simple retries are potentially realized by, in simple terms, "copying the existing task, adding 1 to the attempt counter, putting it to the front of the task list, marking the last one as complete (+finishing it off like any other, e.g. commit, etc.), providing the condensed/summarized/analyzed/all feedback from the assess step, maybe tweaking the goal but probably not, and just trying again with the new state of the state and the feedback. Or maybe in some cases, reverting the change from the act step, and just going into the copy of the task with a heads-up of what happened when it tried something the first time. Although, it would probably be good for it to know what it tried, so why revert then, if it can essentially inspect the diff for that and try again with the feedback."
+- I think the Core Execution Loop should call out that a git commit should happen right after act, and another separate one after adapt
+- Adapt Phase Decisions: I think this needs to be softer. Or maybe it just doesn't align with the homogenized abstraction where the adapt just modifies the plan (or not if there's nothing to modify), and control flow always occurs by continuing on with the next step in the plan after this re-plan step. Unless it's literally the last task, in which case, the whole process completes.
+
+
+- "Navigator"...
+  - Scout
+  - Trailblazer
+  - ...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
