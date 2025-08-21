@@ -219,6 +219,12 @@ I made a few manual edits to the doc. Otherwise, it's getting closer. And I fina
 
 
 
+Do we have any open issues, decisions, or discussion points that have been noted but not addressed?
+
+
+
+We've made a lot of progress refining the Specs/FRAMEWORK_OVERVIEW.md document. I think the general big picture is coming together, but there may be some key missing pieces still. Certainly, there are more implementation-level details that would need to be ironed out. But what if we were to try to plow ahead right now with a prototype, just given what we know now? I kind of want to try this out, and specifically, try it out with very minimal actual explicit programming, instead favoring "natural language programming", if you will. Think agent instructions, maybe sub-agents, maybe writing out temp files with sub-agent calls and writing pseudo code or simple checklists or something (or whatever might work, I don't really care, these are just some initial ideas) and that would allow us to loop back to the main agent and, in a way, allow it to keep going indefinitely until complete, or more specifically, this would just allow us to implement the ideas around the agential flow/framework we've come up with. What would this take? You should research this hard, searching for documentation on claude code sdk, mcp servers maybe, claude code itself, sub-agents, and anything and everything that might matter. You should think extremely hard about all this, really iterate on it, and see if you can come up with some really solid ideas, and eventually maybe a concrete plan, for how to achieve this prototype idea.
+
 
 
 

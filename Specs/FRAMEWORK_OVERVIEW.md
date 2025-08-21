@@ -655,31 +655,42 @@ These principles guide every design decision in the framework. They prioritize c
 
 For hands-on examples and patterns, explore the `tasks/` directory and run the included examples. (TBD)
 
-## Pending Design Decisions
+## Pending Implementation Decisions
 
-The following topics require further discussion and decision-making:
+The following implementation details require further specification:
 
-### 1. Hierarchical Execution Flow
-- How do parent tasks orchestrate vs atomic tasks that actually act?
-- Where does continuous re-planning occur in the execution hierarchy?
-- How do we balance local adaptation with global plan coherence?
+### 1. Pathfinder Search Strategies
+- **Search algorithm**: How exactly does the Pathfinder search through the solution space?
+- **Path evaluation metrics**: What criteria determine if one path is "better" than another?
+- **Search pruning**: When to abandon a search branch and try alternatives?
+- **Search depth limits**: How deep should the Pathfinder search before committing to a path?
 
-### 2. Observer Implementation Details
-- Plugin architecture for observers - how to make them truly configurable?
-- Balance between explicit coded logic and LLM-based observation
-- Standard interface for observer registration and configuration
+### 2. Observer Plugin Configuration
+- **Observer selection**: How to determine which observers to run for different task types?
+- **Mode switching**: When to use explicit vs model-based vs hybrid observation?
+- **Custom observer registration**: Runtime loading and validation of new observers
+- **Observer dependencies**: How observers can build on each other's outputs
 
-### 3. Natural Language to Formal Spec Conversion
-- How do users naturally describe tasks vs our internal structure?
-- Automated conversion from informal descriptions to structured specs
-- Preserving user intent through the formalization process
+### 3. Task Specification Evolution
+- **Natural language parsing**: Converting user descriptions to structured task specs
+- **Spec validation**: Ensuring task specs are complete enough for execution
+- **Spec freezing**: Technical mechanism for making specs immutable after completion
+- **Spec inheritance**: How child tasks inherit or override parent specifications
 
-### 4. Task Ordering and Dependencies
-- Handling parallel vs sequential execution declaratively
-- Implicit vs explicit dependency management
-- Dynamic reordering based on discovered dependencies
+### 4. Execution Orchestration
+- **Parallel execution control**: Managing concurrent atomic task execution
+- **Resource allocation**: Budgets, rate limits, and resource sharing between tasks
+- **Dependency detection**: Discovering implicit dependencies during execution
+- **Rollback mechanisms**: Handling when we need to undo actions after assessment
 
-### 5. Technical Specification Updates
-- Detailed contracts and interfaces
-- Implementation guidelines
-- To be completed after core design decisions are finalized
+### 5. Retry and Recovery Patterns
+- **Information propagation**: What assessment data gets passed to retry attempts?
+- **Backoff strategies**: When to wait vs immediately retry
+- **Failure aggregation**: How to summarize multiple failure attempts for parent tasks
+- **Recovery checkpoints**: When to save state for potential rollback
+
+### 6. Technical Interfaces
+- **Detailed API contracts** for ExecuteTask, Pathfinder, and Observers
+- **Plugin interfaces** for extending the framework
+- **Git integration patterns** for commit strategies
+- **Example implementations** demonstrating framework usage
