@@ -25,6 +25,30 @@ try:
 except ImportError:
     TEMPLATE_ENGINE_AVAILABLE = False
 
+# Phase 6.2: Import agent communication
+try:
+    from agent_communication import (
+        AgentCommunicationHub, create_communication_system, 
+        create_communicating_agents, EnhancedExecutorAgent
+    )
+    AGENT_COMMUNICATION_AVAILABLE = True
+except ImportError:
+    AGENT_COMMUNICATION_AVAILABLE = False
+
+# Phase 6.3: Import self-improvement
+try:
+    from self_improvement import SelfImprovementEngine, run_self_improvement_cycle
+    SELF_IMPROVEMENT_AVAILABLE = True
+except ImportError:
+    SELF_IMPROVEMENT_AVAILABLE = False
+
+# Phase 6.4: Import natural language parser
+try:
+    from natural_language_parser import NaturalLanguageTaskEngine, process_natural_language_task
+    NATURAL_LANGUAGE_PARSER_AVAILABLE = True
+except ImportError:
+    NATURAL_LANGUAGE_PARSER_AVAILABLE = False
+
 
 class StateManager:
     """Manages persistent state files for agent communication."""
@@ -782,6 +806,24 @@ class TEFOrchestrator:
             self.enhanced_agent_invoker = None
             print(f"[TEMPLATE] Using basic templating (template_engine not available)")
         
+        # Phase 6.2: Agent communication system
+        if AGENT_COMMUNICATION_AVAILABLE:
+            self.communication_hub = create_communication_system(state_dir)
+            self.communicating_agents = create_communicating_agents(self.communication_hub)
+            print(f"[COMM] Agent communication system enabled")
+        else:
+            self.communication_hub = None
+            self.communicating_agents = None
+            print(f"[COMM] Using basic agent system (agent_communication not available)")
+        
+        # Phase 6.3: Self-improvement system
+        if SELF_IMPROVEMENT_AVAILABLE:
+            self.self_improvement_engine = SelfImprovementEngine(state_dir)
+            print(f"[LEARNING] Self-improvement system enabled")
+        else:
+            self.self_improvement_engine = None
+            print(f"[LEARNING] Using basic execution (self_improvement not available)")
+        
         # Initialize checkpoint file
         self._initialize_recovery_system()
     
@@ -993,8 +1035,77 @@ class TEFOrchestrator:
             print(f"Error loading task file: {e}")
             return False
     
+    def load_task_from_natural_language(self, natural_language_text: str) -> bool:
+        """Load task specification from natural language text."""
+        try:
+            if not NATURAL_LANGUAGE_PARSER_AVAILABLE:
+                print("Natural language parser not available. Install required dependencies.")
+                return False
+            
+            print(f"[TASK_LOADER] Processing natural language input...")
+            
+            # Parse natural language content
+            nl_engine = NaturalLanguageTaskEngine(str(self.state_manager.state_dir), "tasks")
+            nl_result = nl_engine.process_natural_language_input(natural_language_text)
+            
+            if nl_result.get("status") == "success":
+                # Extract structured data from natural language processing
+                task_spec = nl_result["task_specification"]
+                
+                # Create task data compatible with the orchestrator
+                task_data = {
+                    "id": task_spec["id"],
+                    "title": task_spec["title"],
+                    "type": task_spec["type"],
+                    "content": natural_language_text,
+                    "source": "natural_language",
+                    "status": "pending",
+                    "created_at": datetime.now().isoformat(),
+                    "priority": task_spec["priority"],
+                    "estimated_effort": task_spec["estimated_effort"],
+                    "nl_processing_result": nl_result,
+                    "requirements": task_spec.get("requirements_count", 0),
+                    "acceptance_criteria": task_spec.get("acceptance_criteria_count", 0),
+                    "constraints": task_spec.get("constraints_count", 0),
+                    "identified_domains": task_spec.get("identified_domains", []),
+                    "technologies": task_spec.get("technologies", [])
+                }
+                
+                # Add to queue
+                success = self.task_queue.add_task(task_data)
+                
+                if success:
+                    print(f"[TASK_LOADER] Successfully processed natural language task: {task_data.get('id')}")
+                    print(f"[TASK_LOADER] Task type: {task_data.get('type')} - Priority: {task_data.get('priority')} - Effort: {task_data.get('estimated_effort')}")
+                    
+                    # Show parsing insights
+                    insights = nl_result.get("parsing_insights", {})
+                    confidence = insights.get("confidence_score", 0)
+                    print(f"[TASK_LOADER] Parsing confidence: {confidence:.2f}")
+                    
+                    if insights.get("ambiguity_indicators"):
+                        print(f"[TASK_LOADER] Ambiguity detected: {', '.join(insights['ambiguity_indicators'])}")
+                    if insights.get("suggested_clarifications"):
+                        print(f"[TASK_LOADER] Suggestions for improvement:")
+                        for suggestion in insights['suggested_clarifications']:
+                            print(f"  - {suggestion}")
+                    
+                    if task_data.get("identified_domains"):
+                        print(f"[TASK_LOADER] Identified domains: {', '.join(task_data['identified_domains'])}")
+                    if task_data.get("technologies"):
+                        print(f"[TASK_LOADER] Technologies mentioned: {', '.join(task_data['technologies'])}")
+                
+                return success
+            else:
+                print(f"[TASK_LOADER] Natural language processing failed: {nl_result.get('error', 'Unknown error')}")
+                return False
+                
+        except Exception as e:
+            print(f"Error processing natural language task: {e}")
+            return False
+    
     def _parse_task_file(self, content: str, task_path: Path) -> Dict[str, Any]:
-        """Parse task file with YAML frontmatter."""
+        """Parse task file with YAML frontmatter or natural language."""
         import re
         
         # Default task data
@@ -1028,10 +1139,55 @@ class TEFOrchestrator:
                     if task_data.get('subtasks') and len(task_data.get('subtasks', [])) > 0:
                         task_data["type"] = "parent"
                     
-                    print(f"[TASK_LOADER] Parsed task: {task_data.get('id')} - type: {task_data.get('type')} - subtasks: {len(task_data.get('subtasks', []))}")
+                    print(f"[TASK_LOADER] Parsed YAML task: {task_data.get('id')} - type: {task_data.get('type')} - subtasks: {len(task_data.get('subtasks', []))}")
                     
             except Exception as e:
                 print(f"Warning: Could not parse YAML frontmatter: {e}")
+        else:
+            # Phase 6.4: Handle natural language task specification
+            if NATURAL_LANGUAGE_PARSER_AVAILABLE:
+                try:
+                    print(f"[TASK_LOADER] Processing natural language task from {task_path.name}")
+                    
+                    # Parse natural language content
+                    nl_engine = NaturalLanguageTaskEngine(str(self.state_manager.state_dir), "tasks")
+                    nl_result = nl_engine.process_natural_language_input(content, task_path.stem)
+                    
+                    if nl_result.get("status") == "success":
+                        # Extract structured data from natural language processing
+                        task_spec = nl_result["task_specification"]
+                        
+                        # Update task data with natural language parsing results
+                        task_data.update({
+                            "id": task_spec["id"],
+                            "title": task_spec["title"],
+                            "type": task_spec["type"],
+                            "priority": task_spec["priority"],
+                            "estimated_effort": task_spec["estimated_effort"],
+                            "source": "natural_language",
+                            "nl_processing_result": nl_result,
+                            "requirements": task_spec.get("requirements_count", 0),
+                            "acceptance_criteria": task_spec.get("acceptance_criteria_count", 0),
+                            "constraints": task_spec.get("constraints_count", 0),
+                            "identified_domains": task_spec.get("identified_domains", []),
+                            "technologies": task_spec.get("technologies", [])
+                        })
+                        
+                        print(f"[TASK_LOADER] Parsed natural language task: {task_data.get('id')} - type: {task_data.get('type')} - confidence: {nl_result.get('parsing_insights', {}).get('confidence_score', 'N/A')}")
+                        
+                        # Show parsing insights
+                        insights = nl_result.get("parsing_insights", {})
+                        if insights.get("ambiguity_indicators"):
+                            print(f"[TASK_LOADER] Ambiguity detected: {', '.join(insights['ambiguity_indicators'])}")
+                        if insights.get("suggested_clarifications"):
+                            print(f"[TASK_LOADER] Suggestions: {'; '.join(insights['suggested_clarifications'])}")
+                    else:
+                        print(f"[TASK_LOADER] Natural language processing failed: {nl_result.get('error', 'Unknown error')}")
+                        
+                except Exception as e:
+                    print(f"[TASK_LOADER] Error in natural language processing: {e}")
+            else:
+                print(f"[TASK_LOADER] Natural language parser not available, treating as plain text task")
         
         return task_data
     
@@ -1196,8 +1352,17 @@ class TEFOrchestrator:
             timeout_seconds = task.get('policy', {}).get('timeout_seconds', 60)
             
             def execute_act():
+                # Phase 6.2: Use communicating agents if available
+                if self.communicating_agents and "executor" in self.communicating_agents:
+                    enhanced_context = {
+                        "timestamp": datetime.now().isoformat(),
+                        "depth": depth,
+                        "iteration": self.current_iteration,
+                        "run_id": self.run_id
+                    }
+                    return self.communicating_agents["executor"].execute_task_with_communication(task, enhanced_context)
                 # Phase 6.1: Use enhanced templating if available
-                if self.enhanced_agent_invoker:
+                elif self.enhanced_agent_invoker:
                     enhanced_context = {
                         "timestamp": datetime.now().isoformat(),
                         "depth": depth,
@@ -1829,6 +1994,27 @@ RECOMMENDED_ACTION: Human review required"""
                 print(f"Reached maximum iterations ({self.max_iterations})")
             
             print(f"\nOrchestrator completed after {self.current_iteration} iterations")
+            
+            # Phase 6.3: Run self-improvement cycle
+            if self.self_improvement_engine:
+                print(f"[LEARNING] Running self-improvement cycle...")
+                try:
+                    history = self.state_manager.read_state("execution_history.json")
+                    execution_history = history.get("executions", [])
+                    
+                    if execution_history:
+                        improvement_result = self.self_improvement_engine.perform_self_improvement(execution_history)
+                        print(f"[LEARNING] Self-improvement completed: {improvement_result.get('status')}")
+                        
+                        learning_summary = improvement_result.get('learning_summary', {})
+                        if learning_summary.get('key_insights', 0) > 0:
+                            print(f"[LEARNING] Generated {learning_summary['key_insights']} insights and {learning_summary['recommendations_generated']} recommendations")
+                    else:
+                        print(f"[LEARNING] No execution history available for learning")
+                        
+                except Exception as e:
+                    print(f"[LEARNING] Self-improvement cycle failed: {e}")
+            
             return True
             
         except KeyboardInterrupt:
@@ -1846,8 +2032,11 @@ def main():
     )
     parser.add_argument(
         "--task", 
-        required=True, 
         help="Path to task specification file"
+    )
+    parser.add_argument(
+        "--natural-language", "--nl",
+        help="Natural language task description (alternative to --task)"
     )
     parser.add_argument(
         "--state-dir", 
@@ -1868,6 +2057,13 @@ def main():
     
     args = parser.parse_args()
     
+    # Validate arguments
+    if not args.task and not args.natural_language:
+        parser.error("Either --task or --natural-language must be provided")
+    
+    if args.task and args.natural_language:
+        parser.error("Cannot specify both --task and --natural-language")
+    
     # Create orchestrator
     orchestrator = TEFOrchestrator(
         state_dir=args.state_dir,
@@ -1879,12 +2075,19 @@ def main():
         print("Clearing previous state...")
         orchestrator.state_manager.clear_state()
     
-    # Load task file
-    if not orchestrator.load_task_from_file(args.task):
-        print("Failed to load task file. Exiting.")
-        sys.exit(1)
-    
-    print(f"Loaded task from: {args.task}")
+    # Load task - either from file or natural language
+    if args.task:
+        # Load from task file
+        if not orchestrator.load_task_from_file(args.task):
+            print("Failed to load task file. Exiting.")
+            sys.exit(1)
+        print(f"Loaded task from: {args.task}")
+    else:
+        # Process natural language input
+        if not orchestrator.load_task_from_natural_language(args.natural_language):
+            print("Failed to process natural language task. Exiting.")
+            sys.exit(1)
+        print(f"Processed natural language task: {args.natural_language[:100]}{'...' if len(args.natural_language) > 100 else ''}")
     
     # Run orchestrator
     success = orchestrator.run_main_loop()
