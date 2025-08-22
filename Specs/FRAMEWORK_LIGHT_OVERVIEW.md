@@ -33,96 +33,44 @@ Every adaptation considers:
 
 ## Architecture
 
-### Directory Structure
-```
-project/
-  user_intent/           # Immutable, human-authored
-    project.json         # Original task tree
-    amendments/          # Clarifications added during execution
-    
-  working_plan/          # Agent-modified, evolving
-    current.json         # The living task tree (entire project)
-    
-  environment/           # The actual repo being modified
-    [project files]
-```
+### Core Components
 
-### Task Tree Format
-Single JSON file representing the entire project:
+The framework consists of three main directories:
+- **user_intent/**: Immutable, human-authored specifications
+- **working_plan/**: Agent-modified, evolving task tree
+- **environment/**: The actual repository being modified
 
-```json
-{
-  "id": "uuid-generated",
-  "type": "parent",
-  "description": "Build a REST API for user management",
-  "failure_threshold": 0.0,
-  "children": [
-    {
-      "id": "uuid-generated",
-      "type": "atomic",
-      "description": "Create user model with email and name fields",
-      "failure_threshold": 0.3
-    },
-    {
-      "id": "uuid-generated",
-      "type": "parent",
-      "description": "Implement CRUD endpoints",
-      "failure_threshold": 0.0,
-      "children": [...]
-    }
-  ]
-}
-```
+### Task Tree Structure
+
+A single JSON file represents the entire project as a hierarchical tree of tasks. Each task has:
+- Unique ID and type (parent or atomic)
+- Natural language description
+- Failure threshold for adaptive retry handling
+- Children tasks (for parent nodes)
 
 ## The Core Loop
 
-```python
-def execute_framework(task_tree_path, environment_path):
-    tree = load_task_tree(task_tree_path)
-    
-    while has_pending_tasks(tree):
-        task = find_next_task(tree)  # Depth-first traversal
-        
-        # Act (atomic tasks only)
-        if task.type == "atomic":
-            result = sdk_call("executor", task)
-            git_commit(f"ACT: {task.id}")
-        
-        # Assess (all tasks, with full context)
-        # Multiple perspectives gather facts, not decisions:
-        # - Build: compilation, technical feasibility
-        # - Requirements: alignment with acceptance criteria  
-        # - Integration: compatibility with system context
-        # - Quality: code standards, maintainability
-        observations = sdk_call("assessor", {
-            "task": task,
-            "result": result if atomic else None,
-            "entire_tree": tree,
-            "perspectives": ["build", "requirements", "integration", "quality"]
-        })
-        
-        # Adapt (can modify entire tree)
-        # Navigator searches for optimal path modifications
-        tree = sdk_call("navigator", {
-            "task": task,
-            "observations": observations,
-            "entire_tree": tree,
-            "user_intent": load_immutable_intent()
-        })
-        
-        save_task_tree(tree)
-        git_commit(f"ADAPT: {task.id}")
-```
+The framework executes a continuous Act→Assess→Adapt cycle:
 
-## SDK Agent Contracts
+1. **Act Phase** (atomic tasks only): Execute changes to the environment
+2. **Assess Phase** (all tasks): Gather observations from multiple perspectives
+   - Build: compilation, technical feasibility
+   - Requirements: alignment with acceptance criteria
+   - Integration: compatibility with system context
+   - Quality: code standards, maintainability
+3. **Adapt Phase** (all tasks): Navigator searches for optimal path modifications
 
-Three pure functions with structured I/O:
+Each phase results in a git commit, providing complete traceability of both execution and planning evolution.
 
-- **Executor**: `Task → ExecutionResult` - Performs actual environment changes
-- **Assessor**: `(Task, Result, Tree) → Observations` - Gathers facts from multiple perspectives
-- **Navigator**: `(Task, Observations, Tree, Intent) → ModifiedTree` - Searches for optimal path forward
+## Agent Architecture
 
-All agents use the Claude SDK with JSON output format for reliable structured responses.
+Three pure functions orchestrate the framework:
+
+- **Executor**: Performs actual environment changes (atomic tasks only)
+- **Assessor**: Gathers facts from multiple perspectives without making decisions
+- **Navigator**: Searches for optimal path forward, modifying the plan based on observations
+
+All agents use structured I/O via the Claude SDK for reliable, deterministic behavior.
 
 ### Observer Philosophy
 Assessors employ observers that emit state, not decisions:
@@ -155,14 +103,13 @@ The Navigator searches for optimal path modifications:
 - **Complete traceability**: Git history shows both execution and plan evolution
 - **No external state**: Everything is in the task tree
 
-## Implementation Simplicity
+## Design Principles
 
-Target: ~200 lines of Python
-- Direct SDK calls (no complex agent templates)
-- Single JSON file for entire project
-- Natural language as specification
-- No parallel execution complexity (emerges from siblings)
-- No elaborate state management
+- **Simplicity over complexity**: Minimal implementation (~200 lines)
+- **Natural language specifications**: Tasks described in plain English
+- **Everything in the tree**: No external state or databases
+- **Continuous reconciliation**: Reality shapes the plan as much as the plan shapes reality
+- **Complete observability**: Every decision and action tracked via git
 
 ## Benefits
 

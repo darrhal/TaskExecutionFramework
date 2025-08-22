@@ -322,7 +322,7 @@ Each task should be its own file, I think. But maybe not. I guess we could just 
 Let's call it there for now. Take these final comments and write out the spec, but not so detailed that it will give me a headache.
 
 
-
+Good. Now I want you to review the document and pull out anything that's more detailed technical implementation plans, and move them to a new .md for that. Retain some semblence of a high-level description, but details sucha s code examples do not belong in the overview doc.
 
 
 
