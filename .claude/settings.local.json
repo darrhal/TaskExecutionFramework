@@ -4,7 +4,11 @@
       "WebFetch(domain:docs.anthropic.com)",
       "WebFetch(domain:docs.anthropic.com)",
       "WebFetch(domain:docs.anthropic.com)",
-      "WebSearch"
+      "WebSearch",
+      "Bash(mkdir:*)",
+      "Bash(python:*)",
+      "Bash(where python)",
+      "Bash(\"C:\\Users\\dhalz\\AppData\\Local\\Microsoft\\WindowsApps\\python.exe\" tef_orchestrator.py --task tasks/hello_world.md --clear-state)"
     ],
     "deny": [],
     "ask": []

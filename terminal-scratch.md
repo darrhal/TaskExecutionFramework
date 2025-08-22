@@ -228,8 +228,7 @@ We've made a lot of progress refining the Specs/FRAMEWORK_OVERVIEW.md document. 
 
 
 
-Let's start executing Phase 1 of the plan found at Prototype/Implementation_plan.md. Read and understand the FRAMEWORK_OVERVIEW.md file, and the rest of the documents in the Prototype folder. Think hard about what you're doing, and let me know if you need any clarifications, or are done with Phase 1.
-
+Let's start executing Phase 1 of the plan found at Prototype/Implementation_plan.md. Read and understand the Specs/FRAMEWORK_OVERVIEW.md file, and the rest of the documents in the Prototype folder. Think hard about what you're doing, and let me know if you need any clarifications.
 
 
 
