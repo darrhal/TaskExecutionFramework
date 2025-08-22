@@ -251,6 +251,75 @@ Check off the tasks in the plan if they are done
 We've detailed some concepts around an agential task execution framework, which you can see in FRAMEWORK_OVERVIEW.md. We also implemented a prototype as seen in the /Prototype1 folder. Don't bother looking through how it was implemented, but it might be worth seeing the plan that was created and followed: Implementation_plan.md. This ended up being too complicated. It should have been a much simpler framework to really test-drive the workflow. Let's iterate together on a new plan that really captures the essence of the workflow, but is simple enough to review and digest at a high level. Think hard about ways we could reduce the surface area of this light prototype, while keeping the core concepts in place. I'm wondering if we can accomplish this with a simple sub-agent architecture. And the observers and pathfinder strategists are just a list of instructions to be followed on a one-pass call to a sub-agent.
 
 
+No testing. I said to not look at how it was implemented. I said we should iterate together, not jump into it like a hyper piece of shit.
+
+
+
+We need different observer types, but we will get that by listing out a set of instructions for a single sub-agent to  review it from those vantage points
+If you mean git commits, I definitely want to keep the state persistence between runs. But you must mean something else?
+Yes I think we need to keep the task queue system, because I think if we really nail that down, it will actually be the simplest way to do it
+
+
+
+
+1) yes mostly. But it would have potentially more/better detail. Which is easy enough to add/tweak later once the structure is there.
+2) Ok, yes, I want all the run/history tracking. It doesn't seem like it would be that hard. Do a task, follow the flow, which includes logging history and git commits, as detailed. All those parts of the flow should stay.
+
+The core loop description is really good. I LOVE the "pop the task" comment. But 4 needs to be deeper. I wonder if what I've been trying to discover here is just that we probably can get reasonbly close, and, hopefully, pretty reliable, implementation of loops and hierarchical task management, by just managing a task queue...and...that it?? So for instance, for step 4, if I want to make that more robust, I could have the instructions for the agent be to create and enqueue a list of 4 tasks at the start of the tasks queue. I could even have natural language control flow such as "if the configuration indicates deep analysis, write out all 4, otherwise just the 2 main ones". So this step 4 is really critical, but maybe the simplicity of this approach (or some other ideas you have - this is one of the big things I'm asking you for) allows us to figure this out later. One key missing piece now though is, how do we communicate between the sub-agent calls? In other words, many of them will be instructed, via a prompt, to return some result, such as their analysis, in, hopefully, some structured format (such as our errors/warnings for the observers, for example). And others will be asked to "do" something, but even in those cases, we'd probably want some sort of feedback after completion. Including maybe specific pointers to what changed, but it doesn't really matter, the point is, there needs to be a mechanism to have the sub-agent calls effectively as as a function call. It's very analagous to the .NET Task and Task<T> class, in that we really always return **something**. Maybe the sub-agent spec supports this? Otherwise, we're back to using the sdk, but i just don't think we need that to start, even if we have to hack something for the prototype.
+Maybe what I'm realizing here is that we could probably do a pretty good job of demonstrating this flow using just a handful of agent/.md files or whatever they're stored in, if these fundamental criteria turn out to have a solution to. I guess that's simply, "how do we call sub-agents, as if they are functions, and have them reliably return data in a structure/format we expect?"
+Thoughts? I think I'd like to move forward with you really trying to guide me through the process of refining this conceptualization. Lead me. What do you thing? What are the key concepts to my rambling? Do you think there is something here? Be honest.
+
+
+
+
+Right, the queueu is the control flow. But the agent calls making decisions about how to change the queue is then the real control flow.
+And see, this is the part I think we really need to dive into now: does the sub-agent spec support and sort of standard with for input/output? Or should be standardize on the sdk? Overall, that seems like the leading approach. Or should we make an MCP? I don't think so, but this is all closely related. I defintely don't want to re-invent any wheel here. I want you to research this. 
+
+And for sure, the queue itself should be committed. That's the "Git commit after EVERY action AND after EVERY plan change" decision.
+
+
+
+What is the "The Task tool we have available"? Our thing we designed? Or something else? Just curious. I'm 100% sold on the sdk approach. What should we think through next? I'm not ready to dive into implementing.
+
+
+
+
+I've stressed this many times in our conversations, and will here again: The most fundamental piece of this, other than the basic loop/flow, is deep, thorough, frequent re-evaluation of the "plan" (which is what our task queue with pointers etc is), from multiple angles. In fact - slight deviation - maybe queue isn't the right data structure. I mean, what we're talking about here is implement a data structure (currently a queue) on disk, with pointers or names or something. But no, I want this to be a hierarchy of tasks, including the ability to define "composite tasks" (this description doesn't seem right - let's clean it up) that basically state that they can be executed in parallel.
+So yeah, your "basic queue operations" is on the right track, but it should be...what data structure?
+You're asking about "how minimal can we make tasks while still being useful". I feel like all we're trying to do at this point - literally - is mimic a pure function call with input/output contract, whatever we would do if we were explicitly coding it up. I think we should focus in on this part right now, and leave the specific algorithms for deep observation and deep "pathfinder" implementation until later - just minimally stubbed out for now, but with the framework in place to implement whatever we want later. So let's do that. But first, please re-read the FRAMEWORK_OVERVIEW.md file, to make sure you are in touch with the real, true, key concepts, and why they are key.
+
+
+
+
+############################################################
+############################################################
+############################################################
+
+Maybe there is no parallel task. We just need the children to be a List<Task> or List<Task[]>? I guess your pseudo code is just one way of realizing that.
+Key point here: there is no spec. The plan **is** the spec, and this spec/plan, the entire thing (including the completed tasks) is the thing that explictly and/or implicitly captures everything about what the goal is and how it's currently planned on being achieved. And this entire structure should be reviewed, thoroughly and completely, every..single...time.
+
+And I'm not sure context applies. The repo/folder is the context, is the environment. It probably can be "implicitly" passed in the main execute task method, but outside of that, this all should be conceptualized as stateless, pure functions. Plus the Task definition is a definition, not a function anyways.
+
+And I just had another realization. To make the "retry" feature a little easier to manage, let's make it softer than passing in "attempts". We should instead do something more like "failure...threshold??...failure bar??"...something that we raise after essentially retrying things, to the extent that it indicates something more major, outside of our task, needs to change, in order to stop running into the same/similar walls...
+
+And again, the execute_agent call (this is the execute task call from our concepts, yes/no?) should just take the task, and implicitly, needs to be called within the context of an "environment".
+
+
+############################################################
+############################################################
+############################################################
+
+
+
+
+This is getting close, and I really want to see what this would actually look like in a runnable implementation, even if the sdk calls are just stubbed out at first. But we also should note that we really need to include some ability to retain all original user intent - in a read-only immutable folder probably. That should be simple enough to do - the initial user-initiation of the agent involves creating this task hierarchy, calling the agent by pointing to its location on disk, then the agent copies it to some "internal" folder (probably alongside it, but the main point is it's for the agent, not a human, to modify). I also really want a way to be able to pause the execution of the agent and add details to the immutable/human-intent area, before continuing. We can figure out how to pause it later, but I think that points to the need to be able to capture the user-provided "plan" in the same format as the agent plan/task-tree specification. Maybe we would plan to have step 0 of the project process be to build up a plan in whatever format makes sense (one .md with actual task/check box hierarchies, or whatever), and we have claude code or some model or agent help us get it into the correct technical structure (we may need something like that anyways as a form of enforcing structure?)
+This threshold thing should be 0-100%.
+I still think we need to define a format for defining a task tree on disk. Seems like that would be a simple exercise for you.
+I'm not feeling confident that you're really grasping the full scope of what we're trying to accomplish here. Now might be the time to write out a spec for what we really are trying to do here with the second prototype. Please try to capture this all at a high level, but that includes the important concepts from the original spec, and the things we've talked about here today.
+
+
+Each task should be its own file, I think. But maybe not. I guess we could just view it as the whole project serialized to json. I think maybe the id should be system-generated though. Not sure if we need a status.
+Let's call it there for now. Take these final comments and write out the spec, but not so detailed that it will give me a headache.
 
 
 
