@@ -126,6 +126,206 @@ class TaskQueue:
             return False
 
 
+class ObserverOrchestrator:
+    """Orchestrates parallel observer execution for the Assess phase."""
+    
+    def __init__(self, agent_invoker, enabled_observers=None):
+        self.agent_invoker = agent_invoker
+        self.enabled_observers = enabled_observers or [
+            "build_observer",
+            "requirements_observer", 
+            "quality_observer",
+            "integration_observer"
+        ]
+    
+    def gather_observations(self, execution_result: Dict[str, Any], task: Dict[str, Any]) -> Dict[str, Any]:
+        """Gather observations from all enabled observers."""
+        print(f"[OBSERVERS] Running {len(self.enabled_observers)} observers in parallel")
+        
+        observations = []
+        observer_results = {}
+        
+        # In Phase 3, we simulate parallel observer execution
+        # In a real implementation, this would invoke multiple Task tools concurrently
+        for observer_name in self.enabled_observers:
+            try:
+                print(f"[OBSERVER] Invoking {observer_name}")
+                
+                # Load observer instructions
+                instructions = self.agent_invoker.load_agent_instructions(observer_name)
+                if not instructions:
+                    print(f"Warning: Could not load instructions for {observer_name}")
+                    continue
+                
+                # Simulate observer execution
+                observation = self._simulate_observer(observer_name, execution_result, task, instructions)
+                
+                observations.append(observation)
+                observer_results[observer_name] = observation
+                
+                print(f"[OBSERVER] {observer_name} completed with status: {observation.get('status')}")
+                
+            except Exception as e:
+                print(f"Error running observer {observer_name}: {e}")
+                observations.append({
+                    "observer_type": observer_name,
+                    "status": "error",
+                    "error": str(e),
+                    "confidence": 0.0
+                })
+        
+        # Aggregate observations
+        aggregated_assessment = self._aggregate_observations(observations, execution_result)
+        
+        return aggregated_assessment
+    
+    def _simulate_observer(self, observer_name: str, execution_result: Dict[str, Any], 
+                          task: Dict[str, Any], instructions: str) -> Dict[str, Any]:
+        """Simulate observer behavior for Phase 3 testing."""
+        
+        # Simulate different observer perspectives
+        if observer_name == "build_observer":
+            return {
+                "observer_type": "build",
+                "status": "pass",
+                "confidence": 0.9,
+                "observations": [
+                    {
+                        "category": "syntax_validation",
+                        "status": "pass",
+                        "message": "No syntax errors detected in created files",
+                        "evidence": {
+                            "type": "analysis",
+                            "details": "Simulated syntax validation completed successfully"
+                        },
+                        "severity": "low"
+                    }
+                ],
+                "summary": "Technical execution appears successful",
+                "perspective_notes": "Build observer found no compilation or syntax issues",
+                "agent_instructions_used": bool(instructions)
+            }
+            
+        elif observer_name == "requirements_observer":
+            return {
+                "observer_type": "requirements",
+                "status": "pass",
+                "confidence": 0.85,
+                "observations": [
+                    {
+                        "category": "acceptance_criteria",
+                        "status": "pass",
+                        "message": "Primary acceptance criteria appear satisfied",
+                        "evidence": {
+                            "type": "analysis",
+                            "details": "Simulated requirements checking completed"
+                        },
+                        "severity": "low"
+                    }
+                ],
+                "summary": "Requirements alignment looks good",
+                "perspective_notes": "Requirements observer found good alignment with specifications",
+                "agent_instructions_used": bool(instructions)
+            }
+            
+        elif observer_name == "quality_observer":
+            return {
+                "observer_type": "quality",
+                "status": "warning",
+                "confidence": 0.7,
+                "observations": [
+                    {
+                        "category": "documentation",
+                        "status": "warning",
+                        "message": "Some documentation gaps identified",
+                        "evidence": {
+                            "type": "analysis",
+                            "details": "Simulated quality analysis found minor issues"
+                        },
+                        "severity": "medium"
+                    }
+                ],
+                "summary": "Code quality acceptable with minor issues",
+                "perspective_notes": "Quality observer found room for improvement in documentation",
+                "recommendations": ["Add more comprehensive docstrings", "Include usage examples"],
+                "agent_instructions_used": bool(instructions)
+            }
+            
+        elif observer_name == "integration_observer":
+            return {
+                "observer_type": "integration",
+                "status": "pass",
+                "confidence": 0.8,
+                "observations": [
+                    {
+                        "category": "task_boundaries",
+                        "status": "pass",
+                        "message": "Task scope appropriate for hierarchy level",
+                        "evidence": {
+                            "type": "analysis",
+                            "details": "Simulated integration analysis completed"
+                        },
+                        "severity": "low"
+                    }
+                ],
+                "summary": "Good integration with system context",
+                "perspective_notes": "Integration observer found good compatibility",
+                "agent_instructions_used": bool(instructions)
+            }
+        
+        # Default observer response
+        return {
+            "observer_type": observer_name,
+            "status": "unknown",
+            "confidence": 0.5,
+            "observations": [],
+            "summary": f"Simulated {observer_name} execution",
+            "agent_instructions_used": bool(instructions)
+        }
+    
+    def _aggregate_observations(self, observations: List[Dict[str, Any]], 
+                              execution_result: Dict[str, Any]) -> Dict[str, Any]:
+        """Aggregate multiple observer reports into overall assessment."""
+        
+        # Calculate overall status
+        statuses = [obs.get("status", "unknown") for obs in observations]
+        
+        # Determine overall status using priority: fail > warning > pass > unknown
+        if "fail" in statuses:
+            overall_status = "fail"
+        elif "warning" in statuses:
+            overall_status = "warning"  
+        elif "pass" in statuses:
+            overall_status = "pass"
+        else:
+            overall_status = "unknown"
+        
+        # Calculate average confidence
+        confidences = [obs.get("confidence", 0.5) for obs in observations if obs.get("confidence")]
+        avg_confidence = sum(confidences) / len(confidences) if confidences else 0.5
+        
+        # Collect all specific observations
+        all_observations = []
+        for observer_report in observations:
+            observer_observations = observer_report.get("observations", [])
+            for obs in observer_observations:
+                obs["observer_source"] = observer_report.get("observer_type", "unknown")
+            all_observations.extend(observer_observations)
+        
+        return {
+            "execution_id": execution_result.get("task_id"),
+            "overall_status": overall_status,
+            "confidence": round(avg_confidence, 2),
+            "observer_count": len(observations),
+            "observers_run": [obs.get("observer_type") for obs in observations],
+            "observations": all_observations,
+            "observer_reports": observations,
+            "assessment_summary": f"Assessment from {len(observations)} observers: {overall_status}",
+            "assessed_at": datetime.now().isoformat(),
+            "phase": "Phase 3 - Observer System Implementation"
+        }
+
+
 class AgentInvoker:
     """Handles invocation of Claude Code Task tool agents."""
     
@@ -247,6 +447,7 @@ class TEFOrchestrator:
         self.state_manager = StateManager(state_dir)
         self.task_queue = TaskQueue(self.state_manager)
         self.agent_invoker = AgentInvoker(self.state_manager)
+        self.observer_orchestrator = ObserverOrchestrator(self.agent_invoker)
         self.max_iterations = max_iterations
         self.current_iteration = 0
         self.run_id = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -309,27 +510,14 @@ class TEFOrchestrator:
         
         return enhanced_result
     
-    def assess_execution(self, execution_result: Dict[str, Any]) -> Dict[str, Any]:
-        """Assess execution results (Assess phase - simplified for Phase 1)."""
-        print(f"[ASSESS] Assessing execution result")
+    def assess_execution(self, execution_result: Dict[str, Any], task: Dict[str, Any]) -> Dict[str, Any]:
+        """Assess execution results (Assess phase - enhanced for Phase 3)."""
+        print(f"[ASSESS] Assessing execution result with multiple observers")
         
-        # For Phase 1, we'll just simulate assessment
-        # In Phase 3, this will invoke multiple observer agents
-        assessment = {
-            "execution_id": execution_result.get("task_id"),
-            "overall_status": "pass",
-            "observations": [
-                {
-                    "observer": "build_observer",
-                    "status": "pass",
-                    "message": "Task executed without errors",
-                    "simulated": True
-                }
-            ],
-            "assessed_at": datetime.now().isoformat()
-        }
+        # Phase 3: Use observer orchestrator for multi-perspective assessment
+        assessment = self.observer_orchestrator.gather_observations(execution_result, task)
         
-        # Write observations
+        # Write observations to state
         self.state_manager.write_state("observations.json", assessment)
         
         return assessment
@@ -381,7 +569,7 @@ class TEFOrchestrator:
                 execution_result = self.execute_task(current_task)
                 
                 # Assess: Evaluate the execution
-                assessment = self.assess_execution(execution_result)
+                assessment = self.assess_execution(execution_result, current_task)
                 
                 # Adapt: Decide next action
                 decision = self.adapt_plan(assessment)
