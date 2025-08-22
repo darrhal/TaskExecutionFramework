@@ -1,0 +1,55 @@
+{
+  "id": "create-hello-app",
+  "type": "parent",
+  "description": "Create a simple hello world application with tests",
+  "status": "pending",
+  "failure_threshold": 0.0,
+  "children": [
+    {
+      "id": "setup-structure",
+      "type": "parent", 
+      "description": "Set up basic project structure",
+      "status": "pending",
+      "failure_threshold": 0.0,
+      "children": [
+        {
+          "id": "create-main-file",
+          "type": "atomic",
+          "description": "Create hello.py with main function",
+          "status": "pending",
+          "failure_threshold": 0.0
+        },
+        {
+          "id": "create-test-file",
+          "type": "atomic", 
+          "description": "Create test_hello.py with basic test",
+          "status": "pending",
+          "failure_threshold": 0.0
+        }
+      ]
+    },
+    {
+      "id": "add-features",
+      "type": "parent",
+      "description": "Add additional features",
+      "status": "pending", 
+      "failure_threshold": 0.0,
+      "children": [
+        {
+          "id": "add-name-parameter",
+          "type": "atomic",
+          "description": "Add optional name parameter to hello function",
+          "status": "pending",
+          "failure_threshold": 0.0
+        },
+        {
+          "id": "add-documentation",
+          "type": "atomic",
+          "description": "Add docstrings and comments",
+          "status": "pending",
+          "failure_threshold": 0.0
+        }
+      ]
+    }
+  ]
+}
