@@ -35,8 +35,8 @@ Claude Code's Task tool already provides the ability to delegate complex work to
 └─────────────────────────────────────────┘
                     ↓
         ┌──────────────────────┐
-        │   Act→Assess→Adapt    │
-        │       Loop            │
+        │   Act→Assess→Adapt   │
+        │       Loop           │
         └──────────────────────┘
            ↓        ↓        ↓
     ┌──────────┬────────┬──────────┐
