@@ -1,27 +1,23 @@
 {
-  "id": "create-hello-app",
-  "type": "parent",
+  "id": "a7f8e3d9-4b2c-11ef-8e7a-0242ac130003",
   "description": "Create a simple hello world application with tests",
   "status": "pending",
   "failure_threshold": 0.0,
   "children": [
     {
-      "id": "setup-structure",
-      "type": "parent", 
+      "id": "b9e4f5a2-4b2c-11ef-8e7a-0242ac130003",
       "description": "Set up basic project structure",
       "status": "pending",
       "failure_threshold": 0.0,
       "children": [
         {
-          "id": "create-main-file",
-          "type": "atomic",
+          "id": "c1d6e7b8-4b2c-11ef-8e7a-0242ac130003",
           "description": "Create hello.py with main function",
           "status": "pending",
           "failure_threshold": 0.0
         },
         {
-          "id": "create-test-file",
-          "type": "atomic", 
+          "id": "d3f8a9c4-4b2c-11ef-8e7a-0242ac130003",
           "description": "Create test_hello.py with basic test",
           "status": "pending",
           "failure_threshold": 0.0
@@ -29,22 +25,19 @@
       ]
     },
     {
-      "id": "add-features",
-      "type": "parent",
+      "id": "e5b1c2d6-4b2c-11ef-8e7a-0242ac130003",
       "description": "Add additional features",
       "status": "pending", 
       "failure_threshold": 0.0,
       "children": [
         {
-          "id": "add-name-parameter",
-          "type": "atomic",
+          "id": "f7d4e5a8-4b2c-11ef-8e7a-0242ac130003",
           "description": "Add optional name parameter to hello function",
           "status": "pending",
           "failure_threshold": 0.0
         },
         {
-          "id": "add-documentation",
-          "type": "atomic",
+          "id": "g9f6h7b2-4b2c-11ef-8e7a-0242ac130003",
           "description": "Add docstrings and comments",
           "status": "pending",
           "failure_threshold": 0.0

@@ -26,7 +26,7 @@ def execute_task(task_tree, environment):
         task = find_next_task(task_tree)
         
         # Act (atomic only)
-        if task and task["type"] == "atomic":
+        if task and not task.get("children"):
             result = execute(task)
             commit(f"ACT: {task['id']}")
         
