@@ -1,0 +1,923 @@
+{
+  "checkpoints": {
+    "system_initialization": {
+      "name": "system_initialization",
+      "timestamp": "2025-08-22T13:04:31.960722",
+      "run_id": "20250822_130431",
+      "iteration": 0,
+      "state_snapshot": {
+        "task_queue": {
+          "tasks": [
+            {
+              "id": "template-test-001",
+              "title": "Enhanced Template System Test",
+              "type": "atomic",
+              "content": "# Enhanced Template System Test\n\nThis task tests the Phase 6.1 enhanced natural language templating system.\n\n## Purpose\n\nValidate that the enhanced templating system provides:\n\n1. **Variable Substitution**: Dynamic content based on task context\n2. **Conditional Instructions**: Adaptive behavior based on conditions\n3. **Context Injection**: Rich context awareness in agents\n4. **Template Inheritance**: Reusable template components\n\n## Test Scenarios\n\n### Variable Substitution\n- Task ID, title, and metadata should be properly substituted\n- Timestamp and execution context should be injected\n- Depth and iteration information should be available\n\n### Conditional Logic\n- Different instructions based on task type (atomic vs parent)\n- Adaptive behavior based on execution depth\n- Special handling for retry scenarios\n\n### Context Awareness\n- Agent should have access to full execution context\n- Previous execution history should inform current behavior\n- Environment state should influence decision making\n\n## Expected Behavior\n\nThe enhanced template system should:\n1. Load the enhanced executor agent template\n2. Process all template variables and conditionals\n3. Generate context-aware instructions\n4. Execute with improved awareness and adaptability\n5. Document the template features used\n\n## Success Criteria\n\n- [x] Enhanced template is loaded and processed\n- [x] Variables are substituted correctly\n- [x] Conditional blocks execute appropriately  \n- [x] Context injection provides rich information\n- [x] Agent behavior shows enhanced awareness\n- [x] Template features are documented in execution results",
+              "source_file": "tasks\\template_test.md",
+              "status": "completed",
+              "created_at": "2025-08-22T12:59:21.209898",
+              "source": "user",
+              "constraints": [
+                "Must test enhanced natural language templating",
+                "Should demonstrate variable substitution",
+                "Must validate conditional instructions"
+              ],
+              "acceptance": [
+                "Template engine processes variables correctly",
+                "Conditional blocks work as expected",
+                "Context injection functions properly",
+                "Enhanced agent behavior is observable"
+              ],
+              "max_attempts": 2,
+              "max_depth": 2,
+              "timeout_seconds": 30,
+              "completed_at": "2025-08-22T12:59:21.650470"
+            },
+            {
+              "id": "template-test-001",
+              "title": "Enhanced Template System Test",
+              "type": "atomic",
+              "content": "# Enhanced Template System Test\n\nThis task tests the Phase 6.1 enhanced natural language templating system.\n\n## Purpose\n\nValidate that the enhanced templating system provides:\n\n1. **Variable Substitution**: Dynamic content based on task context\n2. **Conditional Instructions**: Adaptive behavior based on conditions\n3. **Context Injection**: Rich context awareness in agents\n4. **Template Inheritance**: Reusable template components\n\n## Test Scenarios\n\n### Variable Substitution\n- Task ID, title, and metadata should be properly substituted\n- Timestamp and execution context should be injected\n- Depth and iteration information should be available\n\n### Conditional Logic\n- Different instructions based on task type (atomic vs parent)\n- Adaptive behavior based on execution depth\n- Special handling for retry scenarios\n\n### Context Awareness\n- Agent should have access to full execution context\n- Previous execution history should inform current behavior\n- Environment state should influence decision making\n\n## Expected Behavior\n\nThe enhanced template system should:\n1. Load the enhanced executor agent template\n2. Process all template variables and conditionals\n3. Generate context-aware instructions\n4. Execute with improved awareness and adaptability\n5. Document the template features used\n\n## Success Criteria\n\n- [x] Enhanced template is loaded and processed\n- [x] Variables are substituted correctly\n- [x] Conditional blocks execute appropriately  \n- [x] Context injection provides rich information\n- [x] Agent behavior shows enhanced awareness\n- [x] Template features are documented in execution results",
+              "source_file": "tasks\\template_test.md",
+              "status": "pending",
+              "created_at": "2025-08-22T12:59:21.209898",
+              "source": "user",
+              "constraints": [
+                "Must test enhanced natural language templating",
+                "Should demonstrate variable substitution",
+                "Must validate conditional instructions"
+              ],
+              "acceptance": [
+                "Template engine processes variables correctly",
+                "Conditional blocks work as expected",
+                "Context injection functions properly",
+                "Enhanced agent behavior is observable"
+              ],
+              "max_attempts": 2,
+              "max_depth": 2,
+              "timeout_seconds": 30,
+              "acceptance_criteria": [
+                "Task objective is achieved",
+                "No errors or exceptions occur",
+                "Result meets basic quality standards"
+              ],
+              "elaboration_level": "enhanced",
+              "elaboration_history": [
+                {
+                  "level": "enhanced",
+                  "timestamp": "2025-08-22T12:59:21.222714",
+                  "context_used": [
+                    "queue_position",
+                    "working_directory",
+                    "language"
+                  ]
+                }
+              ],
+              "retry_count": 1,
+              "last_attempt_result": {
+                "task_id": "template-test-001",
+                "execution_type": "atomic",
+                "status": "failure",
+                "error": "ACT phase error: [Errno 2] No such file or directory: 'state\\\\shared_context.json'",
+                "timestamp": "2025-08-22T12:59:21.232727",
+                "orchestrator_metadata": {
+                  "run_id": "20250822_125921",
+                  "iteration": 1,
+                  "depth": 0,
+                  "task_type": "atomic",
+                  "phase": "Phase 5.4 - Error Recovery",
+                  "recovery_applied": true
+                },
+                "recovery_info": {
+                  "task_id": "template-test-001",
+                  "status": "failure",
+                  "error": "ACT phase error: [Errno 2] No such file or directory: 'state\\\\shared_context.json'",
+                  "phase": "execution",
+                  "failure_count": 1,
+                  "max_attempts": 3,
+                  "timestamp": "2025-08-22T12:59:21.229014",
+                  "recovery_action": "retry_with_backoff",
+                  "final_status": "retry_needed",
+                  "backoff_seconds": 1
+                },
+                "final_status": "retry_needed"
+              }
+            },
+            {
+              "id": "template-test-001",
+              "title": "Enhanced Template System Test",
+              "type": "atomic",
+              "content": "# Enhanced Template System Test\n\nThis task tests the Phase 6.1 enhanced natural language templating system.\n\n## Purpose\n\nValidate that the enhanced templating system provides:\n\n1. **Variable Substitution**: Dynamic content based on task context\n2. **Conditional Instructions**: Adaptive behavior based on conditions\n3. **Context Injection**: Rich context awareness in agents\n4. **Template Inheritance**: Reusable template components\n\n## Test Scenarios\n\n### Variable Substitution\n- Task ID, title, and metadata should be properly substituted\n- Timestamp and execution context should be injected\n- Depth and iteration information should be available\n\n### Conditional Logic\n- Different instructions based on task type (atomic vs parent)\n- Adaptive behavior based on execution depth\n- Special handling for retry scenarios\n\n### Context Awareness\n- Agent should have access to full execution context\n- Previous execution history should inform current behavior\n- Environment state should influence decision making\n\n## Expected Behavior\n\nThe enhanced template system should:\n1. Load the enhanced executor agent template\n2. Process all template variables and conditionals\n3. Generate context-aware instructions\n4. Execute with improved awareness and adaptability\n5. Document the template features used\n\n## Success Criteria\n\n- [x] Enhanced template is loaded and processed\n- [x] Variables are substituted correctly\n- [x] Conditional blocks execute appropriately  \n- [x] Context injection provides rich information\n- [x] Agent behavior shows enhanced awareness\n- [x] Template features are documented in execution results",
+              "source_file": "tasks\\template_test.md",
+              "status": "pending",
+              "created_at": "2025-08-22T12:59:21.209898",
+              "source": "user",
+              "constraints": [
+                "Must test enhanced natural language templating",
+                "Should demonstrate variable substitution",
+                "Must validate conditional instructions"
+              ],
+              "acceptance": [
+                "Template engine processes variables correctly",
+                "Conditional blocks work as expected",
+                "Context injection functions properly",
+                "Enhanced agent behavior is observable"
+              ],
+              "max_attempts": 2,
+              "max_depth": 2,
+              "timeout_seconds": 30,
+              "acceptance_criteria": [
+                "Task objective is achieved",
+                "No errors or exceptions occur",
+                "Result meets basic quality standards"
+              ],
+              "elaboration_level": "enhanced",
+              "elaboration_history": [
+                {
+                  "level": "enhanced",
+                  "timestamp": "2025-08-22T12:59:21.249469",
+                  "context_used": [
+                    "queue_position",
+                    "working_directory",
+                    "language"
+                  ]
+                }
+              ],
+              "retry_count": 1,
+              "last_attempt_result": {
+                "task_id": "template-test-001",
+                "execution_type": "atomic",
+                "status": "failure",
+                "error": "ACT phase error: [Errno 2] No such file or directory: 'state\\\\shared_context.json'",
+                "timestamp": "2025-08-22T12:59:21.278288",
+                "orchestrator_metadata": {
+                  "run_id": "20250822_125921",
+                  "iteration": 2,
+                  "depth": 0,
+                  "task_type": "atomic",
+                  "phase": "Phase 5.4 - Error Recovery",
+                  "recovery_applied": true
+                },
+                "recovery_info": {
+                  "task_id": "template-test-001",
+                  "status": "failure",
+                  "error": "ACT phase error: [Errno 2] No such file or directory: 'state\\\\shared_context.json'",
+                  "phase": "execution",
+                  "failure_count": 2,
+                  "max_attempts": 3,
+                  "timestamp": "2025-08-22T12:59:21.271042",
+                  "recovery_action": "retry_with_backoff",
+                  "final_status": "retry_needed",
+                  "backoff_seconds": 2
+                },
+                "final_status": "retry_needed"
+              }
+            }
+          ]
+        },
+        "execution_history": {
+          "executions": [
+            {
+              "task_id": "template-test-001",
+              "execution_type": "atomic",
+              "status": "failure",
+              "error": "ACT phase error: [Errno 2] No such file or directory: 'state\\\\shared_context.json'",
+              "timestamp": "2025-08-22T12:59:21.232727",
+              "orchestrator_metadata": {
+                "run_id": "20250822_125921",
+                "iteration": 1,
+                "depth": 0,
+                "task_type": "atomic",
+                "phase": "Phase 5.4 - Error Recovery",
+                "recovery_applied": true
+              },
+              "recovery_info": {
+                "task_id": "template-test-001",
+                "status": "failure",
+                "error": "ACT phase error: [Errno 2] No such file or directory: 'state\\\\shared_context.json'",
+                "phase": "execution",
+                "failure_count": 1,
+                "max_attempts": 3,
+                "timestamp": "2025-08-22T12:59:21.229014",
+                "recovery_action": "retry_with_backoff",
+                "final_status": "retry_needed",
+                "backoff_seconds": 1
+              },
+              "final_status": "retry_needed"
+            },
+            {
+              "task_id": "template-test-001",
+              "execution_type": "atomic",
+              "status": "failure",
+              "error": "ACT phase error: [Errno 2] No such file or directory: 'state\\\\shared_context.json'",
+              "timestamp": "2025-08-22T12:59:21.278288",
+              "orchestrator_metadata": {
+                "run_id": "20250822_125921",
+                "iteration": 2,
+                "depth": 0,
+                "task_type": "atomic",
+                "phase": "Phase 5.4 - Error Recovery",
+                "recovery_applied": true
+              },
+              "recovery_info": {
+                "task_id": "template-test-001",
+                "status": "failure",
+                "error": "ACT phase error: [Errno 2] No such file or directory: 'state\\\\shared_context.json'",
+                "phase": "execution",
+                "failure_count": 2,
+                "max_attempts": 3,
+                "timestamp": "2025-08-22T12:59:21.271042",
+                "recovery_action": "retry_with_backoff",
+                "final_status": "retry_needed",
+                "backoff_seconds": 2
+              },
+              "final_status": "retry_needed"
+            },
+            {
+              "task_id": "template-test-001",
+              "execution_type": "atomic",
+              "status": "failure",
+              "error": "ACT phase error: [Errno 2] No such file or directory: 'state\\\\shared_context.json'",
+              "timestamp": "2025-08-22T12:59:21.323952",
+              "orchestrator_metadata": {
+                "run_id": "20250822_125921",
+                "iteration": 3,
+                "depth": 0,
+                "task_type": "atomic",
+                "phase": "Phase 5.4 - Error Recovery",
+                "recovery_applied": true
+              },
+              "recovery_info": {
+                "task_id": "template-test-001",
+                "status": "failure",
+                "error": "ACT phase error: [Errno 2] No such file or directory: 'state\\\\shared_context.json'",
+                "phase": "execution",
+                "failure_count": 3,
+                "max_attempts": 3,
+                "timestamp": "2025-08-22T12:59:21.316062",
+                "recovery_action": "escalate",
+                "final_status": "max_attempts_exceeded"
+              },
+              "final_status": "max_attempts_exceeded"
+            },
+            {
+              "task_id": "template-test-001",
+              "execution_type": "atomic",
+              "status": "failure",
+              "error": "ACT phase error: [Errno 2] No such file or directory: 'state\\\\shared_context.json'",
+              "timestamp": "2025-08-22T12:59:21.369870",
+              "orchestrator_metadata": {
+                "run_id": "20250822_125921",
+                "iteration": 4,
+                "depth": 0,
+                "task_type": "atomic",
+                "phase": "Phase 5.4 - Error Recovery",
+                "recovery_applied": true
+              },
+              "recovery_info": {
+                "task_id": "template-test-001",
+                "status": "failure",
+                "error": "ACT phase error: [Errno 2] No such file or directory: 'state\\\\shared_context.json'",
+                "phase": "execution",
+                "failure_count": 4,
+                "max_attempts": 3,
+                "timestamp": "2025-08-22T12:59:21.360251",
+                "recovery_action": "escalate",
+                "final_status": "max_attempts_exceeded"
+              },
+              "final_status": "max_attempts_exceeded"
+            },
+            {
+              "task_id": "template-test-001",
+              "execution_type": "atomic",
+              "status": "failure",
+              "error": "ACT phase error: [Errno 2] No such file or directory: 'state\\\\shared_context.json'",
+              "timestamp": "2025-08-22T12:59:21.412099",
+              "orchestrator_metadata": {
+                "run_id": "20250822_125921",
+                "iteration": 5,
+                "depth": 0,
+                "task_type": "atomic",
+                "phase": "Phase 5.4 - Error Recovery",
+                "recovery_applied": true
+              },
+              "recovery_info": {
+                "task_id": "template-test-001",
+                "status": "failure",
+                "error": "ACT phase error: [Errno 2] No such file or directory: 'state\\\\shared_context.json'",
+                "phase": "execution",
+                "failure_count": 5,
+                "max_attempts": 3,
+                "timestamp": "2025-08-22T12:59:21.404110",
+                "recovery_action": "escalate",
+                "final_status": "max_attempts_exceeded"
+              },
+              "final_status": "max_attempts_exceeded"
+            },
+            {
+              "task_id": "template-test-001",
+              "execution_type": "atomic",
+              "status": "failure",
+              "error": "ACT phase error: [Errno 2] No such file or directory: 'state\\\\shared_context.json'",
+              "timestamp": "2025-08-22T12:59:21.457410",
+              "orchestrator_metadata": {
+                "run_id": "20250822_125921",
+                "iteration": 6,
+                "depth": 0,
+                "task_type": "atomic",
+                "phase": "Phase 5.4 - Error Recovery",
+                "recovery_applied": true
+              },
+              "recovery_info": {
+                "task_id": "template-test-001",
+                "status": "failure",
+                "error": "ACT phase error: [Errno 2] No such file or directory: 'state\\\\shared_context.json'",
+                "phase": "execution",
+                "failure_count": 6,
+                "max_attempts": 3,
+                "timestamp": "2025-08-22T12:59:21.448609",
+                "recovery_action": "escalate",
+                "final_status": "max_attempts_exceeded"
+              },
+              "final_status": "max_attempts_exceeded"
+            },
+            {
+              "task_id": "template-test-001",
+              "execution_type": "atomic",
+              "status": "failure",
+              "error": "ACT phase error: [Errno 2] No such file or directory: 'state\\\\shared_context.json'",
+              "timestamp": "2025-08-22T12:59:21.502890",
+              "orchestrator_metadata": {
+                "run_id": "20250822_125921",
+                "iteration": 7,
+                "depth": 0,
+                "task_type": "atomic",
+                "phase": "Phase 5.4 - Error Recovery",
+                "recovery_applied": true
+              },
+              "recovery_info": {
+                "task_id": "template-test-001",
+                "status": "failure",
+                "error": "ACT phase error: [Errno 2] No such file or directory: 'state\\\\shared_context.json'",
+                "phase": "execution",
+                "failure_count": 7,
+                "max_attempts": 3,
+                "timestamp": "2025-08-22T12:59:21.494664",
+                "recovery_action": "escalate",
+                "final_status": "max_attempts_exceeded"
+              },
+              "final_status": "max_attempts_exceeded"
+            },
+            {
+              "task_id": "template-test-001",
+              "execution_type": "atomic",
+              "status": "failure",
+              "error": "ACT phase error: [Errno 2] No such file or directory: 'state\\\\shared_context.json'",
+              "timestamp": "2025-08-22T12:59:21.550426",
+              "orchestrator_metadata": {
+                "run_id": "20250822_125921",
+                "iteration": 8,
+                "depth": 0,
+                "task_type": "atomic",
+                "phase": "Phase 5.4 - Error Recovery",
+                "recovery_applied": true
+              },
+              "recovery_info": {
+                "task_id": "template-test-001",
+                "status": "failure",
+                "error": "ACT phase error: [Errno 2] No such file or directory: 'state\\\\shared_context.json'",
+                "phase": "execution",
+                "failure_count": 8,
+                "max_attempts": 3,
+                "timestamp": "2025-08-22T12:59:21.539282",
+                "recovery_action": "escalate",
+                "final_status": "max_attempts_exceeded"
+              },
+              "final_status": "max_attempts_exceeded"
+            },
+            {
+              "task_id": "template-test-001",
+              "execution_type": "atomic",
+              "status": "failure",
+              "error": "ACT phase error: [Errno 2] No such file or directory: 'state\\\\shared_context.json'",
+              "timestamp": "2025-08-22T12:59:21.596371",
+              "orchestrator_metadata": {
+                "run_id": "20250822_125921",
+                "iteration": 9,
+                "depth": 0,
+                "task_type": "atomic",
+                "phase": "Phase 5.4 - Error Recovery",
+                "recovery_applied": true
+              },
+              "recovery_info": {
+                "task_id": "template-test-001",
+                "status": "failure",
+                "error": "ACT phase error: [Errno 2] No such file or directory: 'state\\\\shared_context.json'",
+                "phase": "execution",
+                "failure_count": 9,
+                "max_attempts": 3,
+                "timestamp": "2025-08-22T12:59:21.587140",
+                "recovery_action": "escalate",
+                "final_status": "max_attempts_exceeded"
+              },
+              "final_status": "max_attempts_exceeded"
+            },
+            {
+              "task_id": "template-test-001",
+              "execution_type": "atomic",
+              "status": "failure",
+              "error": "ACT phase error: [Errno 2] No such file or directory: 'state\\\\shared_context.json'",
+              "timestamp": "2025-08-22T12:59:21.648537",
+              "orchestrator_metadata": {
+                "run_id": "20250822_125921",
+                "iteration": 10,
+                "depth": 0,
+                "task_type": "atomic",
+                "phase": "Phase 5.4 - Error Recovery",
+                "recovery_applied": true
+              },
+              "recovery_info": {
+                "task_id": "template-test-001",
+                "status": "failure",
+                "error": "ACT phase error: [Errno 2] No such file or directory: 'state\\\\shared_context.json'",
+                "phase": "execution",
+                "failure_count": 10,
+                "max_attempts": 3,
+                "timestamp": "2025-08-22T12:59:21.637211",
+                "recovery_action": "escalate",
+                "final_status": "max_attempts_exceeded"
+              },
+              "final_status": "max_attempts_exceeded"
+            }
+          ]
+        },
+        "current_task": {}
+      },
+      "recovery_metadata": {
+        "failure_counts": {},
+        "checkpoints_created": 0
+      }
+    }
+  },
+  "failure_counts": {},
+  "last_successful_state": {
+    "name": "system_initialization",
+    "timestamp": "2025-08-22T13:04:31.960722",
+    "run_id": "20250822_130431",
+    "iteration": 0,
+    "state_snapshot": {
+      "task_queue": {
+        "tasks": [
+          {
+            "id": "template-test-001",
+            "title": "Enhanced Template System Test",
+            "type": "atomic",
+            "content": "# Enhanced Template System Test\n\nThis task tests the Phase 6.1 enhanced natural language templating system.\n\n## Purpose\n\nValidate that the enhanced templating system provides:\n\n1. **Variable Substitution**: Dynamic content based on task context\n2. **Conditional Instructions**: Adaptive behavior based on conditions\n3. **Context Injection**: Rich context awareness in agents\n4. **Template Inheritance**: Reusable template components\n\n## Test Scenarios\n\n### Variable Substitution\n- Task ID, title, and metadata should be properly substituted\n- Timestamp and execution context should be injected\n- Depth and iteration information should be available\n\n### Conditional Logic\n- Different instructions based on task type (atomic vs parent)\n- Adaptive behavior based on execution depth\n- Special handling for retry scenarios\n\n### Context Awareness\n- Agent should have access to full execution context\n- Previous execution history should inform current behavior\n- Environment state should influence decision making\n\n## Expected Behavior\n\nThe enhanced template system should:\n1. Load the enhanced executor agent template\n2. Process all template variables and conditionals\n3. Generate context-aware instructions\n4. Execute with improved awareness and adaptability\n5. Document the template features used\n\n## Success Criteria\n\n- [x] Enhanced template is loaded and processed\n- [x] Variables are substituted correctly\n- [x] Conditional blocks execute appropriately  \n- [x] Context injection provides rich information\n- [x] Agent behavior shows enhanced awareness\n- [x] Template features are documented in execution results",
+            "source_file": "tasks\\template_test.md",
+            "status": "completed",
+            "created_at": "2025-08-22T12:59:21.209898",
+            "source": "user",
+            "constraints": [
+              "Must test enhanced natural language templating",
+              "Should demonstrate variable substitution",
+              "Must validate conditional instructions"
+            ],
+            "acceptance": [
+              "Template engine processes variables correctly",
+              "Conditional blocks work as expected",
+              "Context injection functions properly",
+              "Enhanced agent behavior is observable"
+            ],
+            "max_attempts": 2,
+            "max_depth": 2,
+            "timeout_seconds": 30,
+            "completed_at": "2025-08-22T12:59:21.650470"
+          },
+          {
+            "id": "template-test-001",
+            "title": "Enhanced Template System Test",
+            "type": "atomic",
+            "content": "# Enhanced Template System Test\n\nThis task tests the Phase 6.1 enhanced natural language templating system.\n\n## Purpose\n\nValidate that the enhanced templating system provides:\n\n1. **Variable Substitution**: Dynamic content based on task context\n2. **Conditional Instructions**: Adaptive behavior based on conditions\n3. **Context Injection**: Rich context awareness in agents\n4. **Template Inheritance**: Reusable template components\n\n## Test Scenarios\n\n### Variable Substitution\n- Task ID, title, and metadata should be properly substituted\n- Timestamp and execution context should be injected\n- Depth and iteration information should be available\n\n### Conditional Logic\n- Different instructions based on task type (atomic vs parent)\n- Adaptive behavior based on execution depth\n- Special handling for retry scenarios\n\n### Context Awareness\n- Agent should have access to full execution context\n- Previous execution history should inform current behavior\n- Environment state should influence decision making\n\n## Expected Behavior\n\nThe enhanced template system should:\n1. Load the enhanced executor agent template\n2. Process all template variables and conditionals\n3. Generate context-aware instructions\n4. Execute with improved awareness and adaptability\n5. Document the template features used\n\n## Success Criteria\n\n- [x] Enhanced template is loaded and processed\n- [x] Variables are substituted correctly\n- [x] Conditional blocks execute appropriately  \n- [x] Context injection provides rich information\n- [x] Agent behavior shows enhanced awareness\n- [x] Template features are documented in execution results",
+            "source_file": "tasks\\template_test.md",
+            "status": "pending",
+            "created_at": "2025-08-22T12:59:21.209898",
+            "source": "user",
+            "constraints": [
+              "Must test enhanced natural language templating",
+              "Should demonstrate variable substitution",
+              "Must validate conditional instructions"
+            ],
+            "acceptance": [
+              "Template engine processes variables correctly",
+              "Conditional blocks work as expected",
+              "Context injection functions properly",
+              "Enhanced agent behavior is observable"
+            ],
+            "max_attempts": 2,
+            "max_depth": 2,
+            "timeout_seconds": 30,
+            "acceptance_criteria": [
+              "Task objective is achieved",
+              "No errors or exceptions occur",
+              "Result meets basic quality standards"
+            ],
+            "elaboration_level": "enhanced",
+            "elaboration_history": [
+              {
+                "level": "enhanced",
+                "timestamp": "2025-08-22T12:59:21.222714",
+                "context_used": [
+                  "queue_position",
+                  "working_directory",
+                  "language"
+                ]
+              }
+            ],
+            "retry_count": 1,
+            "last_attempt_result": {
+              "task_id": "template-test-001",
+              "execution_type": "atomic",
+              "status": "failure",
+              "error": "ACT phase error: [Errno 2] No such file or directory: 'state\\\\shared_context.json'",
+              "timestamp": "2025-08-22T12:59:21.232727",
+              "orchestrator_metadata": {
+                "run_id": "20250822_125921",
+                "iteration": 1,
+                "depth": 0,
+                "task_type": "atomic",
+                "phase": "Phase 5.4 - Error Recovery",
+                "recovery_applied": true
+              },
+              "recovery_info": {
+                "task_id": "template-test-001",
+                "status": "failure",
+                "error": "ACT phase error: [Errno 2] No such file or directory: 'state\\\\shared_context.json'",
+                "phase": "execution",
+                "failure_count": 1,
+                "max_attempts": 3,
+                "timestamp": "2025-08-22T12:59:21.229014",
+                "recovery_action": "retry_with_backoff",
+                "final_status": "retry_needed",
+                "backoff_seconds": 1
+              },
+              "final_status": "retry_needed"
+            }
+          },
+          {
+            "id": "template-test-001",
+            "title": "Enhanced Template System Test",
+            "type": "atomic",
+            "content": "# Enhanced Template System Test\n\nThis task tests the Phase 6.1 enhanced natural language templating system.\n\n## Purpose\n\nValidate that the enhanced templating system provides:\n\n1. **Variable Substitution**: Dynamic content based on task context\n2. **Conditional Instructions**: Adaptive behavior based on conditions\n3. **Context Injection**: Rich context awareness in agents\n4. **Template Inheritance**: Reusable template components\n\n## Test Scenarios\n\n### Variable Substitution\n- Task ID, title, and metadata should be properly substituted\n- Timestamp and execution context should be injected\n- Depth and iteration information should be available\n\n### Conditional Logic\n- Different instructions based on task type (atomic vs parent)\n- Adaptive behavior based on execution depth\n- Special handling for retry scenarios\n\n### Context Awareness\n- Agent should have access to full execution context\n- Previous execution history should inform current behavior\n- Environment state should influence decision making\n\n## Expected Behavior\n\nThe enhanced template system should:\n1. Load the enhanced executor agent template\n2. Process all template variables and conditionals\n3. Generate context-aware instructions\n4. Execute with improved awareness and adaptability\n5. Document the template features used\n\n## Success Criteria\n\n- [x] Enhanced template is loaded and processed\n- [x] Variables are substituted correctly\n- [x] Conditional blocks execute appropriately  \n- [x] Context injection provides rich information\n- [x] Agent behavior shows enhanced awareness\n- [x] Template features are documented in execution results",
+            "source_file": "tasks\\template_test.md",
+            "status": "pending",
+            "created_at": "2025-08-22T12:59:21.209898",
+            "source": "user",
+            "constraints": [
+              "Must test enhanced natural language templating",
+              "Should demonstrate variable substitution",
+              "Must validate conditional instructions"
+            ],
+            "acceptance": [
+              "Template engine processes variables correctly",
+              "Conditional blocks work as expected",
+              "Context injection functions properly",
+              "Enhanced agent behavior is observable"
+            ],
+            "max_attempts": 2,
+            "max_depth": 2,
+            "timeout_seconds": 30,
+            "acceptance_criteria": [
+              "Task objective is achieved",
+              "No errors or exceptions occur",
+              "Result meets basic quality standards"
+            ],
+            "elaboration_level": "enhanced",
+            "elaboration_history": [
+              {
+                "level": "enhanced",
+                "timestamp": "2025-08-22T12:59:21.249469",
+                "context_used": [
+                  "queue_position",
+                  "working_directory",
+                  "language"
+                ]
+              }
+            ],
+            "retry_count": 1,
+            "last_attempt_result": {
+              "task_id": "template-test-001",
+              "execution_type": "atomic",
+              "status": "failure",
+              "error": "ACT phase error: [Errno 2] No such file or directory: 'state\\\\shared_context.json'",
+              "timestamp": "2025-08-22T12:59:21.278288",
+              "orchestrator_metadata": {
+                "run_id": "20250822_125921",
+                "iteration": 2,
+                "depth": 0,
+                "task_type": "atomic",
+                "phase": "Phase 5.4 - Error Recovery",
+                "recovery_applied": true
+              },
+              "recovery_info": {
+                "task_id": "template-test-001",
+                "status": "failure",
+                "error": "ACT phase error: [Errno 2] No such file or directory: 'state\\\\shared_context.json'",
+                "phase": "execution",
+                "failure_count": 2,
+                "max_attempts": 3,
+                "timestamp": "2025-08-22T12:59:21.271042",
+                "recovery_action": "retry_with_backoff",
+                "final_status": "retry_needed",
+                "backoff_seconds": 2
+              },
+              "final_status": "retry_needed"
+            }
+          }
+        ]
+      },
+      "execution_history": {
+        "executions": [
+          {
+            "task_id": "template-test-001",
+            "execution_type": "atomic",
+            "status": "failure",
+            "error": "ACT phase error: [Errno 2] No such file or directory: 'state\\\\shared_context.json'",
+            "timestamp": "2025-08-22T12:59:21.232727",
+            "orchestrator_metadata": {
+              "run_id": "20250822_125921",
+              "iteration": 1,
+              "depth": 0,
+              "task_type": "atomic",
+              "phase": "Phase 5.4 - Error Recovery",
+              "recovery_applied": true
+            },
+            "recovery_info": {
+              "task_id": "template-test-001",
+              "status": "failure",
+              "error": "ACT phase error: [Errno 2] No such file or directory: 'state\\\\shared_context.json'",
+              "phase": "execution",
+              "failure_count": 1,
+              "max_attempts": 3,
+              "timestamp": "2025-08-22T12:59:21.229014",
+              "recovery_action": "retry_with_backoff",
+              "final_status": "retry_needed",
+              "backoff_seconds": 1
+            },
+            "final_status": "retry_needed"
+          },
+          {
+            "task_id": "template-test-001",
+            "execution_type": "atomic",
+            "status": "failure",
+            "error": "ACT phase error: [Errno 2] No such file or directory: 'state\\\\shared_context.json'",
+            "timestamp": "2025-08-22T12:59:21.278288",
+            "orchestrator_metadata": {
+              "run_id": "20250822_125921",
+              "iteration": 2,
+              "depth": 0,
+              "task_type": "atomic",
+              "phase": "Phase 5.4 - Error Recovery",
+              "recovery_applied": true
+            },
+            "recovery_info": {
+              "task_id": "template-test-001",
+              "status": "failure",
+              "error": "ACT phase error: [Errno 2] No such file or directory: 'state\\\\shared_context.json'",
+              "phase": "execution",
+              "failure_count": 2,
+              "max_attempts": 3,
+              "timestamp": "2025-08-22T12:59:21.271042",
+              "recovery_action": "retry_with_backoff",
+              "final_status": "retry_needed",
+              "backoff_seconds": 2
+            },
+            "final_status": "retry_needed"
+          },
+          {
+            "task_id": "template-test-001",
+            "execution_type": "atomic",
+            "status": "failure",
+            "error": "ACT phase error: [Errno 2] No such file or directory: 'state\\\\shared_context.json'",
+            "timestamp": "2025-08-22T12:59:21.323952",
+            "orchestrator_metadata": {
+              "run_id": "20250822_125921",
+              "iteration": 3,
+              "depth": 0,
+              "task_type": "atomic",
+              "phase": "Phase 5.4 - Error Recovery",
+              "recovery_applied": true
+            },
+            "recovery_info": {
+              "task_id": "template-test-001",
+              "status": "failure",
+              "error": "ACT phase error: [Errno 2] No such file or directory: 'state\\\\shared_context.json'",
+              "phase": "execution",
+              "failure_count": 3,
+              "max_attempts": 3,
+              "timestamp": "2025-08-22T12:59:21.316062",
+              "recovery_action": "escalate",
+              "final_status": "max_attempts_exceeded"
+            },
+            "final_status": "max_attempts_exceeded"
+          },
+          {
+            "task_id": "template-test-001",
+            "execution_type": "atomic",
+            "status": "failure",
+            "error": "ACT phase error: [Errno 2] No such file or directory: 'state\\\\shared_context.json'",
+            "timestamp": "2025-08-22T12:59:21.369870",
+            "orchestrator_metadata": {
+              "run_id": "20250822_125921",
+              "iteration": 4,
+              "depth": 0,
+              "task_type": "atomic",
+              "phase": "Phase 5.4 - Error Recovery",
+              "recovery_applied": true
+            },
+            "recovery_info": {
+              "task_id": "template-test-001",
+              "status": "failure",
+              "error": "ACT phase error: [Errno 2] No such file or directory: 'state\\\\shared_context.json'",
+              "phase": "execution",
+              "failure_count": 4,
+              "max_attempts": 3,
+              "timestamp": "2025-08-22T12:59:21.360251",
+              "recovery_action": "escalate",
+              "final_status": "max_attempts_exceeded"
+            },
+            "final_status": "max_attempts_exceeded"
+          },
+          {
+            "task_id": "template-test-001",
+            "execution_type": "atomic",
+            "status": "failure",
+            "error": "ACT phase error: [Errno 2] No such file or directory: 'state\\\\shared_context.json'",
+            "timestamp": "2025-08-22T12:59:21.412099",
+            "orchestrator_metadata": {
+              "run_id": "20250822_125921",
+              "iteration": 5,
+              "depth": 0,
+              "task_type": "atomic",
+              "phase": "Phase 5.4 - Error Recovery",
+              "recovery_applied": true
+            },
+            "recovery_info": {
+              "task_id": "template-test-001",
+              "status": "failure",
+              "error": "ACT phase error: [Errno 2] No such file or directory: 'state\\\\shared_context.json'",
+              "phase": "execution",
+              "failure_count": 5,
+              "max_attempts": 3,
+              "timestamp": "2025-08-22T12:59:21.404110",
+              "recovery_action": "escalate",
+              "final_status": "max_attempts_exceeded"
+            },
+            "final_status": "max_attempts_exceeded"
+          },
+          {
+            "task_id": "template-test-001",
+            "execution_type": "atomic",
+            "status": "failure",
+            "error": "ACT phase error: [Errno 2] No such file or directory: 'state\\\\shared_context.json'",
+            "timestamp": "2025-08-22T12:59:21.457410",
+            "orchestrator_metadata": {
+              "run_id": "20250822_125921",
+              "iteration": 6,
+              "depth": 0,
+              "task_type": "atomic",
+              "phase": "Phase 5.4 - Error Recovery",
+              "recovery_applied": true
+            },
+            "recovery_info": {
+              "task_id": "template-test-001",
+              "status": "failure",
+              "error": "ACT phase error: [Errno 2] No such file or directory: 'state\\\\shared_context.json'",
+              "phase": "execution",
+              "failure_count": 6,
+              "max_attempts": 3,
+              "timestamp": "2025-08-22T12:59:21.448609",
+              "recovery_action": "escalate",
+              "final_status": "max_attempts_exceeded"
+            },
+            "final_status": "max_attempts_exceeded"
+          },
+          {
+            "task_id": "template-test-001",
+            "execution_type": "atomic",
+            "status": "failure",
+            "error": "ACT phase error: [Errno 2] No such file or directory: 'state\\\\shared_context.json'",
+            "timestamp": "2025-08-22T12:59:21.502890",
+            "orchestrator_metadata": {
+              "run_id": "20250822_125921",
+              "iteration": 7,
+              "depth": 0,
+              "task_type": "atomic",
+              "phase": "Phase 5.4 - Error Recovery",
+              "recovery_applied": true
+            },
+            "recovery_info": {
+              "task_id": "template-test-001",
+              "status": "failure",
+              "error": "ACT phase error: [Errno 2] No such file or directory: 'state\\\\shared_context.json'",
+              "phase": "execution",
+              "failure_count": 7,
+              "max_attempts": 3,
+              "timestamp": "2025-08-22T12:59:21.494664",
+              "recovery_action": "escalate",
+              "final_status": "max_attempts_exceeded"
+            },
+            "final_status": "max_attempts_exceeded"
+          },
+          {
+            "task_id": "template-test-001",
+            "execution_type": "atomic",
+            "status": "failure",
+            "error": "ACT phase error: [Errno 2] No such file or directory: 'state\\\\shared_context.json'",
+            "timestamp": "2025-08-22T12:59:21.550426",
+            "orchestrator_metadata": {
+              "run_id": "20250822_125921",
+              "iteration": 8,
+              "depth": 0,
+              "task_type": "atomic",
+              "phase": "Phase 5.4 - Error Recovery",
+              "recovery_applied": true
+            },
+            "recovery_info": {
+              "task_id": "template-test-001",
+              "status": "failure",
+              "error": "ACT phase error: [Errno 2] No such file or directory: 'state\\\\shared_context.json'",
+              "phase": "execution",
+              "failure_count": 8,
+              "max_attempts": 3,
+              "timestamp": "2025-08-22T12:59:21.539282",
+              "recovery_action": "escalate",
+              "final_status": "max_attempts_exceeded"
+            },
+            "final_status": "max_attempts_exceeded"
+          },
+          {
+            "task_id": "template-test-001",
+            "execution_type": "atomic",
+            "status": "failure",
+            "error": "ACT phase error: [Errno 2] No such file or directory: 'state\\\\shared_context.json'",
+            "timestamp": "2025-08-22T12:59:21.596371",
+            "orchestrator_metadata": {
+              "run_id": "20250822_125921",
+              "iteration": 9,
+              "depth": 0,
+              "task_type": "atomic",
+              "phase": "Phase 5.4 - Error Recovery",
+              "recovery_applied": true
+            },
+            "recovery_info": {
+              "task_id": "template-test-001",
+              "status": "failure",
+              "error": "ACT phase error: [Errno 2] No such file or directory: 'state\\\\shared_context.json'",
+              "phase": "execution",
+              "failure_count": 9,
+              "max_attempts": 3,
+              "timestamp": "2025-08-22T12:59:21.587140",
+              "recovery_action": "escalate",
+              "final_status": "max_attempts_exceeded"
+            },
+            "final_status": "max_attempts_exceeded"
+          },
+          {
+            "task_id": "template-test-001",
+            "execution_type": "atomic",
+            "status": "failure",
+            "error": "ACT phase error: [Errno 2] No such file or directory: 'state\\\\shared_context.json'",
+            "timestamp": "2025-08-22T12:59:21.648537",
+            "orchestrator_metadata": {
+              "run_id": "20250822_125921",
+              "iteration": 10,
+              "depth": 0,
+              "task_type": "atomic",
+              "phase": "Phase 5.4 - Error Recovery",
+              "recovery_applied": true
+            },
+            "recovery_info": {
+              "task_id": "template-test-001",
+              "status": "failure",
+              "error": "ACT phase error: [Errno 2] No such file or directory: 'state\\\\shared_context.json'",
+              "phase": "execution",
+              "failure_count": 10,
+              "max_attempts": 3,
+              "timestamp": "2025-08-22T12:59:21.637211",
+              "recovery_action": "escalate",
+              "final_status": "max_attempts_exceeded"
+            },
+            "final_status": "max_attempts_exceeded"
+          }
+        ]
+      },
+      "current_task": {}
+    },
+    "recovery_metadata": {
+      "failure_counts": {},
+      "checkpoints_created": 0
+    }
+  },
+  "emergency_recovery_enabled": true,
+  "recovery_file": "runs\\20250822_130431\\recovery.json"
+}
