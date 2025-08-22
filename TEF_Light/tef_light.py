@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import os
 import json
+import subprocess
 from typing import Any
 
 
@@ -42,14 +43,25 @@ def find_next_task(tree: dict[str, Any]) -> dict[str, Any] | None:
 
 
 def execute(task: dict[str, Any]) -> dict[str, Any]:
-    """Execute an atomic task and return results"""
+    """Execute an atomic task and return comprehensive results"""
     print(f"Executing: {task.get('description')}")
     
     # TODO: Call Claude SDK to actually execute the task
+    sdk_response = f"SDK executed: {task.get('description')}"  # Stub
+    
+    # Capture what changed in git
+    try:
+        git_diff = subprocess.run(['git', 'diff', 'HEAD'], 
+                                 capture_output=True, text=True, check=True)
+        diff_output = git_diff.stdout
+    except subprocess.CalledProcessError:
+        diff_output = "Error capturing git diff"
+    
     return {
         "status": "success",
-        "output": f"Completed: {task.get('description')}",
-        "files_modified": [],
+        "sdk_output": sdk_response,        # What the LLM said/did
+        "git_diff": diff_output,           # Complete diff including new files  
+        "environment_path": "./",          # For assessor exploration
         "errors": []
     }
 
@@ -65,9 +77,12 @@ def assess(task: dict[str, Any], tree: dict[str, Any], execution_result: dict[st
         execution_info = f"""
 ## Execution Result
 Status: {execution_result.get('status')}
-Output: {execution_result.get('output')}
-Files Modified: {execution_result.get('files_modified', [])}
+SDK Output: {execution_result.get('sdk_output')}
+Environment Path: {execution_result.get('environment_path')}
 Errors: {execution_result.get('errors', [])}
+
+## Changes Made (Git Diff)
+{execution_result.get('git_diff', 'No changes detected')}
 """
 
     prompt = f"""
