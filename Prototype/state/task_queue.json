@@ -6,7 +6,7 @@
       "type": "parent",
       "content": "# Comprehensive End-to-End Test\n\nThis task thoroughly tests all components of the Task Execution Framework working together.\n\n## Purpose\n\nValidate that all implemented features work correctly in combination:\n\n1. **Recursive ExecuteTask Pattern**: Parent tasks with multiple levels of subtasks\n2. **Act\u2192Assess\u2192Adapt Loop**: Full cycle execution with real Task tool integration\n3. **Error Recovery**: Graceful failure handling and retry mechanisms\n4. **Git Integration**: Dual commits (ACT and ADAPT phases) with proper attribution\n5. **State Management**: Consistent state across all operations\n6. **Checkpointing**: Recovery checkpoints at all levels\n\n## Test Scenarios\n\n### 1. Basic Execution (Sub-1)\n- Simple atomic task execution\n- Validates core Act\u2192Assess\u2192Adapt cycle\n- Tests Git integration for successful completion\n\n### 2. Error Recovery (Sub-2)\n- Simulated failure on first attempt\n- Recovery mechanisms activation\n- Successful completion after retry\n- Recovery checkpoint creation\n\n### 3. Nested Hierarchy (Sub-3)\n- Parent task containing atomic subtasks\n- Multi-level task nesting (depth 2)\n- One subtask with error recovery testing\n- Validates recursive ExecuteTask pattern\n\n## Expected Behavior\n\n1. **Parent Task**: Orchestrates all subtasks recursively\n2. **Basic Task**: Completes successfully in one attempt\n3. **Recovery Task**: Fails first, succeeds after recovery\n4. **Nested Parent**: Manages its own subtasks independently\n5. **Deep Tasks**: Execute at depth=2 with proper context\n6. **Git History**: Multiple commits showing all phases\n7. **State Files**: Consistent throughout execution\n8. **Recovery Files**: Checkpoints created at key points\n\n## Success Criteria\n\n- [x] All subtasks complete successfully\n- [x] Error recovery works at multiple depths\n- [x] Git commits track every phase\n- [x] State remains consistent\n- [x] Recovery checkpoints created\n- [x] Recursive ExecuteTask pattern validated\n- [x] Full loop integration confirmed",
       "source_file": "tasks\\comprehensive_test.md",
-      "status": "pending",
+      "status": "completed",
       "created_at": "2025-08-22T12:15:54.897308",
       "source": "user",
       "constraints": [
@@ -75,7 +75,8 @@
       ],
       "description": "Test recovery at depth",
       "simulate_failure": true,
-      "failure_type": "simulated_test_failure"
+      "failure_type": "simulated_test_failure",
+      "completed_at": "2025-08-22T12:16:01.440856"
     }
   ]
 }

@@ -235,7 +235,10 @@ Let's start executing Phase 1 of the plan found at Prototype/Implementation_plan
 Can you do a brief review of the implementation plan, to verify that everything you've done is marked as done?
 
 
+/compact Also, consider this approach: Please condense this conversation ...
 
+
+Read the overview spec and prototype implementation plan. Continue the implementation plan but stop after you complete phase 7. Think hard and critically on this. Take inspiration from the framework principles themselves to really make sure you implement the intent of the framework.
 
 
 
