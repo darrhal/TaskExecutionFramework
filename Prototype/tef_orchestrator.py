@@ -757,6 +757,204 @@ class TEFOrchestrator:
         self.run_dir = Path("runs") / self.run_id
         self.run_dir.mkdir(parents=True, exist_ok=True)
         
+        # Phase 5.4: Error recovery and resilience
+        self.recovery_state = {
+            "checkpoints": {},
+            "failure_counts": {},
+            "last_successful_state": None,
+            "emergency_recovery_enabled": True
+        }
+        
+        # Initialize checkpoint file
+        self._initialize_recovery_system()
+    
+    def _initialize_recovery_system(self) -> None:
+        """Initialize the error recovery and resilience system."""
+        try:
+            print(f"[RECOVERY] Initializing recovery system for run {self.run_id}")
+            
+            # Create recovery checkpoint file
+            recovery_file = self.run_dir / "recovery.json"
+            self.recovery_state["recovery_file"] = str(recovery_file)
+            
+            # Load previous recovery state if resuming
+            if recovery_file.exists():
+                with open(recovery_file, 'r') as f:
+                    previous_state = json.load(f)
+                    self.recovery_state.update(previous_state)
+                    print(f"[RECOVERY] Resumed from previous recovery state")
+            
+            # Save initial state
+            self._create_checkpoint("system_initialization")
+            
+        except Exception as e:
+            print(f"[RECOVERY] Warning: Could not initialize recovery system: {e}")
+    
+    def _create_checkpoint(self, checkpoint_name: str, additional_data: Dict[str, Any] = None) -> bool:
+        """Create a recovery checkpoint."""
+        try:
+            checkpoint = {
+                "name": checkpoint_name,
+                "timestamp": datetime.now().isoformat(),
+                "run_id": self.run_id,
+                "iteration": self.current_iteration,
+                "state_snapshot": {
+                    "task_queue": self.state_manager.read_state("task_queue.json"),
+                    "execution_history": self.state_manager.read_state("execution_history.json"),
+                    "current_task": self.state_manager.read_state("current_task.json")
+                },
+                "recovery_metadata": {
+                    "failure_counts": self.recovery_state["failure_counts"].copy(),
+                    "checkpoints_created": len(self.recovery_state["checkpoints"])
+                }
+            }
+            
+            if additional_data:
+                checkpoint["additional_data"] = additional_data
+            
+            # Store checkpoint
+            self.recovery_state["checkpoints"][checkpoint_name] = checkpoint
+            self.recovery_state["last_successful_state"] = checkpoint
+            
+            # Save to file
+            recovery_file = self.recovery_state.get("recovery_file")
+            if recovery_file:
+                with open(recovery_file, 'w') as f:
+                    json.dump(self.recovery_state, f, indent=2, default=str)
+            
+            print(f"[RECOVERY] Checkpoint created: {checkpoint_name}")
+            return True
+            
+        except Exception as e:
+            print(f"[RECOVERY] Error creating checkpoint {checkpoint_name}: {e}")
+            return False
+    
+    def _handle_task_failure(self, task: Dict[str, Any], error: Exception, phase: str) -> Dict[str, Any]:
+        """Handle task failure with recovery mechanisms."""
+        task_id = task.get('id', 'unknown')
+        
+        try:
+            print(f"[RECOVERY] Handling failure for task {task_id} in {phase} phase: {str(error)}")
+            
+            # Increment failure count
+            if task_id not in self.recovery_state["failure_counts"]:
+                self.recovery_state["failure_counts"][task_id] = {"total": 0, "by_phase": {}}
+            
+            self.recovery_state["failure_counts"][task_id]["total"] += 1
+            
+            if phase not in self.recovery_state["failure_counts"][task_id]["by_phase"]:
+                self.recovery_state["failure_counts"][task_id]["by_phase"][phase] = 0
+            self.recovery_state["failure_counts"][task_id]["by_phase"][phase] += 1
+            
+            # Determine recovery strategy
+            total_failures = self.recovery_state["failure_counts"][task_id]["total"]
+            max_attempts = task.get('policy', {}).get('max_attempts', 3)
+            
+            recovery_result = {
+                "task_id": task_id,
+                "status": "failure",
+                "error": str(error),
+                "phase": phase,
+                "failure_count": total_failures,
+                "max_attempts": max_attempts,
+                "timestamp": datetime.now().isoformat(),
+                "recovery_action": "none"
+            }
+            
+            if total_failures < max_attempts:
+                # Attempt recovery
+                recovery_result["recovery_action"] = "retry_with_backoff"
+                recovery_result["final_status"] = "retry_needed"
+                
+                # Implement exponential backoff
+                backoff_seconds = min(2 ** (total_failures - 1), 30)  # Max 30 seconds
+                recovery_result["backoff_seconds"] = backoff_seconds
+                
+                print(f"[RECOVERY] Task {task_id} will retry after {backoff_seconds}s backoff (attempt {total_failures + 1}/{max_attempts})")
+                
+                # Create recovery checkpoint
+                self._create_checkpoint(f"failure_recovery_{task_id}_{total_failures}", {
+                    "failed_task": task,
+                    "error": str(error),
+                    "phase": phase,
+                    "recovery_strategy": "retry_with_backoff"
+                })
+                
+            else:
+                # Max attempts reached
+                recovery_result["recovery_action"] = "escalate"
+                recovery_result["final_status"] = "max_attempts_exceeded"
+                
+                print(f"[RECOVERY] Task {task_id} exceeded max attempts ({max_attempts}), escalating")
+                
+                # Create failure checkpoint
+                self._create_checkpoint(f"failure_escalation_{task_id}", {
+                    "failed_task": task,
+                    "error": str(error),
+                    "phase": phase,
+                    "total_failures": total_failures
+                })
+            
+            return recovery_result
+            
+        except Exception as recovery_error:
+            print(f"[RECOVERY] Error in recovery handler: {recovery_error}")
+            return {
+                "task_id": task_id,
+                "status": "failure",
+                "error": str(error),
+                "recovery_error": str(recovery_error),
+                "final_status": "recovery_failed",
+                "timestamp": datetime.now().isoformat()
+            }
+    
+    def _execute_with_timeout(self, func, timeout_seconds: int, *args, **kwargs) -> Dict[str, Any]:
+        """Execute a function with timeout protection."""
+        import signal
+        import time
+        
+        def timeout_handler(signum, frame):
+            raise TimeoutError(f"Operation timed out after {timeout_seconds} seconds")
+        
+        try:
+            # Set up timeout (only works on Unix-like systems)
+            if hasattr(signal, 'SIGALRM'):
+                signal.signal(signal.SIGALRM, timeout_handler)
+                signal.alarm(timeout_seconds)
+            
+            start_time = time.time()
+            result = func(*args, **kwargs)
+            execution_time = time.time() - start_time
+            
+            # Cancel timeout
+            if hasattr(signal, 'SIGALRM'):
+                signal.alarm(0)
+            
+            return {
+                "status": "success",
+                "result": result,
+                "execution_time": execution_time,
+                "timeout_used": timeout_seconds
+            }
+            
+        except TimeoutError as e:
+            print(f"[RECOVERY] Timeout after {timeout_seconds}s: {str(e)}")
+            return {
+                "status": "timeout",
+                "error": str(e),
+                "timeout_used": timeout_seconds
+            }
+        except Exception as e:
+            return {
+                "status": "error", 
+                "error": str(e),
+                "timeout_used": timeout_seconds
+            }
+        finally:
+            # Ensure timeout is cancelled
+            if hasattr(signal, 'SIGALRM'):
+                signal.alarm(0)
+        
     def load_task_from_file(self, task_file: str) -> bool:
         """Load task specification from markdown file with YAML frontmatter parsing."""
         try:
@@ -965,51 +1163,131 @@ class TEFOrchestrator:
             }
     
     def _execute_atomic_task(self, task: Dict[str, Any], depth: int) -> Dict[str, Any]:
-        """Execute an atomic task through the full Act→Assess→Adapt cycle."""
+        """Execute an atomic task through the full Act→Assess→Adapt cycle with error recovery."""
         task_id = task.get('id', 'unknown')
         print(f"[ATOMIC_TASK] {'  ' * depth}Processing atomic task: {task_id}")
         
-        # ACT: Execute the task via agent
-        execution_result = self.agent_invoker.invoke_executor(task)
+        # Phase 5.4: Create checkpoint before execution
+        self._create_checkpoint(f"before_task_{task_id}", {"task": task, "depth": depth})
         
-        # Enhance with metadata
-        enhanced_result = {
-            **execution_result,
-            "orchestrator_metadata": {
-                "run_id": self.run_id,
-                "iteration": self.current_iteration,
-                "depth": depth,
-                "task_type": "atomic",
-                "phase": "Phase 5.3 - Git Integration"
+        try:
+            # Check for simulated failure (for testing)
+            if task.get('simulate_failure') and task_id not in self.recovery_state["failure_counts"]:
+                raise Exception("Simulated failure for testing error recovery")
+            
+            # ACT: Execute the task via agent with timeout
+            timeout_seconds = task.get('policy', {}).get('timeout_seconds', 60)
+            
+            def execute_act():
+                return self.agent_invoker.invoke_executor(task)
+            
+            act_result = self._execute_with_timeout(execute_act, timeout_seconds)
+            
+            if act_result["status"] == "timeout":
+                raise TimeoutError(f"ACT phase timed out after {timeout_seconds}s")
+            elif act_result["status"] == "error":
+                raise Exception(f"ACT phase error: {act_result['error']}")
+            
+            execution_result = act_result["result"]
+            
+            # Enhance with metadata
+            enhanced_result = {
+                **execution_result,
+                "orchestrator_metadata": {
+                    "run_id": self.run_id,
+                    "iteration": self.current_iteration,
+                    "depth": depth,
+                    "task_type": "atomic",
+                    "phase": "Phase 5.4 - Error Recovery",
+                    "execution_time": act_result.get("execution_time", 0),
+                    "timeout_used": timeout_seconds
+                }
             }
-        }
-        
-        # COMMIT AFTER ACT: Record all environment changes
-        self._commit_after_act(task_id, enhanced_result, depth)
-        
-        # ASSESS: Evaluate execution
-        assessment = self.assess_execution(enhanced_result, task)
-        
-        # ADAPT: Make decision about next steps
-        decision = self.adapt_plan(assessment)
-        
-        # COMMIT AFTER ADAPT: Record all plan modifications
-        self._commit_after_adapt(task_id, decision, assessment, depth)
-        
-        # Apply decision locally for this task
-        if decision.get("decision") == "COMPLETE":
-            enhanced_result["final_status"] = "completed"
-            print(f"[ATOMIC_TASK] {'  ' * depth}Task {task_id} completed successfully")
-        elif decision.get("decision") == "RETRY":
-            print(f"[ATOMIC_TASK] {'  ' * depth}Task {task_id} needs retry")
-            enhanced_result["final_status"] = "retry_needed"
-        else:
-            enhanced_result["final_status"] = decision.get("decision", "unknown")
-        
-        # Record execution history
-        self._record_execution(enhanced_result)
-        
-        return enhanced_result
+            
+            # COMMIT AFTER ACT: Record all environment changes
+            self._commit_after_act(task_id, enhanced_result, depth)
+            
+            # ASSESS: Evaluate execution with timeout
+            def execute_assess():
+                return self.assess_execution(enhanced_result, task)
+            
+            assess_result = self._execute_with_timeout(execute_assess, 30)  # 30s timeout for assessment
+            
+            if assess_result["status"] == "timeout":
+                raise TimeoutError("ASSESS phase timed out")
+            elif assess_result["status"] == "error":
+                raise Exception(f"ASSESS phase error: {assess_result['error']}")
+            
+            assessment = assess_result["result"]
+            
+            # ADAPT: Make decision about next steps with timeout
+            def execute_adapt():
+                return self.adapt_plan(assessment)
+            
+            adapt_result = self._execute_with_timeout(execute_adapt, 30)  # 30s timeout for adaptation
+            
+            if adapt_result["status"] == "timeout":
+                raise TimeoutError("ADAPT phase timed out")
+            elif adapt_result["status"] == "error":
+                raise Exception(f"ADAPT phase error: {adapt_result['error']}")
+            
+            decision = adapt_result["result"]
+            
+            # COMMIT AFTER ADAPT: Record all plan modifications
+            self._commit_after_adapt(task_id, decision, assessment, depth)
+            
+            # Apply decision locally for this task
+            if decision.get("decision") == "COMPLETE":
+                enhanced_result["final_status"] = "completed"
+                print(f"[ATOMIC_TASK] {'  ' * depth}Task {task_id} completed successfully")
+                
+                # Create success checkpoint
+                self._create_checkpoint(f"success_{task_id}", {
+                    "task": task,
+                    "result": enhanced_result,
+                    "decision": decision
+                })
+                
+            elif decision.get("decision") == "RETRY":
+                print(f"[ATOMIC_TASK] {'  ' * depth}Task {task_id} needs retry")
+                enhanced_result["final_status"] = "retry_needed"
+            else:
+                enhanced_result["final_status"] = decision.get("decision", "unknown")
+            
+            # Record execution history
+            self._record_execution(enhanced_result)
+            
+            return enhanced_result
+            
+        except Exception as e:
+            # Phase 5.4: Handle failure with recovery mechanisms
+            print(f"[ATOMIC_TASK] {'  ' * depth}Task {task_id} failed with error: {str(e)}")
+            
+            recovery_result = self._handle_task_failure(task, e, "execution")
+            
+            # Convert recovery result to task execution format
+            failed_result = {
+                "task_id": task_id,
+                "execution_type": "atomic",
+                "status": "failure",
+                "error": str(e),
+                "timestamp": datetime.now().isoformat(),
+                "orchestrator_metadata": {
+                    "run_id": self.run_id,
+                    "iteration": self.current_iteration,
+                    "depth": depth,
+                    "task_type": "atomic",
+                    "phase": "Phase 5.4 - Error Recovery",
+                    "recovery_applied": True
+                },
+                "recovery_info": recovery_result,
+                "final_status": recovery_result.get("final_status", "failed")
+            }
+            
+            # Record failed execution
+            self._record_execution(failed_result)
+            
+            return failed_result
     
     def _execute_parent_task(self, task: Dict[str, Any], depth: int) -> Dict[str, Any]:
         """Execute a parent task by orchestrating its subtasks recursively.""" 

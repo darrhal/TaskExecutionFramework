@@ -1,22 +1,41 @@
 {
-  "id": "parent-task-001-sub-2",
-  "title": "Second Subtask",
-  "description": "Validate the created file",
+  "id": "error-recovery-001",
+  "title": "Error Recovery Test Task",
   "type": "atomic",
-  "parent_id": "parent-task-001",
-  "parent_context": {
-    "parent_title": "Second Subtask",
-    "parent_type": "parent",
-    "depth": 0
-  },
-  "policy": {
-    "max_attempts": 2,
-    "max_depth": 5
-  },
-  "acceptance": [
-    "Subtask completes successfully"
-  ],
-  "constraints": [],
+  "content": "# Error Recovery Test Task\n\nThis task is designed to test the framework's error recovery and resilience mechanisms.\n\n## Purpose\n\nTest the framework's ability to:\n- Handle execution failures gracefully\n- Implement retry logic with backoff\n- Maintain state consistency during errors\n- Recover from partial failures\n- Manage timeouts appropriately\n\n## Expected Behavior\n\n1. **First attempt**: Simulated failure to test error handling\n2. **Second attempt**: Recovery mechanisms should activate\n3. **Third attempt**: Should succeed with proper state management\n\n## Success Criteria\n\n- [x] Error handling doesn't crash the system\n- [x] State files remain consistent during failures  \n- [x] Retry logic works correctly\n- [x] Proper error logging and reporting\n- [x] Graceful degradation when max attempts reached",
+  "source_file": "tasks\\error_recovery_test.md",
   "status": "pending",
-  "created_at": "2025-08-22T12:12:47.053580"
+  "created_at": "2025-08-22T12:14:41.188106",
+  "source": "user",
+  "constraints": [
+    "Must test error recovery mechanisms",
+    "Should demonstrate resilience features"
+  ],
+  "acceptance": [
+    "Task fails gracefully on first attempt",
+    "Recovery mechanisms activate correctly",
+    "System remains stable after errors"
+  ],
+  "max_attempts": 3,
+  "max_depth": 2,
+  "timeout_seconds": 30,
+  "simulate_failure": true,
+  "failure_type": "execution_error",
+  "acceptance_criteria": [
+    "Task objective is achieved",
+    "No errors or exceptions occur",
+    "Result meets basic quality standards"
+  ],
+  "elaboration_level": "enhanced",
+  "elaboration_history": [
+    {
+      "level": "enhanced",
+      "timestamp": "2025-08-22T12:14:41.252686",
+      "context_used": [
+        "queue_position",
+        "working_directory",
+        "language"
+      ]
+    }
+  ]
 }
