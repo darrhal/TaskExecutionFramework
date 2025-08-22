@@ -3,6 +3,7 @@ import os
 import json
 import subprocess
 from typing import Any
+import anthropic
 
 
 def execute_framework(environment_path: str, task_plan_path: str = "project_plan.json") -> None:
@@ -46,8 +47,29 @@ def execute(task: dict[str, Any]) -> dict[str, Any]:
     """Execute an atomic task and return comprehensive results"""
     print(f"Executing: {task.get('description')}")
     
-    # TODO: Call Claude SDK to actually execute the task
-    sdk_response = f"SDK executed: {task.get('description')}"  # Stub
+    # Call Claude SDK to actually execute the task
+    client = anthropic.Anthropic()  # Uses ANTHROPIC_API_KEY env var
+    
+    prompt = f"""
+You are a software engineer implementing tasks in a codebase.
+
+Task to complete: {task.get('description')}
+Task ID: {task['id']}
+Working directory: ./
+
+Please implement this task by creating or modifying files as needed.
+Respond with a brief summary of what you did.
+"""
+    
+    try:
+        message = client.messages.create(
+            model="claude-3-5-sonnet-20241022",
+            max_tokens=1024,
+            messages=[{"role": "user", "content": prompt}]
+        )
+        sdk_response = message.content[0].text
+    except Exception as e:
+        sdk_response = f"SDK Error: {str(e)}"
     
     # Capture what changed in git
     try:
