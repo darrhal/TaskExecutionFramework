@@ -1,13 +1,40 @@
 {
   "tasks": [
     {
-      "id": "create_file",
-      "title": "Task from create_file.md",
-      "content": "---\nid: create-file-001\ntitle: Create simple Python file\ntype: atomic\nsource: user\nconstraints:\n  - Must create a valid Python file\n  - Should include basic error handling\n  - File must be executable\nacceptance:\n  - File is created at specified location\n  - Python syntax is valid\n  - File contains the required functionality\n  - File has appropriate comments\npolicy:\n  max_attempts: 3\n  max_depth: 1\n---\n\n# Create Simple Python File Task\n\nThis task demonstrates atomic task execution by creating a simple Python file with basic functionality.\n\n## Objective\n\nCreate a Python file at `examples/hello_calculator.py` that:\n\n1. **Implements a simple calculator** with add, subtract, multiply, divide functions\n2. **Includes error handling** for division by zero\n3. **Has a main function** that demonstrates the calculator\n4. **Contains proper documentation** with docstrings\n5. **Is executable** as a standalone script\n\n## Technical Requirements\n\n### File Location\n- Path: `examples/hello_calculator.py`\n- Must be created relative to the current working directory\n\n### Functionality\n```python\ndef add(a, b):\n    \"\"\"Add two numbers.\"\"\"\n    return a + b\n\ndef subtract(a, b):\n    \"\"\"Subtract second number from first.\"\"\"\n    return a - b\n\ndef multiply(a, b):\n    \"\"\"Multiply two numbers.\"\"\"\n    return a * b\n\ndef divide(a, b):\n    \"\"\"Divide first number by second, with error handling.\"\"\"\n    # Handle division by zero\n    pass\n\ndef main():\n    \"\"\"Demonstrate calculator functionality.\"\"\"\n    # Show examples of each operation\n    pass\n\nif __name__ == \"__main__\":\n    main()\n```\n\n### Code Quality Requirements\n- Include docstrings for all functions\n- Handle division by zero gracefully\n- Use meaningful variable names\n- Include comments explaining complex logic\n- Follow PEP 8 style guidelines\n\n## Success Criteria\n\nThe task is successful when:\n- [x] File `examples/hello_calculator.py` exists\n- [x] File contains all required functions (add, subtract, multiply, divide)\n- [x] Division function handles zero-division error\n- [x] Main function demonstrates all operations\n- [x] All functions have docstrings\n- [x] File is syntactically valid Python\n- [x] File runs without errors when executed\n\n## Expected Agent Behavior\n\nThe executor agent should:\n1. **Read this task specification** from `state/current_task.json`\n2. **Understand the requirements** and acceptance criteria\n3. **Create the directory** if it doesn't exist\n4. **Write the Python file** with all required functionality\n5. **Test the file** to ensure it works correctly\n6. **Document the execution** in the execution history\n\nThis task validates that the executor agent can:\n- Handle file creation operations\n- Generate syntactically correct code\n- Follow detailed specifications\n- Implement error handling\n- Write comprehensive execution records",
-      "source_file": "tasks\\create_file.md",
-      "status": "completed",
-      "created_at": "2025-08-22T11:38:20.142126",
-      "completed_at": "2025-08-22T11:38:20.256274"
+      "id": "parent-task-001",
+      "title": "Second Subtask",
+      "type": "parent",
+      "content": "# Parent Task Test\n\nThis task demonstrates the recursive ExecuteTask pattern by:\n\n1. **Parent Task**: Orchestrates multiple subtasks\n2. **Subtask 1**: Creates a simple test file\n3. **Subtask 2**: Validates the created file\n\n## Purpose\n\nTest the framework's ability to:\n- Handle parent tasks that contain subtasks\n- Recursively invoke ExecuteTask for each subtask\n- Maintain proper context between parent and child tasks\n- Complete parent task only after all subtasks finish\n\n## Expected Behavior\n\n1. Parent task analyzes its subtasks\n2. Each subtask is processed through the full Act\u2192Assess\u2192Adapt loop\n3. Parent task monitors subtask completion\n4. Parent task completes when all subtasks are done\n\n## Success Criteria\n\n- [x] Parent task loads and identifies subtasks\n- [x] Subtasks are created and added to task queue\n- [x] Each subtask executes through ExecuteTask recursively\n- [x] Parent task completes after all subtasks finish\n- [x] Proper hierarchy and context maintained throughout",
+      "source_file": "tasks\\parent_task_test.md",
+      "status": "pending",
+      "created_at": "2025-08-22T12:12:45.929911",
+      "source": "user",
+      "constraints": [
+        "Must demonstrate parent task orchestration",
+        "Should spawn and manage subtasks"
+      ],
+      "acceptance": [
+        "All subtasks complete successfully",
+        "Parent task orchestrates properly",
+        "Recursive ExecuteTask pattern works"
+      ],
+      "max_attempts": 2,
+      "max_depth": 3,
+      "subtasks": [
+        {
+          "id": "parent-task-001-sub-1",
+          "title": "First Subtask",
+          "description": "Create a simple file",
+          "type": "atomic"
+        },
+        {
+          "id": "parent-task-001-sub-2",
+          "title": "Second Subtask",
+          "description": "Validate the created file",
+          "type": "atomic"
+        }
+      ],
+      "description": "Validate the created file"
     }
   ]
 }
