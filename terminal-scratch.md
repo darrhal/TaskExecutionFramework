@@ -232,7 +232,7 @@ Let's start executing Phase 1 of the plan found at Prototype/Implementation_plan
 
 
 
-
+Can you do a brief review of the implementation plan, to verify that everything you've done is marked as done?
 
 
 
