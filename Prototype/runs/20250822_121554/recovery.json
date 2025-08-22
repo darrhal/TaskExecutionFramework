@@ -620,12 +620,401 @@
         },
         "depth": 1
       }
+    },
+    "success_comprehensive-test-001-sub-1": {
+      "name": "success_comprehensive-test-001-sub-1",
+      "timestamp": "2025-08-22T12:15:55.531165",
+      "run_id": "20250822_121554",
+      "iteration": 1,
+      "state_snapshot": {
+        "task_queue": {
+          "tasks": [
+            {
+              "id": "comprehensive-test-001",
+              "title": "Deep Recovery Task",
+              "type": "parent",
+              "content": "# Comprehensive End-to-End Test\n\nThis task thoroughly tests all components of the Task Execution Framework working together.\n\n## Purpose\n\nValidate that all implemented features work correctly in combination:\n\n1. **Recursive ExecuteTask Pattern**: Parent tasks with multiple levels of subtasks\n2. **Act\u2192Assess\u2192Adapt Loop**: Full cycle execution with real Task tool integration\n3. **Error Recovery**: Graceful failure handling and retry mechanisms\n4. **Git Integration**: Dual commits (ACT and ADAPT phases) with proper attribution\n5. **State Management**: Consistent state across all operations\n6. **Checkpointing**: Recovery checkpoints at all levels\n\n## Test Scenarios\n\n### 1. Basic Execution (Sub-1)\n- Simple atomic task execution\n- Validates core Act\u2192Assess\u2192Adapt cycle\n- Tests Git integration for successful completion\n\n### 2. Error Recovery (Sub-2)\n- Simulated failure on first attempt\n- Recovery mechanisms activation\n- Successful completion after retry\n- Recovery checkpoint creation\n\n### 3. Nested Hierarchy (Sub-3)\n- Parent task containing atomic subtasks\n- Multi-level task nesting (depth 2)\n- One subtask with error recovery testing\n- Validates recursive ExecuteTask pattern\n\n## Expected Behavior\n\n1. **Parent Task**: Orchestrates all subtasks recursively\n2. **Basic Task**: Completes successfully in one attempt\n3. **Recovery Task**: Fails first, succeeds after recovery\n4. **Nested Parent**: Manages its own subtasks independently\n5. **Deep Tasks**: Execute at depth=2 with proper context\n6. **Git History**: Multiple commits showing all phases\n7. **State Files**: Consistent throughout execution\n8. **Recovery Files**: Checkpoints created at key points\n\n## Success Criteria\n\n- [x] All subtasks complete successfully\n- [x] Error recovery works at multiple depths\n- [x] Git commits track every phase\n- [x] State remains consistent\n- [x] Recovery checkpoints created\n- [x] Recursive ExecuteTask pattern validated\n- [x] Full loop integration confirmed",
+              "source_file": "tasks\\comprehensive_test.md",
+              "status": "pending",
+              "created_at": "2025-08-22T12:15:54.897308",
+              "source": "user",
+              "constraints": [
+                "Must fail on first attempt",
+                "Should recover on second attempt",
+                "id: comprehensive-test-001-sub-3"
+              ],
+              "acceptance": [
+                "All phases execute correctly",
+                "Parent/child task hierarchy works",
+                "Error recovery activates when needed",
+                "Git commits track all changes",
+                "State management is consistent"
+              ],
+              "max_attempts": 2,
+              "max_depth": 4,
+              "timeout_seconds": 45,
+              "subtasks": [
+                {
+                  "id": "comprehensive-test-001-sub-1",
+                  "title": "Basic Task Execution Test",
+                  "description": "Test basic Act\u2192Assess\u2192Adapt cycle",
+                  "type": "atomic",
+                  "constraints": ""
+                },
+                {
+                  "description": "Must complete successfully"
+                },
+                {
+                  "description": "Should create proper state files"
+                },
+                {
+                  "id": "comprehensive-test-001-sub-2",
+                  "title": "Error Recovery Test",
+                  "description": "Test error recovery mechanisms",
+                  "type": "atomic",
+                  "simulate_failure": "true",
+                  "failure_type": "simulated_test_failure",
+                  "constraints": ""
+                },
+                {
+                  "description": "Must fail on first attempt"
+                },
+                {
+                  "description": "Should recover on second attempt"
+                },
+                {
+                  "id": "comprehensive-test-001-sub-3",
+                  "title": "Nested Parent Task",
+                  "description": "Test nested task hierarchies",
+                  "type": "parent"
+                },
+                {
+                  "id": "comprehensive-test-001-sub-3-sub-1",
+                  "title": "Deep Atomic Task",
+                  "description": "Test deep nesting",
+                  "type": "atomic"
+                },
+                {
+                  "id": "comprehensive-test-001-sub-3-sub-2",
+                  "title": "Deep Recovery Task",
+                  "description": "Test recovery at depth",
+                  "type": "atomic",
+                  "simulate_failure": "true"
+                }
+              ],
+              "description": "Test recovery at depth",
+              "simulate_failure": true,
+              "failure_type": "simulated_test_failure"
+            }
+          ]
+        },
+        "execution_history": {},
+        "current_task": {
+          "id": "comprehensive-test-001-sub-1",
+          "title": "Basic Task Execution Test",
+          "description": "Test basic Act\u2192Assess\u2192Adapt cycle",
+          "type": "atomic",
+          "parent_id": "comprehensive-test-001",
+          "parent_context": {
+            "parent_title": "Deep Recovery Task",
+            "parent_type": "parent",
+            "depth": 0
+          },
+          "policy": {
+            "max_attempts": 2,
+            "max_depth": 5
+          },
+          "acceptance": [
+            "Subtask completes successfully"
+          ],
+          "constraints": "",
+          "status": "pending",
+          "created_at": "2025-08-22T12:15:54.915544"
+        }
+      },
+      "recovery_metadata": {
+        "failure_counts": {},
+        "checkpoints_created": 2
+      },
+      "additional_data": {
+        "task": {
+          "id": "comprehensive-test-001-sub-1",
+          "title": "Basic Task Execution Test",
+          "description": "Test basic Act\u2192Assess\u2192Adapt cycle",
+          "type": "atomic",
+          "parent_id": "comprehensive-test-001",
+          "parent_context": {
+            "parent_title": "Deep Recovery Task",
+            "parent_type": "parent",
+            "depth": 0
+          },
+          "policy": {
+            "max_attempts": 2,
+            "max_depth": 5
+          },
+          "acceptance": [
+            "Subtask completes successfully"
+          ],
+          "constraints": "",
+          "status": "pending",
+          "created_at": "2025-08-22T12:15:54.915544"
+        },
+        "result": {
+          "task_id": "comprehensive-test-001-sub-1",
+          "execution_type": "atomic",
+          "status": "success",
+          "timestamp": "2025-08-22T12:15:54.925167",
+          "actions_taken": [
+            {
+              "action": "task_execution",
+              "target": "real_environment",
+              "description": "Executed atomic task using Task tool integration"
+            }
+          ],
+          "results": {
+            "files_created": [],
+            "files_modified": [],
+            "commands_executed": [],
+            "tests_passed": true
+          },
+          "notes": "Phase 5: Atomic task execution via Task tool",
+          "agent_instructions_used": true,
+          "orchestrator_metadata": {
+            "run_id": "20250822_121554",
+            "iteration": 1,
+            "depth": 1,
+            "task_type": "atomic",
+            "phase": "Phase 5.4 - Error Recovery",
+            "execution_time": 0.0017733573913574219,
+            "timeout_used": 60
+          },
+          "final_status": "completed"
+        },
+        "decision": {
+          "decision": "COMPLETE",
+          "reasoning": "Task completed successfully - all observers report success",
+          "confidence": "HIGH",
+          "action_details": "Mark task as completed and commit changes",
+          "strategist_input": {
+            "technical_strategist": {
+              "feasibility": "MEDIUM",
+              "complexity": "MEDIUM",
+              "risks": [
+                "Integration complexity"
+              ],
+              "recommendation": "RETRY"
+            },
+            "requirements_strategist": {
+              "clarity": "MEDIUM",
+              "completeness": "MEDIUM",
+              "value_alignment": "HIGH",
+              "recommendation": "REFINE"
+            },
+            "risk_strategist": {
+              "risk_level": "MEDIUM",
+              "identified_risks": [
+                "Execution failure risk"
+              ],
+              "recommendation": "RETRY"
+            },
+            "efficiency_strategist": {
+              "efficiency": "MEDIUM",
+              "bottlenecks": [
+                "Execution speed"
+              ],
+              "recommendation": "RETRY"
+            }
+          },
+          "assessment_used": {
+            "overall_status": "pass",
+            "observer_count": 4,
+            "confidence": 0.7
+          },
+          "decided_at": "2025-08-22T12:15:55.265975",
+          "navigator_agent_used": true
+        }
+      }
+    },
+    "before_task_comprehensive-test-001_sub_121555": {
+      "name": "before_task_comprehensive-test-001_sub_121555",
+      "timestamp": "2025-08-22T12:15:55.539257",
+      "run_id": "20250822_121554",
+      "iteration": 1,
+      "state_snapshot": {
+        "task_queue": {
+          "tasks": [
+            {
+              "id": "comprehensive-test-001",
+              "title": "Deep Recovery Task",
+              "type": "parent",
+              "content": "# Comprehensive End-to-End Test\n\nThis task thoroughly tests all components of the Task Execution Framework working together.\n\n## Purpose\n\nValidate that all implemented features work correctly in combination:\n\n1. **Recursive ExecuteTask Pattern**: Parent tasks with multiple levels of subtasks\n2. **Act\u2192Assess\u2192Adapt Loop**: Full cycle execution with real Task tool integration\n3. **Error Recovery**: Graceful failure handling and retry mechanisms\n4. **Git Integration**: Dual commits (ACT and ADAPT phases) with proper attribution\n5. **State Management**: Consistent state across all operations\n6. **Checkpointing**: Recovery checkpoints at all levels\n\n## Test Scenarios\n\n### 1. Basic Execution (Sub-1)\n- Simple atomic task execution\n- Validates core Act\u2192Assess\u2192Adapt cycle\n- Tests Git integration for successful completion\n\n### 2. Error Recovery (Sub-2)\n- Simulated failure on first attempt\n- Recovery mechanisms activation\n- Successful completion after retry\n- Recovery checkpoint creation\n\n### 3. Nested Hierarchy (Sub-3)\n- Parent task containing atomic subtasks\n- Multi-level task nesting (depth 2)\n- One subtask with error recovery testing\n- Validates recursive ExecuteTask pattern\n\n## Expected Behavior\n\n1. **Parent Task**: Orchestrates all subtasks recursively\n2. **Basic Task**: Completes successfully in one attempt\n3. **Recovery Task**: Fails first, succeeds after recovery\n4. **Nested Parent**: Manages its own subtasks independently\n5. **Deep Tasks**: Execute at depth=2 with proper context\n6. **Git History**: Multiple commits showing all phases\n7. **State Files**: Consistent throughout execution\n8. **Recovery Files**: Checkpoints created at key points\n\n## Success Criteria\n\n- [x] All subtasks complete successfully\n- [x] Error recovery works at multiple depths\n- [x] Git commits track every phase\n- [x] State remains consistent\n- [x] Recovery checkpoints created\n- [x] Recursive ExecuteTask pattern validated\n- [x] Full loop integration confirmed",
+              "source_file": "tasks\\comprehensive_test.md",
+              "status": "pending",
+              "created_at": "2025-08-22T12:15:54.897308",
+              "source": "user",
+              "constraints": [
+                "Must fail on first attempt",
+                "Should recover on second attempt",
+                "id: comprehensive-test-001-sub-3"
+              ],
+              "acceptance": [
+                "All phases execute correctly",
+                "Parent/child task hierarchy works",
+                "Error recovery activates when needed",
+                "Git commits track all changes",
+                "State management is consistent"
+              ],
+              "max_attempts": 2,
+              "max_depth": 4,
+              "timeout_seconds": 45,
+              "subtasks": [
+                {
+                  "id": "comprehensive-test-001-sub-1",
+                  "title": "Basic Task Execution Test",
+                  "description": "Test basic Act\u2192Assess\u2192Adapt cycle",
+                  "type": "atomic",
+                  "constraints": ""
+                },
+                {
+                  "description": "Must complete successfully"
+                },
+                {
+                  "description": "Should create proper state files"
+                },
+                {
+                  "id": "comprehensive-test-001-sub-2",
+                  "title": "Error Recovery Test",
+                  "description": "Test error recovery mechanisms",
+                  "type": "atomic",
+                  "simulate_failure": "true",
+                  "failure_type": "simulated_test_failure",
+                  "constraints": ""
+                },
+                {
+                  "description": "Must fail on first attempt"
+                },
+                {
+                  "description": "Should recover on second attempt"
+                },
+                {
+                  "id": "comprehensive-test-001-sub-3",
+                  "title": "Nested Parent Task",
+                  "description": "Test nested task hierarchies",
+                  "type": "parent"
+                },
+                {
+                  "id": "comprehensive-test-001-sub-3-sub-1",
+                  "title": "Deep Atomic Task",
+                  "description": "Test deep nesting",
+                  "type": "atomic"
+                },
+                {
+                  "id": "comprehensive-test-001-sub-3-sub-2",
+                  "title": "Deep Recovery Task",
+                  "description": "Test recovery at depth",
+                  "type": "atomic",
+                  "simulate_failure": "true"
+                }
+              ],
+              "description": "Test recovery at depth",
+              "simulate_failure": true,
+              "failure_type": "simulated_test_failure"
+            }
+          ]
+        },
+        "execution_history": {
+          "executions": [
+            {
+              "task_id": "comprehensive-test-001-sub-1",
+              "execution_type": "atomic",
+              "status": "success",
+              "timestamp": "2025-08-22T12:15:54.925167",
+              "actions_taken": [
+                {
+                  "action": "task_execution",
+                  "target": "real_environment",
+                  "description": "Executed atomic task using Task tool integration"
+                }
+              ],
+              "results": {
+                "files_created": [],
+                "files_modified": [],
+                "commands_executed": [],
+                "tests_passed": true
+              },
+              "notes": "Phase 5: Atomic task execution via Task tool",
+              "agent_instructions_used": true,
+              "orchestrator_metadata": {
+                "run_id": "20250822_121554",
+                "iteration": 1,
+                "depth": 1,
+                "task_type": "atomic",
+                "phase": "Phase 5.4 - Error Recovery",
+                "execution_time": 0.0017733573913574219,
+                "timeout_used": 60
+              },
+              "final_status": "completed"
+            }
+          ]
+        },
+        "current_task": {
+          "id": "comprehensive-test-001-sub-1",
+          "title": "Basic Task Execution Test",
+          "description": "Test basic Act\u2192Assess\u2192Adapt cycle",
+          "type": "atomic",
+          "parent_id": "comprehensive-test-001",
+          "parent_context": {
+            "parent_title": "Deep Recovery Task",
+            "parent_type": "parent",
+            "depth": 0
+          },
+          "policy": {
+            "max_attempts": 2,
+            "max_depth": 5
+          },
+          "acceptance": [
+            "Subtask completes successfully"
+          ],
+          "constraints": "",
+          "status": "pending",
+          "created_at": "2025-08-22T12:15:54.915544"
+        }
+      },
+      "recovery_metadata": {
+        "failure_counts": {},
+        "checkpoints_created": 3
+      },
+      "additional_data": {
+        "task": {
+          "id": "comprehensive-test-001_sub_121555",
+          "title": "Subtask",
+          "description": "Must complete successfully",
+          "type": "atomic",
+          "parent_id": "comprehensive-test-001",
+          "parent_context": {
+            "parent_title": "Deep Recovery Task",
+            "parent_type": "parent",
+            "depth": 0
+          },
+          "policy": {
+            "max_attempts": 2,
+            "max_depth": 5
+          },
+          "acceptance": [
+            "Subtask completes successfully"
+          ],
+          "constraints": [],
+          "status": "pending",
+          "created_at": "2025-08-22T12:15:55.539232"
+        },
+        "depth": 1
+      }
     }
   },
   "failure_counts": {},
   "last_successful_state": {
-    "name": "before_task_comprehensive-test-001-sub-1",
-    "timestamp": "2025-08-22T12:15:54.915570",
+    "name": "before_task_comprehensive-test-001_sub_121555",
+    "timestamp": "2025-08-22T12:15:55.539257",
     "run_id": "20250822_121554",
     "iteration": 1,
     "state_snapshot": {
@@ -710,15 +1099,42 @@
           }
         ]
       },
-      "execution_history": {},
-      "current_task": {}
-    },
-    "recovery_metadata": {
-      "failure_counts": {},
-      "checkpoints_created": 1
-    },
-    "additional_data": {
-      "task": {
+      "execution_history": {
+        "executions": [
+          {
+            "task_id": "comprehensive-test-001-sub-1",
+            "execution_type": "atomic",
+            "status": "success",
+            "timestamp": "2025-08-22T12:15:54.925167",
+            "actions_taken": [
+              {
+                "action": "task_execution",
+                "target": "real_environment",
+                "description": "Executed atomic task using Task tool integration"
+              }
+            ],
+            "results": {
+              "files_created": [],
+              "files_modified": [],
+              "commands_executed": [],
+              "tests_passed": true
+            },
+            "notes": "Phase 5: Atomic task execution via Task tool",
+            "agent_instructions_used": true,
+            "orchestrator_metadata": {
+              "run_id": "20250822_121554",
+              "iteration": 1,
+              "depth": 1,
+              "task_type": "atomic",
+              "phase": "Phase 5.4 - Error Recovery",
+              "execution_time": 0.0017733573913574219,
+              "timeout_used": 60
+            },
+            "final_status": "completed"
+          }
+        ]
+      },
+      "current_task": {
         "id": "comprehensive-test-001-sub-1",
         "title": "Basic Task Execution Test",
         "description": "Test basic Act\u2192Assess\u2192Adapt cycle",
@@ -739,6 +1155,34 @@
         "constraints": "",
         "status": "pending",
         "created_at": "2025-08-22T12:15:54.915544"
+      }
+    },
+    "recovery_metadata": {
+      "failure_counts": {},
+      "checkpoints_created": 3
+    },
+    "additional_data": {
+      "task": {
+        "id": "comprehensive-test-001_sub_121555",
+        "title": "Subtask",
+        "description": "Must complete successfully",
+        "type": "atomic",
+        "parent_id": "comprehensive-test-001",
+        "parent_context": {
+          "parent_title": "Deep Recovery Task",
+          "parent_type": "parent",
+          "depth": 0
+        },
+        "policy": {
+          "max_attempts": 2,
+          "max_depth": 5
+        },
+        "acceptance": [
+          "Subtask completes successfully"
+        ],
+        "constraints": [],
+        "status": "pending",
+        "created_at": "2025-08-22T12:15:55.539232"
       },
       "depth": 1
     }
