@@ -1,82 +1,28 @@
 {
   "tasks": [
     {
-      "id": "comprehensive-test-001",
-      "title": "Deep Recovery Task",
-      "type": "parent",
-      "content": "# Comprehensive End-to-End Test\n\nThis task thoroughly tests all components of the Task Execution Framework working together.\n\n## Purpose\n\nValidate that all implemented features work correctly in combination:\n\n1. **Recursive ExecuteTask Pattern**: Parent tasks with multiple levels of subtasks\n2. **Act\u2192Assess\u2192Adapt Loop**: Full cycle execution with real Task tool integration\n3. **Error Recovery**: Graceful failure handling and retry mechanisms\n4. **Git Integration**: Dual commits (ACT and ADAPT phases) with proper attribution\n5. **State Management**: Consistent state across all operations\n6. **Checkpointing**: Recovery checkpoints at all levels\n\n## Test Scenarios\n\n### 1. Basic Execution (Sub-1)\n- Simple atomic task execution\n- Validates core Act\u2192Assess\u2192Adapt cycle\n- Tests Git integration for successful completion\n\n### 2. Error Recovery (Sub-2)\n- Simulated failure on first attempt\n- Recovery mechanisms activation\n- Successful completion after retry\n- Recovery checkpoint creation\n\n### 3. Nested Hierarchy (Sub-3)\n- Parent task containing atomic subtasks\n- Multi-level task nesting (depth 2)\n- One subtask with error recovery testing\n- Validates recursive ExecuteTask pattern\n\n## Expected Behavior\n\n1. **Parent Task**: Orchestrates all subtasks recursively\n2. **Basic Task**: Completes successfully in one attempt\n3. **Recovery Task**: Fails first, succeeds after recovery\n4. **Nested Parent**: Manages its own subtasks independently\n5. **Deep Tasks**: Execute at depth=2 with proper context\n6. **Git History**: Multiple commits showing all phases\n7. **State Files**: Consistent throughout execution\n8. **Recovery Files**: Checkpoints created at key points\n\n## Success Criteria\n\n- [x] All subtasks complete successfully\n- [x] Error recovery works at multiple depths\n- [x] Git commits track every phase\n- [x] State remains consistent\n- [x] Recovery checkpoints created\n- [x] Recursive ExecuteTask pattern validated\n- [x] Full loop integration confirmed",
-      "source_file": "tasks\\comprehensive_test.md",
-      "status": "completed",
-      "created_at": "2025-08-22T12:15:54.897308",
+      "id": "template-test-001",
+      "title": "Enhanced Template System Test",
+      "type": "atomic",
+      "content": "# Enhanced Template System Test\n\nThis task tests the Phase 6.1 enhanced natural language templating system.\n\n## Purpose\n\nValidate that the enhanced templating system provides:\n\n1. **Variable Substitution**: Dynamic content based on task context\n2. **Conditional Instructions**: Adaptive behavior based on conditions\n3. **Context Injection**: Rich context awareness in agents\n4. **Template Inheritance**: Reusable template components\n\n## Test Scenarios\n\n### Variable Substitution\n- Task ID, title, and metadata should be properly substituted\n- Timestamp and execution context should be injected\n- Depth and iteration information should be available\n\n### Conditional Logic\n- Different instructions based on task type (atomic vs parent)\n- Adaptive behavior based on execution depth\n- Special handling for retry scenarios\n\n### Context Awareness\n- Agent should have access to full execution context\n- Previous execution history should inform current behavior\n- Environment state should influence decision making\n\n## Expected Behavior\n\nThe enhanced template system should:\n1. Load the enhanced executor agent template\n2. Process all template variables and conditionals\n3. Generate context-aware instructions\n4. Execute with improved awareness and adaptability\n5. Document the template features used\n\n## Success Criteria\n\n- [x] Enhanced template is loaded and processed\n- [x] Variables are substituted correctly\n- [x] Conditional blocks execute appropriately  \n- [x] Context injection provides rich information\n- [x] Agent behavior shows enhanced awareness\n- [x] Template features are documented in execution results",
+      "source_file": "tasks\\template_test.md",
+      "status": "pending",
+      "created_at": "2025-08-22T12:54:43.580424",
       "source": "user",
       "constraints": [
-        "Must fail on first attempt",
-        "Should recover on second attempt",
-        "id: comprehensive-test-001-sub-3"
+        "Must test enhanced natural language templating",
+        "Should demonstrate variable substitution",
+        "Must validate conditional instructions"
       ],
       "acceptance": [
-        "All phases execute correctly",
-        "Parent/child task hierarchy works",
-        "Error recovery activates when needed",
-        "Git commits track all changes",
-        "State management is consistent"
+        "Template engine processes variables correctly",
+        "Conditional blocks work as expected",
+        "Context injection functions properly",
+        "Enhanced agent behavior is observable"
       ],
       "max_attempts": 2,
-      "max_depth": 4,
-      "timeout_seconds": 45,
-      "subtasks": [
-        {
-          "id": "comprehensive-test-001-sub-1",
-          "title": "Basic Task Execution Test",
-          "description": "Test basic Act\u2192Assess\u2192Adapt cycle",
-          "type": "atomic",
-          "constraints": ""
-        },
-        {
-          "description": "Must complete successfully"
-        },
-        {
-          "description": "Should create proper state files"
-        },
-        {
-          "id": "comprehensive-test-001-sub-2",
-          "title": "Error Recovery Test",
-          "description": "Test error recovery mechanisms",
-          "type": "atomic",
-          "simulate_failure": "true",
-          "failure_type": "simulated_test_failure",
-          "constraints": ""
-        },
-        {
-          "description": "Must fail on first attempt"
-        },
-        {
-          "description": "Should recover on second attempt"
-        },
-        {
-          "id": "comprehensive-test-001-sub-3",
-          "title": "Nested Parent Task",
-          "description": "Test nested task hierarchies",
-          "type": "parent"
-        },
-        {
-          "id": "comprehensive-test-001-sub-3-sub-1",
-          "title": "Deep Atomic Task",
-          "description": "Test deep nesting",
-          "type": "atomic"
-        },
-        {
-          "id": "comprehensive-test-001-sub-3-sub-2",
-          "title": "Deep Recovery Task",
-          "description": "Test recovery at depth",
-          "type": "atomic",
-          "simulate_failure": "true"
-        }
-      ],
-      "description": "Test recovery at depth",
-      "simulate_failure": true,
-      "failure_type": "simulated_test_failure",
-      "completed_at": "2025-08-22T12:16:01.440856"
+      "max_depth": 2,
+      "timeout_seconds": 30
     }
   ]
 }

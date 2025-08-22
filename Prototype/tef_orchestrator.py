@@ -18,6 +18,13 @@ from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional, Any
 
+# Phase 6.1: Import template engine
+try:
+    from template_engine import NaturalLanguageTemplateEngine, EnhancedAgentInvoker
+    TEMPLATE_ENGINE_AVAILABLE = True
+except ImportError:
+    TEMPLATE_ENGINE_AVAILABLE = False
+
 
 class StateManager:
     """Manages persistent state files for agent communication."""
@@ -765,6 +772,16 @@ class TEFOrchestrator:
             "emergency_recovery_enabled": True
         }
         
+        # Phase 6.1: Enhanced natural language templating
+        if TEMPLATE_ENGINE_AVAILABLE:
+            self.template_engine = NaturalLanguageTemplateEngine()
+            self.enhanced_agent_invoker = EnhancedAgentInvoker(self.state_manager, self.template_engine)
+            print(f"[TEMPLATE] Enhanced templating system enabled")
+        else:
+            self.template_engine = None
+            self.enhanced_agent_invoker = None
+            print(f"[TEMPLATE] Using basic templating (template_engine not available)")
+        
         # Initialize checkpoint file
         self._initialize_recovery_system()
     
@@ -1179,7 +1196,17 @@ class TEFOrchestrator:
             timeout_seconds = task.get('policy', {}).get('timeout_seconds', 60)
             
             def execute_act():
-                return self.agent_invoker.invoke_executor(task)
+                # Phase 6.1: Use enhanced templating if available
+                if self.enhanced_agent_invoker:
+                    enhanced_context = {
+                        "timestamp": datetime.now().isoformat(),
+                        "depth": depth,
+                        "iteration": self.current_iteration,
+                        "run_id": self.run_id
+                    }
+                    return self.enhanced_agent_invoker.invoke_enhanced_executor(task, enhanced_context)
+                else:
+                    return self.agent_invoker.invoke_executor(task)
             
             act_result = self._execute_with_timeout(execute_act, timeout_seconds)
             

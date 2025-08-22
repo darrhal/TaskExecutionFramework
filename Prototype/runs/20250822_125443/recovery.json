@@ -1,0 +1,875 @@
+{
+  "checkpoints": {
+    "system_initialization": {
+      "name": "system_initialization",
+      "timestamp": "2025-08-22T12:54:43.558716",
+      "run_id": "20250822_125443",
+      "iteration": 0,
+      "state_snapshot": {
+        "task_queue": {
+          "tasks": [
+            {
+              "id": "comprehensive-test-001",
+              "title": "Deep Recovery Task",
+              "type": "parent",
+              "content": "# Comprehensive End-to-End Test\n\nThis task thoroughly tests all components of the Task Execution Framework working together.\n\n## Purpose\n\nValidate that all implemented features work correctly in combination:\n\n1. **Recursive ExecuteTask Pattern**: Parent tasks with multiple levels of subtasks\n2. **Act\u2192Assess\u2192Adapt Loop**: Full cycle execution with real Task tool integration\n3. **Error Recovery**: Graceful failure handling and retry mechanisms\n4. **Git Integration**: Dual commits (ACT and ADAPT phases) with proper attribution\n5. **State Management**: Consistent state across all operations\n6. **Checkpointing**: Recovery checkpoints at all levels\n\n## Test Scenarios\n\n### 1. Basic Execution (Sub-1)\n- Simple atomic task execution\n- Validates core Act\u2192Assess\u2192Adapt cycle\n- Tests Git integration for successful completion\n\n### 2. Error Recovery (Sub-2)\n- Simulated failure on first attempt\n- Recovery mechanisms activation\n- Successful completion after retry\n- Recovery checkpoint creation\n\n### 3. Nested Hierarchy (Sub-3)\n- Parent task containing atomic subtasks\n- Multi-level task nesting (depth 2)\n- One subtask with error recovery testing\n- Validates recursive ExecuteTask pattern\n\n## Expected Behavior\n\n1. **Parent Task**: Orchestrates all subtasks recursively\n2. **Basic Task**: Completes successfully in one attempt\n3. **Recovery Task**: Fails first, succeeds after recovery\n4. **Nested Parent**: Manages its own subtasks independently\n5. **Deep Tasks**: Execute at depth=2 with proper context\n6. **Git History**: Multiple commits showing all phases\n7. **State Files**: Consistent throughout execution\n8. **Recovery Files**: Checkpoints created at key points\n\n## Success Criteria\n\n- [x] All subtasks complete successfully\n- [x] Error recovery works at multiple depths\n- [x] Git commits track every phase\n- [x] State remains consistent\n- [x] Recovery checkpoints created\n- [x] Recursive ExecuteTask pattern validated\n- [x] Full loop integration confirmed",
+              "source_file": "tasks\\comprehensive_test.md",
+              "status": "completed",
+              "created_at": "2025-08-22T12:15:54.897308",
+              "source": "user",
+              "constraints": [
+                "Must fail on first attempt",
+                "Should recover on second attempt",
+                "id: comprehensive-test-001-sub-3"
+              ],
+              "acceptance": [
+                "All phases execute correctly",
+                "Parent/child task hierarchy works",
+                "Error recovery activates when needed",
+                "Git commits track all changes",
+                "State management is consistent"
+              ],
+              "max_attempts": 2,
+              "max_depth": 4,
+              "timeout_seconds": 45,
+              "subtasks": [
+                {
+                  "id": "comprehensive-test-001-sub-1",
+                  "title": "Basic Task Execution Test",
+                  "description": "Test basic Act\u2192Assess\u2192Adapt cycle",
+                  "type": "atomic",
+                  "constraints": ""
+                },
+                {
+                  "description": "Must complete successfully"
+                },
+                {
+                  "description": "Should create proper state files"
+                },
+                {
+                  "id": "comprehensive-test-001-sub-2",
+                  "title": "Error Recovery Test",
+                  "description": "Test error recovery mechanisms",
+                  "type": "atomic",
+                  "simulate_failure": "true",
+                  "failure_type": "simulated_test_failure",
+                  "constraints": ""
+                },
+                {
+                  "description": "Must fail on first attempt"
+                },
+                {
+                  "description": "Should recover on second attempt"
+                },
+                {
+                  "id": "comprehensive-test-001-sub-3",
+                  "title": "Nested Parent Task",
+                  "description": "Test nested task hierarchies",
+                  "type": "parent"
+                },
+                {
+                  "id": "comprehensive-test-001-sub-3-sub-1",
+                  "title": "Deep Atomic Task",
+                  "description": "Test deep nesting",
+                  "type": "atomic"
+                },
+                {
+                  "id": "comprehensive-test-001-sub-3-sub-2",
+                  "title": "Deep Recovery Task",
+                  "description": "Test recovery at depth",
+                  "type": "atomic",
+                  "simulate_failure": "true"
+                }
+              ],
+              "description": "Test recovery at depth",
+              "simulate_failure": true,
+              "failure_type": "simulated_test_failure",
+              "completed_at": "2025-08-22T12:16:01.440856"
+            }
+          ]
+        },
+        "execution_history": {
+          "executions": [
+            {
+              "task_id": "comprehensive-test-001-sub-1",
+              "execution_type": "atomic",
+              "status": "success",
+              "timestamp": "2025-08-22T12:15:54.925167",
+              "actions_taken": [
+                {
+                  "action": "task_execution",
+                  "target": "real_environment",
+                  "description": "Executed atomic task using Task tool integration"
+                }
+              ],
+              "results": {
+                "files_created": [],
+                "files_modified": [],
+                "commands_executed": [],
+                "tests_passed": true
+              },
+              "notes": "Phase 5: Atomic task execution via Task tool",
+              "agent_instructions_used": true,
+              "orchestrator_metadata": {
+                "run_id": "20250822_121554",
+                "iteration": 1,
+                "depth": 1,
+                "task_type": "atomic",
+                "phase": "Phase 5.4 - Error Recovery",
+                "execution_time": 0.0017733573913574219,
+                "timeout_used": 60
+              },
+              "final_status": "completed"
+            },
+            {
+              "task_id": "comprehensive-test-001_sub_121555",
+              "execution_type": "atomic",
+              "status": "success",
+              "timestamp": "2025-08-22T12:15:55.561543",
+              "actions_taken": [
+                {
+                  "action": "task_execution",
+                  "target": "real_environment",
+                  "description": "Executed atomic task using Task tool integration"
+                }
+              ],
+              "results": {
+                "files_created": [],
+                "files_modified": [],
+                "commands_executed": [],
+                "tests_passed": true
+              },
+              "notes": "Phase 5: Atomic task execution via Task tool",
+              "agent_instructions_used": true,
+              "orchestrator_metadata": {
+                "run_id": "20250822_121554",
+                "iteration": 1,
+                "depth": 1,
+                "task_type": "atomic",
+                "phase": "Phase 5.4 - Error Recovery",
+                "execution_time": 0.0022008419036865234,
+                "timeout_used": 60
+              },
+              "final_status": "completed"
+            },
+            {
+              "task_id": "comprehensive-test-001_sub_121556",
+              "execution_type": "atomic",
+              "status": "success",
+              "timestamp": "2025-08-22T12:15:56.141052",
+              "actions_taken": [
+                {
+                  "action": "task_execution",
+                  "target": "real_environment",
+                  "description": "Executed atomic task using Task tool integration"
+                }
+              ],
+              "results": {
+                "files_created": [],
+                "files_modified": [],
+                "commands_executed": [],
+                "tests_passed": true
+              },
+              "notes": "Phase 5: Atomic task execution via Task tool",
+              "agent_instructions_used": true,
+              "orchestrator_metadata": {
+                "run_id": "20250822_121554",
+                "iteration": 1,
+                "depth": 1,
+                "task_type": "atomic",
+                "phase": "Phase 5.4 - Error Recovery",
+                "execution_time": 0.003198862075805664,
+                "timeout_used": 60
+              },
+              "final_status": "completed"
+            },
+            {
+              "task_id": "comprehensive-test-001-sub-2",
+              "execution_type": "atomic",
+              "status": "success",
+              "timestamp": "2025-08-22T12:15:56.797643",
+              "actions_taken": [
+                {
+                  "action": "task_execution",
+                  "target": "real_environment",
+                  "description": "Executed atomic task using Task tool integration"
+                }
+              ],
+              "results": {
+                "files_created": [],
+                "files_modified": [],
+                "commands_executed": [],
+                "tests_passed": true
+              },
+              "notes": "Phase 5: Atomic task execution via Task tool",
+              "agent_instructions_used": true,
+              "orchestrator_metadata": {
+                "run_id": "20250822_121554",
+                "iteration": 1,
+                "depth": 1,
+                "task_type": "atomic",
+                "phase": "Phase 5.4 - Error Recovery",
+                "execution_time": 0.002257108688354492,
+                "timeout_used": 60
+              },
+              "final_status": "completed"
+            },
+            {
+              "task_id": "comprehensive-test-001_sub_121557",
+              "execution_type": "atomic",
+              "status": "success",
+              "timestamp": "2025-08-22T12:15:57.400706",
+              "actions_taken": [
+                {
+                  "action": "task_execution",
+                  "target": "real_environment",
+                  "description": "Executed atomic task using Task tool integration"
+                }
+              ],
+              "results": {
+                "files_created": [],
+                "files_modified": [],
+                "commands_executed": [],
+                "tests_passed": true
+              },
+              "notes": "Phase 5: Atomic task execution via Task tool",
+              "agent_instructions_used": true,
+              "orchestrator_metadata": {
+                "run_id": "20250822_121554",
+                "iteration": 1,
+                "depth": 1,
+                "task_type": "atomic",
+                "phase": "Phase 5.4 - Error Recovery",
+                "execution_time": 0.0021889209747314453,
+                "timeout_used": 60
+              },
+              "final_status": "completed"
+            },
+            {
+              "task_id": "comprehensive-test-001_sub_121558",
+              "execution_type": "atomic",
+              "status": "success",
+              "timestamp": "2025-08-22T12:15:58.073654",
+              "actions_taken": [
+                {
+                  "action": "task_execution",
+                  "target": "real_environment",
+                  "description": "Executed atomic task using Task tool integration"
+                }
+              ],
+              "results": {
+                "files_created": [],
+                "files_modified": [],
+                "commands_executed": [],
+                "tests_passed": true
+              },
+              "notes": "Phase 5: Atomic task execution via Task tool",
+              "agent_instructions_used": true,
+              "orchestrator_metadata": {
+                "run_id": "20250822_121554",
+                "iteration": 1,
+                "depth": 1,
+                "task_type": "atomic",
+                "phase": "Phase 5.4 - Error Recovery",
+                "execution_time": 0.0029921531677246094,
+                "timeout_used": 60
+              },
+              "final_status": "completed"
+            },
+            {
+              "task_id": "comprehensive-test-001-sub-3",
+              "execution_type": "atomic",
+              "status": "success",
+              "timestamp": "2025-08-22T12:15:58.820599",
+              "actions_taken": [
+                {
+                  "action": "task_execution",
+                  "target": "real_environment",
+                  "description": "Executed atomic task using Task tool integration"
+                }
+              ],
+              "results": {
+                "files_created": [],
+                "files_modified": [],
+                "commands_executed": [],
+                "tests_passed": true
+              },
+              "notes": "Phase 5: Atomic task execution via Task tool",
+              "agent_instructions_used": true,
+              "orchestrator_metadata": {
+                "run_id": "20250822_121554",
+                "iteration": 1,
+                "depth": 1,
+                "task_type": "atomic",
+                "phase": "Phase 5.4 - Error Recovery",
+                "execution_time": 0.0024156570434570312,
+                "timeout_used": 60
+              },
+              "final_status": "completed"
+            },
+            {
+              "task_id": "comprehensive-test-001-sub-3-sub-1",
+              "execution_type": "atomic",
+              "status": "success",
+              "timestamp": "2025-08-22T12:15:59.489823",
+              "actions_taken": [
+                {
+                  "action": "task_execution",
+                  "target": "real_environment",
+                  "description": "Executed atomic task using Task tool integration"
+                }
+              ],
+              "results": {
+                "files_created": [],
+                "files_modified": [],
+                "commands_executed": [],
+                "tests_passed": true
+              },
+              "notes": "Phase 5: Atomic task execution via Task tool",
+              "agent_instructions_used": true,
+              "orchestrator_metadata": {
+                "run_id": "20250822_121554",
+                "iteration": 1,
+                "depth": 1,
+                "task_type": "atomic",
+                "phase": "Phase 5.4 - Error Recovery",
+                "execution_time": 0.0019714832305908203,
+                "timeout_used": 60
+              },
+              "final_status": "completed"
+            },
+            {
+              "task_id": "comprehensive-test-001-sub-3-sub-2",
+              "execution_type": "atomic",
+              "status": "success",
+              "timestamp": "2025-08-22T12:16:00.253230",
+              "actions_taken": [
+                {
+                  "action": "task_execution",
+                  "target": "real_environment",
+                  "description": "Executed atomic task using Task tool integration"
+                }
+              ],
+              "results": {
+                "files_created": [],
+                "files_modified": [],
+                "commands_executed": [],
+                "tests_passed": true
+              },
+              "notes": "Phase 5: Atomic task execution via Task tool",
+              "agent_instructions_used": true,
+              "orchestrator_metadata": {
+                "run_id": "20250822_121554",
+                "iteration": 1,
+                "depth": 1,
+                "task_type": "atomic",
+                "phase": "Phase 5.4 - Error Recovery",
+                "execution_time": 0.0030105113983154297,
+                "timeout_used": 60
+              },
+              "final_status": "completed"
+            },
+            {
+              "task_id": "comprehensive-test-001",
+              "execution_type": "parent",
+              "status": "success",
+              "timestamp": "2025-08-22T12:15:54.915497",
+              "depth": 0,
+              "subtask_count": 9,
+              "subtask_results": [
+                {
+                  "task_id": "comprehensive-test-001-sub-1",
+                  "execution_type": "atomic",
+                  "status": "success",
+                  "timestamp": "2025-08-22T12:15:54.925167",
+                  "actions_taken": [
+                    {
+                      "action": "task_execution",
+                      "target": "real_environment",
+                      "description": "Executed atomic task using Task tool integration"
+                    }
+                  ],
+                  "results": {
+                    "files_created": [],
+                    "files_modified": [],
+                    "commands_executed": [],
+                    "tests_passed": true
+                  },
+                  "notes": "Phase 5: Atomic task execution via Task tool",
+                  "agent_instructions_used": true,
+                  "orchestrator_metadata": {
+                    "run_id": "20250822_121554",
+                    "iteration": 1,
+                    "depth": 1,
+                    "task_type": "atomic",
+                    "phase": "Phase 5.4 - Error Recovery",
+                    "execution_time": 0.0017733573913574219,
+                    "timeout_used": 60
+                  },
+                  "final_status": "completed"
+                },
+                {
+                  "task_id": "comprehensive-test-001_sub_121555",
+                  "execution_type": "atomic",
+                  "status": "success",
+                  "timestamp": "2025-08-22T12:15:55.561543",
+                  "actions_taken": [
+                    {
+                      "action": "task_execution",
+                      "target": "real_environment",
+                      "description": "Executed atomic task using Task tool integration"
+                    }
+                  ],
+                  "results": {
+                    "files_created": [],
+                    "files_modified": [],
+                    "commands_executed": [],
+                    "tests_passed": true
+                  },
+                  "notes": "Phase 5: Atomic task execution via Task tool",
+                  "agent_instructions_used": true,
+                  "orchestrator_metadata": {
+                    "run_id": "20250822_121554",
+                    "iteration": 1,
+                    "depth": 1,
+                    "task_type": "atomic",
+                    "phase": "Phase 5.4 - Error Recovery",
+                    "execution_time": 0.0022008419036865234,
+                    "timeout_used": 60
+                  },
+                  "final_status": "completed"
+                },
+                {
+                  "task_id": "comprehensive-test-001_sub_121556",
+                  "execution_type": "atomic",
+                  "status": "success",
+                  "timestamp": "2025-08-22T12:15:56.141052",
+                  "actions_taken": [
+                    {
+                      "action": "task_execution",
+                      "target": "real_environment",
+                      "description": "Executed atomic task using Task tool integration"
+                    }
+                  ],
+                  "results": {
+                    "files_created": [],
+                    "files_modified": [],
+                    "commands_executed": [],
+                    "tests_passed": true
+                  },
+                  "notes": "Phase 5: Atomic task execution via Task tool",
+                  "agent_instructions_used": true,
+                  "orchestrator_metadata": {
+                    "run_id": "20250822_121554",
+                    "iteration": 1,
+                    "depth": 1,
+                    "task_type": "atomic",
+                    "phase": "Phase 5.4 - Error Recovery",
+                    "execution_time": 0.003198862075805664,
+                    "timeout_used": 60
+                  },
+                  "final_status": "completed"
+                },
+                {
+                  "task_id": "comprehensive-test-001-sub-2",
+                  "execution_type": "atomic",
+                  "status": "success",
+                  "timestamp": "2025-08-22T12:15:56.797643",
+                  "actions_taken": [
+                    {
+                      "action": "task_execution",
+                      "target": "real_environment",
+                      "description": "Executed atomic task using Task tool integration"
+                    }
+                  ],
+                  "results": {
+                    "files_created": [],
+                    "files_modified": [],
+                    "commands_executed": [],
+                    "tests_passed": true
+                  },
+                  "notes": "Phase 5: Atomic task execution via Task tool",
+                  "agent_instructions_used": true,
+                  "orchestrator_metadata": {
+                    "run_id": "20250822_121554",
+                    "iteration": 1,
+                    "depth": 1,
+                    "task_type": "atomic",
+                    "phase": "Phase 5.4 - Error Recovery",
+                    "execution_time": 0.002257108688354492,
+                    "timeout_used": 60
+                  },
+                  "final_status": "completed"
+                },
+                {
+                  "task_id": "comprehensive-test-001_sub_121557",
+                  "execution_type": "atomic",
+                  "status": "success",
+                  "timestamp": "2025-08-22T12:15:57.400706",
+                  "actions_taken": [
+                    {
+                      "action": "task_execution",
+                      "target": "real_environment",
+                      "description": "Executed atomic task using Task tool integration"
+                    }
+                  ],
+                  "results": {
+                    "files_created": [],
+                    "files_modified": [],
+                    "commands_executed": [],
+                    "tests_passed": true
+                  },
+                  "notes": "Phase 5: Atomic task execution via Task tool",
+                  "agent_instructions_used": true,
+                  "orchestrator_metadata": {
+                    "run_id": "20250822_121554",
+                    "iteration": 1,
+                    "depth": 1,
+                    "task_type": "atomic",
+                    "phase": "Phase 5.4 - Error Recovery",
+                    "execution_time": 0.0021889209747314453,
+                    "timeout_used": 60
+                  },
+                  "final_status": "completed"
+                },
+                {
+                  "task_id": "comprehensive-test-001_sub_121558",
+                  "execution_type": "atomic",
+                  "status": "success",
+                  "timestamp": "2025-08-22T12:15:58.073654",
+                  "actions_taken": [
+                    {
+                      "action": "task_execution",
+                      "target": "real_environment",
+                      "description": "Executed atomic task using Task tool integration"
+                    }
+                  ],
+                  "results": {
+                    "files_created": [],
+                    "files_modified": [],
+                    "commands_executed": [],
+                    "tests_passed": true
+                  },
+                  "notes": "Phase 5: Atomic task execution via Task tool",
+                  "agent_instructions_used": true,
+                  "orchestrator_metadata": {
+                    "run_id": "20250822_121554",
+                    "iteration": 1,
+                    "depth": 1,
+                    "task_type": "atomic",
+                    "phase": "Phase 5.4 - Error Recovery",
+                    "execution_time": 0.0029921531677246094,
+                    "timeout_used": 60
+                  },
+                  "final_status": "completed"
+                },
+                {
+                  "task_id": "comprehensive-test-001-sub-3",
+                  "execution_type": "atomic",
+                  "status": "success",
+                  "timestamp": "2025-08-22T12:15:58.820599",
+                  "actions_taken": [
+                    {
+                      "action": "task_execution",
+                      "target": "real_environment",
+                      "description": "Executed atomic task using Task tool integration"
+                    }
+                  ],
+                  "results": {
+                    "files_created": [],
+                    "files_modified": [],
+                    "commands_executed": [],
+                    "tests_passed": true
+                  },
+                  "notes": "Phase 5: Atomic task execution via Task tool",
+                  "agent_instructions_used": true,
+                  "orchestrator_metadata": {
+                    "run_id": "20250822_121554",
+                    "iteration": 1,
+                    "depth": 1,
+                    "task_type": "atomic",
+                    "phase": "Phase 5.4 - Error Recovery",
+                    "execution_time": 0.0024156570434570312,
+                    "timeout_used": 60
+                  },
+                  "final_status": "completed"
+                },
+                {
+                  "task_id": "comprehensive-test-001-sub-3-sub-1",
+                  "execution_type": "atomic",
+                  "status": "success",
+                  "timestamp": "2025-08-22T12:15:59.489823",
+                  "actions_taken": [
+                    {
+                      "action": "task_execution",
+                      "target": "real_environment",
+                      "description": "Executed atomic task using Task tool integration"
+                    }
+                  ],
+                  "results": {
+                    "files_created": [],
+                    "files_modified": [],
+                    "commands_executed": [],
+                    "tests_passed": true
+                  },
+                  "notes": "Phase 5: Atomic task execution via Task tool",
+                  "agent_instructions_used": true,
+                  "orchestrator_metadata": {
+                    "run_id": "20250822_121554",
+                    "iteration": 1,
+                    "depth": 1,
+                    "task_type": "atomic",
+                    "phase": "Phase 5.4 - Error Recovery",
+                    "execution_time": 0.0019714832305908203,
+                    "timeout_used": 60
+                  },
+                  "final_status": "completed"
+                },
+                {
+                  "task_id": "comprehensive-test-001-sub-3-sub-2",
+                  "execution_type": "atomic",
+                  "status": "success",
+                  "timestamp": "2025-08-22T12:16:00.253230",
+                  "actions_taken": [
+                    {
+                      "action": "task_execution",
+                      "target": "real_environment",
+                      "description": "Executed atomic task using Task tool integration"
+                    }
+                  ],
+                  "results": {
+                    "files_created": [],
+                    "files_modified": [],
+                    "commands_executed": [],
+                    "tests_passed": true
+                  },
+                  "notes": "Phase 5: Atomic task execution via Task tool",
+                  "agent_instructions_used": true,
+                  "orchestrator_metadata": {
+                    "run_id": "20250822_121554",
+                    "iteration": 1,
+                    "depth": 1,
+                    "task_type": "atomic",
+                    "phase": "Phase 5.4 - Error Recovery",
+                    "execution_time": 0.0030105113983154297,
+                    "timeout_used": 60
+                  },
+                  "final_status": "completed"
+                }
+              ],
+              "orchestrator_metadata": {
+                "run_id": "20250822_121554",
+                "iteration": 1,
+                "depth": 0,
+                "task_type": "parent",
+                "phase": "Phase 5.2 - Recursive ExecuteTask"
+              },
+              "final_status": "completed"
+            }
+          ]
+        },
+        "current_task": {
+          "id": "comprehensive-test-001-sub-3-sub-2",
+          "title": "Deep Recovery Task",
+          "description": "Test recovery at depth",
+          "type": "atomic",
+          "parent_id": "comprehensive-test-001",
+          "parent_context": {
+            "parent_title": "Deep Recovery Task",
+            "parent_type": "parent",
+            "depth": 0
+          },
+          "policy": {
+            "max_attempts": 2,
+            "max_depth": 5
+          },
+          "acceptance": [
+            "Subtask completes successfully"
+          ],
+          "constraints": [],
+          "status": "pending",
+          "created_at": "2025-08-22T12:16:00.185042"
+        }
+      },
+      "recovery_metadata": {
+        "failure_counts": {},
+        "checkpoints_created": 0
+      }
+    },
+    "before_task_template-test-001": {
+      "name": "before_task_template-test-001",
+      "timestamp": "2025-08-22T12:54:43.593523",
+      "run_id": "20250822_125443",
+      "iteration": 1,
+      "state_snapshot": {
+        "task_queue": {
+          "tasks": [
+            {
+              "id": "template-test-001",
+              "title": "Enhanced Template System Test",
+              "type": "atomic",
+              "content": "# Enhanced Template System Test\n\nThis task tests the Phase 6.1 enhanced natural language templating system.\n\n## Purpose\n\nValidate that the enhanced templating system provides:\n\n1. **Variable Substitution**: Dynamic content based on task context\n2. **Conditional Instructions**: Adaptive behavior based on conditions\n3. **Context Injection**: Rich context awareness in agents\n4. **Template Inheritance**: Reusable template components\n\n## Test Scenarios\n\n### Variable Substitution\n- Task ID, title, and metadata should be properly substituted\n- Timestamp and execution context should be injected\n- Depth and iteration information should be available\n\n### Conditional Logic\n- Different instructions based on task type (atomic vs parent)\n- Adaptive behavior based on execution depth\n- Special handling for retry scenarios\n\n### Context Awareness\n- Agent should have access to full execution context\n- Previous execution history should inform current behavior\n- Environment state should influence decision making\n\n## Expected Behavior\n\nThe enhanced template system should:\n1. Load the enhanced executor agent template\n2. Process all template variables and conditionals\n3. Generate context-aware instructions\n4. Execute with improved awareness and adaptability\n5. Document the template features used\n\n## Success Criteria\n\n- [x] Enhanced template is loaded and processed\n- [x] Variables are substituted correctly\n- [x] Conditional blocks execute appropriately  \n- [x] Context injection provides rich information\n- [x] Agent behavior shows enhanced awareness\n- [x] Template features are documented in execution results",
+              "source_file": "tasks\\template_test.md",
+              "status": "pending",
+              "created_at": "2025-08-22T12:54:43.580424",
+              "source": "user",
+              "constraints": [
+                "Must test enhanced natural language templating",
+                "Should demonstrate variable substitution",
+                "Must validate conditional instructions"
+              ],
+              "acceptance": [
+                "Template engine processes variables correctly",
+                "Conditional blocks work as expected",
+                "Context injection functions properly",
+                "Enhanced agent behavior is observable"
+              ],
+              "max_attempts": 2,
+              "max_depth": 2,
+              "timeout_seconds": 30
+            }
+          ]
+        },
+        "execution_history": {},
+        "current_task": {}
+      },
+      "recovery_metadata": {
+        "failure_counts": {},
+        "checkpoints_created": 1
+      },
+      "additional_data": {
+        "task": {
+          "id": "template-test-001",
+          "title": "Enhanced Template System Test",
+          "type": "atomic",
+          "content": "# Enhanced Template System Test\n\nThis task tests the Phase 6.1 enhanced natural language templating system.\n\n## Purpose\n\nValidate that the enhanced templating system provides:\n\n1. **Variable Substitution**: Dynamic content based on task context\n2. **Conditional Instructions**: Adaptive behavior based on conditions\n3. **Context Injection**: Rich context awareness in agents\n4. **Template Inheritance**: Reusable template components\n\n## Test Scenarios\n\n### Variable Substitution\n- Task ID, title, and metadata should be properly substituted\n- Timestamp and execution context should be injected\n- Depth and iteration information should be available\n\n### Conditional Logic\n- Different instructions based on task type (atomic vs parent)\n- Adaptive behavior based on execution depth\n- Special handling for retry scenarios\n\n### Context Awareness\n- Agent should have access to full execution context\n- Previous execution history should inform current behavior\n- Environment state should influence decision making\n\n## Expected Behavior\n\nThe enhanced template system should:\n1. Load the enhanced executor agent template\n2. Process all template variables and conditionals\n3. Generate context-aware instructions\n4. Execute with improved awareness and adaptability\n5. Document the template features used\n\n## Success Criteria\n\n- [x] Enhanced template is loaded and processed\n- [x] Variables are substituted correctly\n- [x] Conditional blocks execute appropriately  \n- [x] Context injection provides rich information\n- [x] Agent behavior shows enhanced awareness\n- [x] Template features are documented in execution results",
+          "source_file": "tasks\\template_test.md",
+          "status": "pending",
+          "created_at": "2025-08-22T12:54:43.580424",
+          "source": "user",
+          "constraints": [
+            "Must test enhanced natural language templating",
+            "Should demonstrate variable substitution",
+            "Must validate conditional instructions"
+          ],
+          "acceptance": [
+            "Template engine processes variables correctly",
+            "Conditional blocks work as expected",
+            "Context injection functions properly",
+            "Enhanced agent behavior is observable"
+          ],
+          "max_attempts": 2,
+          "max_depth": 2,
+          "timeout_seconds": 30,
+          "acceptance_criteria": [
+            "Task objective is achieved",
+            "No errors or exceptions occur",
+            "Result meets basic quality standards"
+          ],
+          "elaboration_level": "enhanced",
+          "elaboration_history": [
+            {
+              "level": "enhanced",
+              "timestamp": "2025-08-22T12:54:43.593468",
+              "context_used": [
+                "queue_position",
+                "working_directory",
+                "language"
+              ]
+            }
+          ]
+        },
+        "depth": 0
+      }
+    }
+  },
+  "failure_counts": {},
+  "last_successful_state": {
+    "name": "before_task_template-test-001",
+    "timestamp": "2025-08-22T12:54:43.593523",
+    "run_id": "20250822_125443",
+    "iteration": 1,
+    "state_snapshot": {
+      "task_queue": {
+        "tasks": [
+          {
+            "id": "template-test-001",
+            "title": "Enhanced Template System Test",
+            "type": "atomic",
+            "content": "# Enhanced Template System Test\n\nThis task tests the Phase 6.1 enhanced natural language templating system.\n\n## Purpose\n\nValidate that the enhanced templating system provides:\n\n1. **Variable Substitution**: Dynamic content based on task context\n2. **Conditional Instructions**: Adaptive behavior based on conditions\n3. **Context Injection**: Rich context awareness in agents\n4. **Template Inheritance**: Reusable template components\n\n## Test Scenarios\n\n### Variable Substitution\n- Task ID, title, and metadata should be properly substituted\n- Timestamp and execution context should be injected\n- Depth and iteration information should be available\n\n### Conditional Logic\n- Different instructions based on task type (atomic vs parent)\n- Adaptive behavior based on execution depth\n- Special handling for retry scenarios\n\n### Context Awareness\n- Agent should have access to full execution context\n- Previous execution history should inform current behavior\n- Environment state should influence decision making\n\n## Expected Behavior\n\nThe enhanced template system should:\n1. Load the enhanced executor agent template\n2. Process all template variables and conditionals\n3. Generate context-aware instructions\n4. Execute with improved awareness and adaptability\n5. Document the template features used\n\n## Success Criteria\n\n- [x] Enhanced template is loaded and processed\n- [x] Variables are substituted correctly\n- [x] Conditional blocks execute appropriately  \n- [x] Context injection provides rich information\n- [x] Agent behavior shows enhanced awareness\n- [x] Template features are documented in execution results",
+            "source_file": "tasks\\template_test.md",
+            "status": "pending",
+            "created_at": "2025-08-22T12:54:43.580424",
+            "source": "user",
+            "constraints": [
+              "Must test enhanced natural language templating",
+              "Should demonstrate variable substitution",
+              "Must validate conditional instructions"
+            ],
+            "acceptance": [
+              "Template engine processes variables correctly",
+              "Conditional blocks work as expected",
+              "Context injection functions properly",
+              "Enhanced agent behavior is observable"
+            ],
+            "max_attempts": 2,
+            "max_depth": 2,
+            "timeout_seconds": 30
+          }
+        ]
+      },
+      "execution_history": {},
+      "current_task": {}
+    },
+    "recovery_metadata": {
+      "failure_counts": {},
+      "checkpoints_created": 1
+    },
+    "additional_data": {
+      "task": {
+        "id": "template-test-001",
+        "title": "Enhanced Template System Test",
+        "type": "atomic",
+        "content": "# Enhanced Template System Test\n\nThis task tests the Phase 6.1 enhanced natural language templating system.\n\n## Purpose\n\nValidate that the enhanced templating system provides:\n\n1. **Variable Substitution**: Dynamic content based on task context\n2. **Conditional Instructions**: Adaptive behavior based on conditions\n3. **Context Injection**: Rich context awareness in agents\n4. **Template Inheritance**: Reusable template components\n\n## Test Scenarios\n\n### Variable Substitution\n- Task ID, title, and metadata should be properly substituted\n- Timestamp and execution context should be injected\n- Depth and iteration information should be available\n\n### Conditional Logic\n- Different instructions based on task type (atomic vs parent)\n- Adaptive behavior based on execution depth\n- Special handling for retry scenarios\n\n### Context Awareness\n- Agent should have access to full execution context\n- Previous execution history should inform current behavior\n- Environment state should influence decision making\n\n## Expected Behavior\n\nThe enhanced template system should:\n1. Load the enhanced executor agent template\n2. Process all template variables and conditionals\n3. Generate context-aware instructions\n4. Execute with improved awareness and adaptability\n5. Document the template features used\n\n## Success Criteria\n\n- [x] Enhanced template is loaded and processed\n- [x] Variables are substituted correctly\n- [x] Conditional blocks execute appropriately  \n- [x] Context injection provides rich information\n- [x] Agent behavior shows enhanced awareness\n- [x] Template features are documented in execution results",
+        "source_file": "tasks\\template_test.md",
+        "status": "pending",
+        "created_at": "2025-08-22T12:54:43.580424",
+        "source": "user",
+        "constraints": [
+          "Must test enhanced natural language templating",
+          "Should demonstrate variable substitution",
+          "Must validate conditional instructions"
+        ],
+        "acceptance": [
+          "Template engine processes variables correctly",
+          "Conditional blocks work as expected",
+          "Context injection functions properly",
+          "Enhanced agent behavior is observable"
+        ],
+        "max_attempts": 2,
+        "max_depth": 2,
+        "timeout_seconds": 30,
+        "acceptance_criteria": [
+          "Task objective is achieved",
+          "No errors or exceptions occur",
+          "Result meets basic quality standards"
+        ],
+        "elaboration_level": "enhanced",
+        "elaboration_history": [
+          {
+            "level": "enhanced",
+            "timestamp": "2025-08-22T12:54:43.593468",
+            "context_used": [
+              "queue_position",
+              "working_directory",
+              "language"
+            ]
+          }
+        ]
+      },
+      "depth": 0
+    }
+  },
+  "emergency_recovery_enabled": true,
+  "recovery_file": "runs\\20250822_125443\\recovery.json"
+}
