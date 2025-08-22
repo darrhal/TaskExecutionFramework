@@ -23,7 +23,7 @@
       "timeout_seconds": 30,
       "simulate_failure": true,
       "failure_type": "execution_error",
-      "completed_at": "2025-08-22T12:14:44.177531"
+      "completed_at": "2025-08-22T12:14:44.796070"
     },
     {
       "id": "error-recovery-001",
