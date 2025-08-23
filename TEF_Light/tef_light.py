@@ -11,6 +11,7 @@ import subprocess
 
 from claude_client import ClaudeClient
 from models import ExecutionResult, AssessmentResult, TaskNode, TaskTree
+from templates import template_manager
 
 
 # Initialize Claude client globally
@@ -89,21 +90,14 @@ def execute(task: TaskNode) -> ExecutionResult:
     """Execute an atomic task and return comprehensive results."""
     print(f"Executing: {task.description}")
 
-    # Load task execution instructions
-    with open("instructions/task_execution_instructions.md", "r") as f:
-        instructions = f.read()
-
-    # Create prompt for Claude
-    prompt = f"""
-{instructions}
-
-## Current Task
-Task to complete: {task.description}
-Task ID: {task.id}
-Working directory: ./
-
-Please implement this task according to the instructions above.
-"""
+    # Render prompt using template system
+    prompt = template_manager.render(
+        "task_execution",
+        task_id=task.id,
+        task_description=task.description,
+        working_directory="./",
+        additional_context=""  # Can be extended for future use
+    )
 
     # Get structured execution result from Claude
     execution_result = claude_client.execute_task(prompt)
@@ -122,10 +116,8 @@ Please implement this task according to the instructions above.
 
 def assess(task: TaskNode, tree: TaskNode, execution_result: ExecutionResult | None) -> AssessmentResult:
     """Assess from multiple perspectives using Claude."""
-    # Load assessment instructions
-    with open("instructions/assessment_instructions.md", "r") as f:
-        instructions = f.read()
-
+    
+    # Format execution info if available
     execution_info = ""
     if execution_result:
         execution_info = f"""
@@ -140,30 +132,22 @@ Errors: {execution_result.errors}
 {execution_result.git_diff or 'No changes detected'}
 """
 
-    prompt = f"""
-{instructions}
-
-## Current Task
-Task: {task.description}
-Task ID: {task.id}
-{execution_info}
-
-## Context
-Full task tree: {json.dumps(tree.model_dump(), indent=2)}
-
-Please assess this task from all four perspectives (Build, Requirements, Integration, Quality)
-according to the instructions above.
-"""
+    # Render prompt using template system
+    prompt = template_manager.render(
+        "task_assessment",
+        task_id=task.id,
+        task_description=task.description,
+        execution_info=execution_info,
+        task_tree_context=f"Full task tree: {json.dumps(tree.model_dump(), indent=2)}"
+    )
 
     return claude_client.assess_task(prompt)
 
 
 def adapt(task: TaskNode, obs: AssessmentResult, tree: TaskNode) -> TaskNode | None:
     """Navigate/adapt the plan based on observations."""
-    # Load adaptation instructions
-    with open("instructions/adaptation_instructions.md", "r") as f:
-        instructions = f.read()
-
+    
+    # Format observations for template
     observations_text = f"""
 Build Perspective:
 - Feasible: {obs.build.feasible}
@@ -186,21 +170,14 @@ Quality Perspective:
 - Observations: {obs.quality.observations}
 """
 
-    prompt = f"""
-{instructions}
-
-## Current Situation
-Task just completed: {task.description}
-Task ID: {task.id}
-
-## Assessment Observations
-{observations_text}
-
-## Current Task Tree
-{json.dumps(tree.model_dump(), indent=2)}
-
-Based on the observations above, adapt the plan according to the instructions.
-"""
+    # Render prompt using template system
+    prompt = template_manager.render(
+        "plan_adaptation",
+        task_id=task.id,
+        task_description=task.description,
+        observations=observations_text,
+        task_tree=json.dumps(tree.model_dump(), indent=2)
+    )
 
     return claude_client.adapt_plan(prompt)
 

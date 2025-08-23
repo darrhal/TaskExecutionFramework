@@ -337,9 +337,10 @@ rename execution_instructions to task_execution_instructions
 
 why does this say "Use the execution_summary tool". Is that supposed to be a tool available to claude code?
 
-Also why aren't the instructions templates? Can we make it like that?
+Why aren't the instructions templates? Can we make it like that? Is there a standard that anthropic suggests for how to define essentially "parameters" that you can pass into something like this that acts as a template, and slots that data in?
 
 
+I think we should try to utilize system prompts since we are using the sdk, which exposes this
 
 
 
