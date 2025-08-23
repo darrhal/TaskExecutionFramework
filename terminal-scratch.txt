@@ -327,7 +327,7 @@ Good. Now I want you to review the document and pull out anything that's more de
 
 
 
-
+Need to add state tracking/whatever to the commit (record) area, based on specs. Might need to review full spec also to get that right.
 
 
 

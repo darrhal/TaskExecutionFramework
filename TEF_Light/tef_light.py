@@ -27,7 +27,7 @@ def call_claude(prompt: str, model: str = "claude-3-5-sonnet-20241022", max_toke
         return f"Claude API Error: {str(e)}"
 
 
-def execute_framework(environment_path: str, task_plan_path: str = "project_plan.json") -> None:
+def execute_framework(environment_path: str, task_plan_path: str = "sample_project_plan.json") -> None:
     # Load task tree from plan
     with open(task_plan_path, "r") as f:
         task_tree = json.load(f)
