@@ -36,11 +36,14 @@ def execute_framework(environment_path: str, task_plan_path: str = "project_plan
 
 
 def execute_task(task_tree: dict[str, Any], environment_path: str) -> None:
-    while has_pending_tasks(task_tree):
+    while True:
         task = find_next_task(task_tree)
         if not task:
             break
 
+        # Mark task as in progress
+        task["status"] = "in_progress"
+        
         # Act (atomic only)
         result = None
         if not task.get("children"):
@@ -52,16 +55,26 @@ def execute_task(task_tree: dict[str, Any], environment_path: str) -> None:
 
         # Adapt (all tasks)
         task_tree = adapt(task, observations, task_tree)
+        
+        # Mark task as completed
+        task["status"] = "completed"
         record(f"ADAPT: {task['id']}")
 
 
-# Stubs
-def has_pending_tasks(tree: dict[str, Any]) -> bool:
-    return False
-
-
+# Task tree navigation
 def find_next_task(tree: dict[str, Any]) -> dict[str, Any] | None:
-    pass
+    """Find the next atomic (leaf) task that's pending using depth-first traversal"""
+    # If this task is atomic (no children) and pending, return it
+    if not tree.get("children") and tree.get("status") == "pending":
+        return tree
+    
+    # Otherwise, check children depth-first
+    for child in tree.get("children", []):
+        next_task = find_next_task(child)
+        if next_task:
+            return next_task
+    
+    return None
 
 
 def execute(task: dict[str, Any]) -> dict[str, Any]:
@@ -175,7 +188,16 @@ Return the updated task tree as JSON, or the same tree if no changes needed.
 
 
 def record(msg: str) -> None:
+    """Record progress with both logging and git commits"""
     print(msg)
+    
+    try:
+        # Stage all changes
+        subprocess.run(['git', 'add', '-A'], check=True, capture_output=True)
+        # Commit with the message
+        subprocess.run(['git', 'commit', '-m', msg], check=True, capture_output=True)
+    except subprocess.CalledProcessError as e:
+        print(f"Git commit failed: {e}")
 
 
 if __name__ == "__main__":
