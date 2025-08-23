@@ -67,7 +67,11 @@ Respond with a brief summary of what you did.
             max_tokens=1024,
             messages=[{"role": "user", "content": prompt}]
         )
-        sdk_response = message.content[0].text
+        # Extract text from response content blocks
+        sdk_response = ""
+        for block in message.content:
+            if block.type == "text":
+                sdk_response += block.text
     except Exception as e:
         sdk_response = f"SDK Error: {str(e)}"
     
