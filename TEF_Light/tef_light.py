@@ -132,12 +132,46 @@ Full task tree: {json.dumps(tree, indent=2)}
 Please assess this task according to the instructions above.
 """
 
-    # TODO: Call Claude SDK with prompt
-    return {"observations": prompt}
+    # Call Claude SDK with assessment prompt
+    observations = call_claude(prompt)
+    return {"observations": observations}
 
 
 def adapt(task: dict[str, Any], obs: dict[str, Any], tree: dict[str, Any]) -> dict[str, Any]:
-    return tree
+    """Navigate/adapt the plan based on observations"""
+    prompt = f"""
+You are a project navigator adapting plans based on observations.
+
+Current Task: {task.get('description')}
+Task ID: {task['id']}
+
+Observations from assessment:
+{obs.get('observations', 'No observations')}
+
+Current Task Tree:
+{json.dumps(tree, indent=2)}
+
+Based on these observations, should the plan be modified?
+Consider:
+- Task decomposition if needed
+- Plan refinement 
+- Task status updates
+- New tasks to insert
+- Tasks to remove or reorder
+
+Return the updated task tree as JSON, or the same tree if no changes needed.
+"""
+    
+    adaptation = call_claude(prompt, max_tokens=2048)  # More tokens for tree modifications
+    
+    try:
+        # Try to parse response as JSON (updated tree)
+        updated_tree = json.loads(adaptation)
+        return updated_tree
+    except json.JSONDecodeError:
+        # If not valid JSON, return original tree
+        print(f"Adaptation not valid JSON: {adaptation}")
+        return tree
 
 
 def record(msg: str) -> None:
