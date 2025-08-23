@@ -6,6 +6,27 @@ from typing import Any
 import anthropic
 
 
+def call_claude(prompt: str, model: str = "claude-3-5-sonnet-20241022", max_tokens: int = 1024) -> str:
+    """Simple wrapper for Claude API calls with sensible defaults"""
+    try:
+        client = anthropic.Anthropic()
+        message = client.messages.create(
+            model=model,
+            max_tokens=max_tokens,
+            messages=[{"role": "user", "content": prompt}]
+        )
+        
+        # Extract text from response content blocks
+        response_text = ""
+        for block in message.content:
+            if block.type == "text":
+                response_text += block.text
+        
+        return response_text
+    except Exception as e:
+        return f"Claude API Error: {str(e)}"
+
+
 def execute_framework(environment_path: str, task_plan_path: str = "project_plan.json") -> None:
     # Load task tree from plan
     with open(task_plan_path, "r") as f:
@@ -48,8 +69,6 @@ def execute(task: dict[str, Any]) -> dict[str, Any]:
     print(f"Executing: {task.get('description')}")
     
     # Call Claude SDK to actually execute the task
-    client = anthropic.Anthropic()  # Uses ANTHROPIC_API_KEY env var
-    
     prompt = f"""
 You are a software engineer implementing tasks in a codebase.
 
@@ -61,19 +80,7 @@ Please implement this task by creating or modifying files as needed.
 Respond with a brief summary of what you did.
 """
     
-    try:
-        message = client.messages.create(
-            model="claude-3-5-sonnet-20241022",
-            max_tokens=1024,
-            messages=[{"role": "user", "content": prompt}]
-        )
-        # Extract text from response content blocks
-        sdk_response = ""
-        for block in message.content:
-            if block.type == "text":
-                sdk_response += block.text
-    except Exception as e:
-        sdk_response = f"SDK Error: {str(e)}"
+    sdk_response = call_claude(prompt)
     
     # Capture what changed in git
     try:
