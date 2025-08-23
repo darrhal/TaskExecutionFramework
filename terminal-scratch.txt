@@ -333,7 +333,11 @@ We need to add state tracking/whatever to the commit (record) area, based on spe
 
 execute_framework->execute_project_plan
 
+rename execution_instructions to task_execution_instructions
 
+why does it say "Use the execution_summary tool". Is that supposed to be a tool available to claude code?
+
+Also why aren't the instructions templates? Can we make it like that?
 
 
 

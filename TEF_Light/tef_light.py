@@ -6,10 +6,8 @@ A minimal implementation of the Act→Assess→Adapt cycle using Claude SDK
 with structured outputs for reliable task orchestration.
 """
 
-import os
 import json
 import subprocess
-from typing import Any, Dict
 
 from claude_client import ClaudeClient
 from models import ExecutionResult, AssessmentResult, TaskNode, TaskTree
@@ -19,11 +17,12 @@ from models import ExecutionResult, AssessmentResult, TaskNode, TaskTree
 claude_client = ClaudeClient()
 
 
-def execute_framework(environment_path: str, task_plan_path: str = "sample_project_plan.json") -> None:
+def execute_framework(environment_path: str,
+                      task_plan_path: str = "sample_project_plan.json") -> None:
     """Execute the complete task framework."""
     # Load and validate task tree from plan
     task_tree = TaskTree.load_from_file(task_plan_path)
-    
+
     execute_task(task_tree.root, environment_path)
 
 
@@ -36,7 +35,7 @@ def execute_task(task_tree: TaskNode, environment_path: str) -> None:
 
         # Mark task as in progress
         task.status = "in_progress"
-        
+
         # Act (atomic only)
         execution_result = None
         if not task.children:
@@ -46,12 +45,12 @@ def execute_task(task_tree: TaskNode, environment_path: str) -> None:
         # Assess (all tasks)
         assessment = assess(task, task_tree, execution_result)
 
-        # Adapt (all tasks) 
+        # Adapt (all tasks)
         updated_tree = adapt(task, assessment, task_tree)
         if updated_tree:
             # Update the tree with adapted changes
             _update_task_tree(task_tree, updated_tree)
-        
+
         # Mark task as completed
         task.status = "completed"
         record(f"ADAPT: {task.id}")
@@ -63,14 +62,14 @@ def find_next_task(tree: TaskNode) -> TaskNode | None:
     # If this task is atomic (no children) and pending, return it
     if not tree.children and tree.status == "pending":
         return tree
-    
+
     # Otherwise, check children depth-first
     if tree.children:
         for child in tree.children:
             next_task = find_next_task(child)
             if next_task:
                 return next_task
-    
+
     return None
 
 
@@ -89,11 +88,11 @@ def _update_task_tree(original: TaskNode, updated: TaskNode) -> None:
 def execute(task: TaskNode) -> ExecutionResult:
     """Execute an atomic task and return comprehensive results."""
     print(f"Executing: {task.description}")
-    
+
     # Load execution instructions
     with open("instructions/execution_instructions.md", "r") as f:
         instructions = f.read()
-    
+
     # Create prompt for Claude
     prompt = f"""
 {instructions}
@@ -103,21 +102,22 @@ Task to complete: {task.description}
 Task ID: {task.id}
 Working directory: ./
 
-Please implement this task according to the instructions above. Use the execution_summary tool to provide a structured summary of your implementation.
+Please implement this task according to the instructions above.
+Use the execution_summary tool to provide a structured summary of your implementation.
 """
-    
+
     # Get structured execution result from Claude
     execution_result = claude_client.execute_task(prompt)
-    
+
     # Ensure git_diff is captured if not provided by Claude
     if not execution_result.git_diff:
         try:
-            git_diff = subprocess.run(['git', 'diff', 'HEAD'], 
-                                     capture_output=True, text=True, check=True)
+            git_diff = subprocess.run(['git', 'diff', 'HEAD'],
+                                      capture_output=True, text=True, check=True)
             execution_result.git_diff = git_diff.stdout
         except subprocess.CalledProcessError:
             execution_result.git_diff = "Error capturing git diff"
-    
+
     return execution_result
 
 
@@ -152,7 +152,8 @@ Task ID: {task.id}
 ## Context
 Full task tree: {json.dumps(tree.model_dump(), indent=2)}
 
-Please assess this task from all four perspectives (Build, Requirements, Integration, Quality) according to the instructions above. Use the assessment_summary tool to provide structured observations.
+Please assess this task from all four perspectives (Build, Requirements, Integration, Quality)
+according to the instructions above. Use the assessment_summary tool to provide structured observations.
 """
 
     return claude_client.assess_task(prompt)
@@ -163,7 +164,7 @@ def adapt(task: TaskNode, obs: AssessmentResult, tree: TaskNode) -> TaskNode | N
     # Load adaptation instructions
     with open("instructions/adaptation_instructions.md", "r") as f:
         instructions = f.read()
-    
+
     observations_text = f"""
 Build Perspective:
 - Feasible: {obs.build.feasible}
@@ -185,7 +186,7 @@ Quality Perspective:
 - Blockers: {obs.quality.blockers}
 - Observations: {obs.quality.observations}
 """
-    
+
     prompt = f"""
 {instructions}
 
@@ -199,16 +200,17 @@ Task ID: {task.id}
 ## Current Task Tree
 {json.dumps(tree.model_dump(), indent=2)}
 
-Based on the observations above, adapt the plan according to the instructions. Use the plan_update tool to return the updated task tree structure.
+Based on the observations above, adapt the plan according to the instructions.
+Use the plan_update tool to return the updated task tree structure.
 """
-    
+
     return claude_client.adapt_plan(prompt)
 
 
 def record(msg: str) -> None:
     """Record progress with both logging and git commits"""
     print(msg)
-    
+
     try:
         # Stage all changes
         subprocess.run(['git', 'add', '-A'], check=True, capture_output=True)

@@ -14,7 +14,8 @@
       "Bash(py test_phase2.py)",
       "Bash(py:*)",
       "Bash(pip install:*)",
-      "WebFetch(domain:github.com)"
+      "WebFetch(domain:github.com)",
+      "Bash(sed:*)"
     ],
     "deny": [],
     "ask": []

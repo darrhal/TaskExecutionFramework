@@ -12,7 +12,7 @@ from typing import List, Optional, Literal
 
 class ExecutionResult(BaseModel):
     """Result of executing an atomic task."""
-    
+
     status: Literal["success", "failure", "partial"] = Field(
         description="Status of the task execution"
     )
@@ -39,7 +39,7 @@ class ExecutionResult(BaseModel):
 
 class PerspectiveAssessment(BaseModel):
     """Assessment from a single perspective (Build, Requirements, Integration, or Quality)."""
-    
+
     feasible: bool = Field(
         description="Whether this perspective considers the task feasible/successful"
     )
@@ -54,7 +54,7 @@ class PerspectiveAssessment(BaseModel):
 
 class AssessmentResult(BaseModel):
     """Multi-perspective assessment of a completed task."""
-    
+
     build: PerspectiveAssessment = Field(
         description="Technical feasibility and implementation assessment"
     )
@@ -71,7 +71,7 @@ class AssessmentResult(BaseModel):
 
 class TaskNode(BaseModel):
     """A task in the hierarchical task tree."""
-    
+
     id: str = Field(
         description="Unique identifier for this task"
     )
@@ -96,24 +96,24 @@ class TaskNode(BaseModel):
 
 class TaskTree(BaseModel):
     """Root task tree structure loaded from JSON files."""
-    
+
     root: TaskNode = Field(
         description="Root task node containing the entire project hierarchy"
     )
-    
+
     @classmethod
     def load_from_file(cls, file_path: str) -> 'TaskTree':
         """Load and validate task tree from JSON file."""
         with open(file_path, 'r') as f:
             data = json.load(f)
-        
+
         # If the JSON is just a task node, wrap it as root
         if isinstance(data, dict) and 'id' in data:
             return cls(root=TaskNode.model_validate(data))
-        
+
         # Otherwise expect it to have a 'root' key
         return cls.model_validate(data)
-    
+
     def save_to_file(self, file_path: str) -> None:
         """Save task tree to JSON file."""
         with open(file_path, 'w') as f:
