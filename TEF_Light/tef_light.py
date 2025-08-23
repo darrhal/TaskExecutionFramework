@@ -17,9 +17,9 @@ from models import ExecutionResult, AssessmentResult, TaskNode, TaskTree
 claude_client = ClaudeClient()
 
 
-def execute_framework(environment_path: str,
-                      task_plan_path: str = "sample_project_plan.json") -> None:
-    """Execute the complete task framework."""
+def execute_project_plan(environment_path: str,
+                         task_plan_path: str = "sample_project_plan.json") -> None:
+    """Execute the complete project plan using the task framework."""
     # Load and validate task tree from plan
     task_tree = TaskTree.load_from_file(task_plan_path)
 
@@ -89,8 +89,8 @@ def execute(task: TaskNode) -> ExecutionResult:
     """Execute an atomic task and return comprehensive results."""
     print(f"Executing: {task.description}")
 
-    # Load execution instructions
-    with open("instructions/execution_instructions.md", "r") as f:
+    # Load task execution instructions
+    with open("instructions/task_execution_instructions.md", "r") as f:
         instructions = f.read()
 
     # Create prompt for Claude
@@ -103,7 +103,6 @@ Task ID: {task.id}
 Working directory: ./
 
 Please implement this task according to the instructions above.
-Use the execution_summary tool to provide a structured summary of your implementation.
 """
 
     # Get structured execution result from Claude
@@ -153,7 +152,7 @@ Task ID: {task.id}
 Full task tree: {json.dumps(tree.model_dump(), indent=2)}
 
 Please assess this task from all four perspectives (Build, Requirements, Integration, Quality)
-according to the instructions above. Use the assessment_summary tool to provide structured observations.
+according to the instructions above.
 """
 
     return claude_client.assess_task(prompt)
@@ -201,7 +200,6 @@ Task ID: {task.id}
 {json.dumps(tree.model_dump(), indent=2)}
 
 Based on the observations above, adapt the plan according to the instructions.
-Use the plan_update tool to return the updated task tree structure.
 """
 
     return claude_client.adapt_plan(prompt)
@@ -221,4 +219,4 @@ def record(msg: str) -> None:
 
 
 if __name__ == "__main__":
-    execute_framework(".")
+    execute_project_plan(".")

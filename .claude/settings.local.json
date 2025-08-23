@@ -2,20 +2,13 @@
   "permissions": {
     "allow": [
       "WebFetch(domain:docs.anthropic.com)",
-      "WebFetch(domain:docs.anthropic.com)",
-      "WebFetch(domain:docs.anthropic.com)",
       "WebSearch",
       "Bash(mkdir:*)",
       "Bash(python:*)",
-      "Bash(where python)",
-      "Bash(\"C:\\Users\\dhalz\\AppData\\Local\\Microsoft\\WindowsApps\\python.exe\" tef_orchestrator.py --task tasks/hello_world.md --clear-state)",
-      "Bash(py --version)",
-      "Bash(py tef_orchestrator.py:*)",
-      "Bash(py test_phase2.py)",
       "Bash(py:*)",
       "Bash(pip install:*)",
       "WebFetch(domain:github.com)",
-      "Bash(sed:*)"
+      "Read(C:\\Users\\dhalz\\repos\\github.com\\darrhal\\TaskExecutionFramework\\**)"
     ],
     "deny": [],
     "ask": []

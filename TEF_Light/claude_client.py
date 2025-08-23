@@ -1,52 +1,52 @@
 """
-Clean interface for Claude API with structured outputs.
-
-This module encapsulates all Claude API interactions and uses Pydantic models
-for automatic schema generation and type safety.
+Clean interface for Claude API with structured outputs via schema validation.
 """
 
 import anthropic
-from typing import Optional, Dict, Any
+from anthropic.types import MessageParam, ToolParam, ToolUseBlock
+from typing import Optional, Dict, Any, List
 
 from models import ExecutionResult, AssessmentResult, TaskNode
 
 
 class ClaudeClient:
-    """Professional Claude API client with structured outputs."""
+    """Professional Claude API client with structured outputs via schema validation."""
 
     def __init__(self, model: str = "claude-3-5-sonnet-20241022"):
         """Initialize the Claude client."""
         self.client = anthropic.Anthropic()
         self.model = model
 
-    def _call_with_tool(
+    def _call_with_schema(
         self,
         prompt: str,
-        tool_name: str,
-        tool_description: str,
+        validator_name: str,
+        validator_description: str,
         schema: Dict[str, Any],
         max_tokens: int = 1024
     ) -> Dict[str, Any]:
-        """Internal method to call Claude with tool use for structured output."""
+        """Call Claude with schema validation for structured output."""
         try:
-            tools = [{
-                "name": tool_name,
-                "description": tool_description,
+            schema_spec: List[ToolParam] = [{
+                "name": validator_name,
+                "description": validator_description,
                 "input_schema": schema
             }]
 
-            message = self.client.messages.create(  # type: ignore
+            message = self.client.messages.create(
                 model=self.model,
                 max_tokens=max_tokens,
                 messages=[{"role": "user", "content": prompt}],
-                tools=tools,
-                tool_choice={"type": "tool", "name": tool_name}
+                tools=schema_spec,
+                tool_choice={"type": "tool", "name": validator_name}
             )
 
-            # Extract structured data from tool use
+            # Extract structured data from response
             for block in message.content:
-                if block.type == "tool_use" and block.name == tool_name:
-                    return dict(block.input)  # type: ignore
+                if isinstance(block, ToolUseBlock) and block.name == validator_name:
+                    if isinstance(block.input, dict):
+                        return block.input
+                    return {"error": f"Unexpected input type: {type(block.input)}"}
 
             return {"error": "No structured output received"}
         except Exception as e:
@@ -72,10 +72,10 @@ class ClaudeClient:
 
     def execute_task(self, prompt: str) -> ExecutionResult:
         """Call Claude for task execution with structured ExecutionResult output."""
-        result = self._call_with_tool(
+        result = self._call_with_schema(
             prompt=prompt,
-            tool_name="execution_summary",
-            tool_description=("Provides a structured summary of task execution "
+            validator_name="execution_summary",
+            validator_description=("Provides a structured summary of task execution "
                               "including status, files modified, changes made, "
                               "and any errors encountered."),
             schema=ExecutionResult.model_json_schema()
@@ -97,10 +97,10 @@ class ClaudeClient:
 
     def assess_task(self, prompt: str) -> AssessmentResult:
         """Call Claude for task assessment with structured AssessmentResult output."""
-        result = self._call_with_tool(
+        result = self._call_with_schema(
             prompt=prompt,
-            tool_name="assessment_summary",
-            tool_description=("Provides structured assessment observations from Build, "
+            validator_name="assessment_summary",
+            validator_description=("Provides structured assessment observations from Build, "
                               "Requirements, Integration, and Quality perspectives."),
             schema=AssessmentResult.model_json_schema()
         )
@@ -125,10 +125,10 @@ class ClaudeClient:
 
     def adapt_plan(self, prompt: str) -> Optional[TaskNode]:
         """Call Claude for plan adaptation with structured TaskNode output."""
-        result = self._call_with_tool(
+        result = self._call_with_schema(
             prompt=prompt,
-            tool_name="plan_update",
-            tool_description=("Returns the updated task tree structure based on "
+            validator_name="plan_update",
+            validator_description=("Returns the updated task tree structure based on "
                               "assessment observations and adaptation decisions."),
             schema=TaskNode.model_json_schema(),
             max_tokens=2048

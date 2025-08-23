@@ -1,0 +1,1 @@
+- Always use modern, standard best practices for python typing
