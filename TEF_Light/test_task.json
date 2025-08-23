@@ -1,0 +1,20 @@
+{
+  "id": "test-task-001",
+  "description": "Test task for validation",
+  "status": "pending",
+  "failure_threshold": 0.0,
+  "children": [
+    {
+      "id": "subtask-001", 
+      "description": "First subtask",
+      "status": "pending",
+      "failure_threshold": 0.0
+    },
+    {
+      "id": "subtask-002",
+      "description": "Second subtask", 
+      "status": "pending",
+      "failure_threshold": 0.0
+    }
+  ]
+}

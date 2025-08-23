@@ -331,7 +331,7 @@ We need to review the implementation around how the claude code sdk is called. S
 
 We need to add state tracking/whatever to the commit (record) area, based on specs. Might need to review full spec also to get that right.
 
-
+execute_framework->execute_project_plan
 
 
 

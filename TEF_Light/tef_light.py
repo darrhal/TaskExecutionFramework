@@ -1,123 +1,128 @@
 #!/usr/bin/env python3
+"""
+TEF Light - Task Execution Framework (Simplified)
+
+A minimal implementation of the Act→Assess→Adapt cycle using Claude SDK
+with structured outputs for reliable task orchestration.
+"""
+
 import os
 import json
 import subprocess
-from typing import Any
-import anthropic
+from typing import Any, Dict
+
+from claude_client import ClaudeClient
+from models import ExecutionResult, AssessmentResult, TaskNode, TaskTree
 
 
-def call_claude(prompt: str, model: str = "claude-3-5-sonnet-20241022", max_tokens: int = 1024) -> str:
-    """Simple wrapper for Claude API calls with sensible defaults"""
-    try:
-        client = anthropic.Anthropic()
-        message = client.messages.create(
-            model=model,
-            max_tokens=max_tokens,
-            messages=[{"role": "user", "content": prompt}]
-        )
-        
-        # Extract text from response content blocks
-        response_text = ""
-        for block in message.content:
-            if block.type == "text":
-                response_text += block.text
-        
-        return response_text
-    except Exception as e:
-        return f"Claude API Error: {str(e)}"
+# Initialize Claude client globally
+claude_client = ClaudeClient()
 
 
 def execute_framework(environment_path: str, task_plan_path: str = "sample_project_plan.json") -> None:
-    # Load task tree from plan
-    with open(task_plan_path, "r") as f:
-        task_tree = json.load(f)
+    """Execute the complete task framework."""
+    # Load and validate task tree from plan
+    task_tree = TaskTree.load_from_file(task_plan_path)
+    
+    execute_task(task_tree.root, environment_path)
 
-    execute_task(task_tree, environment_path)
 
-
-def execute_task(task_tree: dict[str, Any], environment_path: str) -> None:
+def execute_task(task_tree: TaskNode, environment_path: str) -> None:
+    """Execute tasks using Act→Assess→Adapt cycle."""
     while True:
         task = find_next_task(task_tree)
         if not task:
             break
 
         # Mark task as in progress
-        task["status"] = "in_progress"
+        task.status = "in_progress"
         
         # Act (atomic only)
-        result = None
-        if not task.get("children"):
-            result = execute(task)
-            record(f"ACT: {task['id']}")
+        execution_result = None
+        if not task.children:
+            execution_result = execute(task)
+            record(f"ACT: {task.id}")
 
         # Assess (all tasks)
-        observations = assess(task, task_tree, result)
+        assessment = assess(task, task_tree, execution_result)
 
-        # Adapt (all tasks)
-        task_tree = adapt(task, observations, task_tree)
+        # Adapt (all tasks) 
+        updated_tree = adapt(task, assessment, task_tree)
+        if updated_tree:
+            # Update the tree with adapted changes
+            _update_task_tree(task_tree, updated_tree)
         
         # Mark task as completed
-        task["status"] = "completed"
-        record(f"ADAPT: {task['id']}")
+        task.status = "completed"
+        record(f"ADAPT: {task.id}")
 
 
 # Task tree navigation
-def find_next_task(tree: dict[str, Any]) -> dict[str, Any] | None:
-    """Find the next atomic (leaf) task that's pending using depth-first traversal"""
+def find_next_task(tree: TaskNode) -> TaskNode | None:
+    """Find the next atomic (leaf) task that's pending using depth-first traversal."""
     # If this task is atomic (no children) and pending, return it
-    if not tree.get("children") and tree.get("status") == "pending":
+    if not tree.children and tree.status == "pending":
         return tree
     
     # Otherwise, check children depth-first
-    for child in tree.get("children", []):
-        next_task = find_next_task(child)
-        if next_task:
-            return next_task
+    if tree.children:
+        for child in tree.children:
+            next_task = find_next_task(child)
+            if next_task:
+                return next_task
     
     return None
 
 
-def execute(task: dict[str, Any]) -> dict[str, Any]:
-    """Execute an atomic task and return comprehensive results"""
-    print(f"Executing: {task.get('description')}")
+def _update_task_tree(original: TaskNode, updated: TaskNode) -> None:
+    """Helper to update original task tree with adapted changes."""
+    # For now, just update the root properties
+    # In a more sophisticated implementation, we'd do a proper merge
+    original.id = updated.id
+    original.description = updated.description
+    original.status = updated.status
+    original.failure_threshold = updated.failure_threshold
+    if updated.children:
+        original.children = updated.children
+
+
+def execute(task: TaskNode) -> ExecutionResult:
+    """Execute an atomic task and return comprehensive results."""
+    print(f"Executing: {task.description}")
     
     # Load execution instructions
     with open("instructions/execution_instructions.md", "r") as f:
         instructions = f.read()
     
-    # Call Claude SDK to actually execute the task
+    # Create prompt for Claude
     prompt = f"""
 {instructions}
 
 ## Current Task
-Task to complete: {task.get('description')}
-Task ID: {task['id']}
+Task to complete: {task.description}
+Task ID: {task.id}
 Working directory: ./
 
-Please implement this task according to the instructions above.
+Please implement this task according to the instructions above. Use the execution_summary tool to provide a structured summary of your implementation.
 """
     
-    sdk_response = call_claude(prompt)
+    # Get structured execution result from Claude
+    execution_result = claude_client.execute_task(prompt)
     
-    # Capture what changed in git
-    try:
-        git_diff = subprocess.run(['git', 'diff', 'HEAD'], 
-                                 capture_output=True, text=True, check=True)
-        diff_output = git_diff.stdout
-    except subprocess.CalledProcessError:
-        diff_output = "Error capturing git diff"
+    # Ensure git_diff is captured if not provided by Claude
+    if not execution_result.git_diff:
+        try:
+            git_diff = subprocess.run(['git', 'diff', 'HEAD'], 
+                                     capture_output=True, text=True, check=True)
+            execution_result.git_diff = git_diff.stdout
+        except subprocess.CalledProcessError:
+            execution_result.git_diff = "Error capturing git diff"
     
-    return {
-        "status": "success",
-        "sdk_output": sdk_response,        # What the LLM said/did
-        "git_diff": diff_output,           # Complete diff including new files  
-        "environment_path": "./",          # For assessor exploration
-        "errors": []
-    }
+    return execution_result
 
 
-def assess(task: dict[str, Any], tree: dict[str, Any], execution_result: dict[str, Any] | None) -> dict[str, Any]:
-    """Assess from multiple perspectives and call SDK"""
+def assess(task: TaskNode, tree: TaskNode, execution_result: ExecutionResult | None) -> AssessmentResult:
+    """Assess from multiple perspectives using Claude."""
     # Load assessment instructions
     with open("instructions/assessment_instructions.md", "r") as f:
         instructions = f.read()
@@ -126,66 +131,78 @@ def assess(task: dict[str, Any], tree: dict[str, Any], execution_result: dict[st
     if execution_result:
         execution_info = f"""
 ## Execution Result
-Status: {execution_result.get('status')}
-SDK Output: {execution_result.get('sdk_output')}
-Environment Path: {execution_result.get('environment_path')}
-Errors: {execution_result.get('errors', [])}
+Status: {execution_result.status}
+Files Modified: {execution_result.files_modified}
+Changes Made: {execution_result.changes_made}
+Environment Path: {execution_result.environment_path}
+Errors: {execution_result.errors}
 
 ## Changes Made (Git Diff)
-{execution_result.get('git_diff', 'No changes detected')}
+{execution_result.git_diff or 'No changes detected'}
 """
 
     prompt = f"""
 {instructions}
 
 ## Current Task
-Task: {task.get('description', 'Unknown task')}
-Task ID: {task['id']}
+Task: {task.description}
+Task ID: {task.id}
 {execution_info}
 
 ## Context
-Full task tree: {json.dumps(tree, indent=2)}
+Full task tree: {json.dumps(tree.model_dump(), indent=2)}
 
-Please assess this task according to the instructions above.
+Please assess this task from all four perspectives (Build, Requirements, Integration, Quality) according to the instructions above. Use the assessment_summary tool to provide structured observations.
 """
 
-    # Call Claude SDK with assessment prompt
-    observations = call_claude(prompt)
-    return {"observations": observations}
+    return claude_client.assess_task(prompt)
 
 
-def adapt(task: dict[str, Any], obs: dict[str, Any], tree: dict[str, Any]) -> dict[str, Any]:
-    """Navigate/adapt the plan based on observations"""
+def adapt(task: TaskNode, obs: AssessmentResult, tree: TaskNode) -> TaskNode | None:
+    """Navigate/adapt the plan based on observations."""
     # Load adaptation instructions
     with open("instructions/adaptation_instructions.md", "r") as f:
         instructions = f.read()
+    
+    observations_text = f"""
+Build Perspective:
+- Feasible: {obs.build.feasible}
+- Blockers: {obs.build.blockers}
+- Observations: {obs.build.observations}
+
+Requirements Perspective:
+- Feasible: {obs.requirements.feasible}
+- Blockers: {obs.requirements.blockers}
+- Observations: {obs.requirements.observations}
+
+Integration Perspective:
+- Feasible: {obs.integration.feasible}
+- Blockers: {obs.integration.blockers}
+- Observations: {obs.integration.observations}
+
+Quality Perspective:
+- Feasible: {obs.quality.feasible}
+- Blockers: {obs.quality.blockers}
+- Observations: {obs.quality.observations}
+"""
     
     prompt = f"""
 {instructions}
 
 ## Current Situation
-Task just completed: {task.get('description')}
-Task ID: {task['id']}
+Task just completed: {task.description}
+Task ID: {task.id}
 
 ## Assessment Observations
-{obs.get('observations', 'No observations')}
+{observations_text}
 
 ## Current Task Tree
-{json.dumps(tree, indent=2)}
+{json.dumps(tree.model_dump(), indent=2)}
 
-Based on the observations above, adapt the plan according to the instructions. Return the updated task tree as JSON.
+Based on the observations above, adapt the plan according to the instructions. Use the plan_update tool to return the updated task tree structure.
 """
     
-    adaptation = call_claude(prompt, max_tokens=2048)  # More tokens for tree modifications
-    
-    try:
-        # Try to parse response as JSON (updated tree)
-        updated_tree = json.loads(adaptation)
-        return updated_tree
-    except json.JSONDecodeError:
-        # If not valid JSON, return original tree
-        print(f"Adaptation not valid JSON: {adaptation}")
-        return tree
+    return claude_client.adapt_plan(prompt)
 
 
 def record(msg: str) -> None:
