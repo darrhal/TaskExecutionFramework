@@ -325,9 +325,11 @@ Let's call it there for now. Take these final comments and write out the spec, b
 Good. Now I want you to review the document and pull out anything that's more detailed technical implementation plans, and move them to a new .md for that. Retain some semblence of a high-level description, but details sucha s code examples do not belong in the overview doc.
 
 
+We need to review the implementation around how the claude code sdk is called. Specifically, it seems like we might not be taking advantage of the structured output capabilities. I believe you can instruct the sdk to use actual json for its ouptut. But I also think there's yaml too. Read the latest official anthropic docs on this, and let's figure out how to improve it. Also, pull in the original larger, more detailed overview spec at ./Specs/FRAMEWORK_OVERVIEW.md. I think we talked about using yaml frontmatter or something. If you don't find that, let me know, and I can try to find our notes where we discussed this.
 
 
-Need to add state tracking/whatever to the commit (record) area, based on specs. Might need to review full spec also to get that right.
+
+We need to add state tracking/whatever to the commit (record) area, based on specs. Might need to review full spec also to get that right.
 
 
 
