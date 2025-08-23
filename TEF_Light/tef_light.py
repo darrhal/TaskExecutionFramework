@@ -73,7 +73,6 @@ def execute(task: dict[str, Any]) -> dict[str, Any]:
 You are a software engineer implementing tasks in a codebase.
 
 Task to complete: {task.get('description')}
-Task ID: {task['id']}
 Working directory: ./
 
 Please implement this task by creating or modifying files as needed.
