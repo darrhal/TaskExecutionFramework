@@ -81,16 +81,20 @@ def execute(task: dict[str, Any]) -> dict[str, Any]:
     """Execute an atomic task and return comprehensive results"""
     print(f"Executing: {task.get('description')}")
     
+    # Load execution instructions
+    with open("instructions/execution_instructions.md", "r") as f:
+        instructions = f.read()
+    
     # Call Claude SDK to actually execute the task
     prompt = f"""
-You are a software engineer implementing tasks in a codebase.
+{instructions}
 
+## Current Task
 Task to complete: {task.get('description')}
 Task ID: {task['id']}
 Working directory: ./
 
-Please implement this task by creating or modifying files as needed.
-Respond with a brief summary of what you did.
+Please implement this task according to the instructions above.
 """
     
     sdk_response = call_claude(prompt)
@@ -115,7 +119,7 @@ Respond with a brief summary of what you did.
 def assess(task: dict[str, Any], tree: dict[str, Any], execution_result: dict[str, Any] | None) -> dict[str, Any]:
     """Assess from multiple perspectives and call SDK"""
     # Load assessment instructions
-    with open("assessment_instructions.md", "r") as f:
+    with open("instructions/assessment_instructions.md", "r") as f:
         instructions = f.read()
 
     execution_info = ""
@@ -152,27 +156,24 @@ Please assess this task according to the instructions above.
 
 def adapt(task: dict[str, Any], obs: dict[str, Any], tree: dict[str, Any]) -> dict[str, Any]:
     """Navigate/adapt the plan based on observations"""
+    # Load adaptation instructions
+    with open("instructions/adaptation_instructions.md", "r") as f:
+        instructions = f.read()
+    
     prompt = f"""
-You are a project navigator adapting plans based on observations.
+{instructions}
 
-Current Task: {task.get('description')}
+## Current Situation
+Task just completed: {task.get('description')}
 Task ID: {task['id']}
 
-Observations from assessment:
+## Assessment Observations
 {obs.get('observations', 'No observations')}
 
-Current Task Tree:
+## Current Task Tree
 {json.dumps(tree, indent=2)}
 
-Based on these observations, should the plan be modified?
-Consider:
-- Task decomposition if needed
-- Plan refinement 
-- Task status updates
-- New tasks to insert
-- Tasks to remove or reorder
-
-Return the updated task tree as JSON, or the same tree if no changes needed.
+Based on the observations above, adapt the plan according to the instructions. Return the updated task tree as JSON.
 """
     
     adaptation = call_claude(prompt, max_tokens=2048)  # More tokens for tree modifications
