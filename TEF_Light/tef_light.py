@@ -74,6 +74,7 @@ You are a software engineer implementing tasks in a codebase.
 
 Task to complete: {task.get('description')}
 Task ID: {task['id']}
+Working directory: ./
 
 Please implement this task by creating or modifying files as needed.
 Respond with a brief summary of what you did.
