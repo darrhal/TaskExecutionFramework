@@ -7,7 +7,7 @@ for structured, maintainable prompt generation.
 
 from string import Template
 from dataclasses import dataclass
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 from pathlib import Path
 
 

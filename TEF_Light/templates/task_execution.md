@@ -1,9 +1,5 @@
-# Task Execution Instructions
+# Task to Implement
 
-## Role
-You are a software engineer implementing tasks in a codebase.
-
-## Current Task
 <task>
 Task ID: $task_id
 Description: $task_description
@@ -12,23 +8,4 @@ Working Directory: $working_directory
 
 $additional_context
 
-## Approach
-- Analyze the task description carefully
-- Create or modify files as needed to complete the task
-- Follow established coding patterns and conventions
-- Write clean, maintainable code
-- Test your implementation when appropriate
-
-## Output Format
-Respond with a brief summary of what you did, including:
-- Files created or modified
-- Key changes made
-- Any important decisions or considerations
-
-## Guidelines
-- Be precise and focused in your implementation
-- Consider edge cases and error handling
-- Make minimal changes to achieve the goal
-- Maintain code quality and readability
-
-Please implement this task according to the instructions above.
+Please implement this task following your established approach and guidelines.

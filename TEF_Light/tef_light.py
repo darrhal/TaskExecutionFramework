@@ -9,13 +9,15 @@ with structured outputs for reliable task orchestration.
 import json
 import subprocess
 
-from claude_client import ClaudeClient
+from claude_agents import TaskExecutor, TaskAssessor, PlanAdapter
 from models import ExecutionResult, AssessmentResult, TaskNode, TaskTree
 from templates import template_manager
 
 
-# Initialize Claude client globally
-claude_client = ClaudeClient()
+# Initialize specialized agents
+task_executor = TaskExecutor()
+task_assessor = TaskAssessor()
+plan_adapter = PlanAdapter()
 
 
 def execute_project_plan(environment_path: str,
@@ -99,8 +101,8 @@ def execute(task: TaskNode) -> ExecutionResult:
         additional_context=""  # Can be extended for future use
     )
 
-    # Get structured execution result from Claude
-    execution_result = claude_client.execute_task(prompt)
+    # Get structured execution result from TaskExecutor
+    execution_result = task_executor.execute(prompt)
 
     # Ensure git_diff is captured if not provided by Claude
     if not execution_result.git_diff:
@@ -141,7 +143,7 @@ Errors: {execution_result.errors}
         task_tree_context=f"Full task tree: {json.dumps(tree.model_dump(), indent=2)}"
     )
 
-    return claude_client.assess_task(prompt)
+    return task_assessor.assess(prompt)
 
 
 def adapt(task: TaskNode, obs: AssessmentResult, tree: TaskNode) -> TaskNode | None:
@@ -179,7 +181,7 @@ Quality Perspective:
         task_tree=json.dumps(tree.model_dump(), indent=2)
     )
 
-    return claude_client.adapt_plan(prompt)
+    return plan_adapter.adapt(prompt)
 
 
 def record(msg: str) -> None:
