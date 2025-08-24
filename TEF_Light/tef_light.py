@@ -8,6 +8,9 @@ with structured outputs for reliable task orchestration.
 
 import json
 import subprocess
+from datetime import datetime
+from pathlib import Path
+from typing import Optional
 
 from claude_agents import TaskExecutor, TaskAssessor, Pathfinder
 from models import ExecutionResult, AssessmentResult, TaskNode, TaskTree
@@ -23,8 +26,27 @@ pathfinder = Pathfinder()
 def execute_project_plan(environment_path: str,
                          task_plan_path: str = "sample_project_plan.json") -> None:
     """Execute the complete project plan using the task framework."""
+    # Create unique project directory structure
+    from datetime import datetime
+    project_id = datetime.now().strftime("%Y%m%d_%H%M%S")
+    project_dir = Path(f"projects/{project_id}")
+    
+    # Create project directories
+    (project_dir / "user_intent").mkdir(parents=True, exist_ok=True)
+    (project_dir / "working_plan").mkdir(parents=True, exist_ok=True)
+    
+    # Store project directory globally for other functions
+    global _current_project_dir
+    _current_project_dir = project_dir
+    
     # Load and validate task tree from plan
     task_tree = TaskTree.load_from_file(task_plan_path)
+    
+    # Preserve original user intent on first run (inline implementation)
+    original_intent_path = project_dir / "user_intent/original_plan.json"
+    if not original_intent_path.exists():
+        task_tree.save_to_file(str(original_intent_path))
+        print(f"Preserved original user intent: {original_intent_path}")
 
     execute_task(task_tree.root, environment_path)
 
@@ -53,6 +75,8 @@ def execute_task(task_tree: TaskNode, environment_path: str) -> None:
         if updated_tree:
             # Update the tree with adapted changes
             _update_task_tree(task_tree, updated_tree)
+            # Save evolving working plan
+            _save_working_plan(task_tree)
 
         # Mark task as completed
         task.status = "completed"
@@ -149,6 +173,9 @@ Errors: {execution_result.errors}
 def adapt(task: TaskNode, obs: AssessmentResult, tree: TaskNode) -> TaskNode | None:
     """Navigate/adapt the plan based on observations."""
     
+    # Load original user intent for "north star" reference
+    original_intent = _load_original_intent()
+    
     # Format observations for template
     observations_text = f"""
 Build Perspective:
@@ -177,11 +204,41 @@ Quality Perspective:
         "plan_adaptation",
         task_id=task.id,
         task_description=task.description,
+        original_user_intent=original_intent,
         observations=observations_text,
         task_tree=json.dumps(tree.model_dump(), indent=2)
     )
 
     return pathfinder.find_path(prompt)
+
+# Global variable to track current project directory
+_current_project_dir: Path = None
+
+
+def _load_original_intent() -> str:
+    """Load original user intent as raw JSON data for template."""
+    original_intent_path = _current_project_dir / "user_intent/original_plan.json"
+    
+    if not original_intent_path.exists():
+        return "No original intent preserved (legacy execution)"
+    
+    try:
+        # Just return the raw JSON content - no pretty formatting needed
+        return original_intent_path.read_text()
+    except Exception as e:
+        return f"Error loading original intent: {e}"
+
+def _save_working_plan(root_task: TaskNode) -> None:
+    """Save current working plan to working_plan directory."""
+    working_plan_path = _current_project_dir / "working_plan/current_plan.json"
+    
+    try:
+        # Create a TaskTree wrapper for consistent saving
+        current_tree = TaskTree(root=root_task)
+        current_tree.save_to_file(str(working_plan_path))
+        print(f"Saved working plan: {working_plan_path}")
+    except Exception as e:
+        print(f"Warning: Failed to save working plan: {e}")
 
 
 def record(msg: str) -> None:

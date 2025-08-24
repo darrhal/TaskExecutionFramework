@@ -1,0 +1,3 @@
+- The user intent/whatever we call it area: this is the "immutable", read-only (from the perspective of the agent) area
+- The long-term sketched-out plan could be described as the "vision"
+- 

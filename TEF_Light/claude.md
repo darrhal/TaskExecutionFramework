@@ -1,1 +1,2 @@
+- Important: I am driving this, not you. Do not jump into coding things unless you're certain that's what I want.
 - Always use modern, standard best practices for python typing
