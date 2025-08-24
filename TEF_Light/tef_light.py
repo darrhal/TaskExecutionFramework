@@ -8,6 +8,7 @@ with structured outputs for reliable task orchestration.
 
 import json
 import subprocess
+import shutil
 from datetime import datetime
 from pathlib import Path
 from typing import Optional
@@ -25,7 +26,7 @@ task_assessor = TaskAssessor()
 pathfinder = Pathfinder()
 
 
-def _init_project(base_path: str, project_id: Optional[str] = None) -> None:
+def _init_project(base_path: str, task_plan_path: str, project_id: Optional[str] = None) -> None:
     """Initialize project structure and global paths."""
     if project_id is None:
         project_id = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -37,33 +38,38 @@ def _init_project(base_path: str, project_id: Optional[str] = None) -> None:
     project_dir = Path(base_path) / "runs" / project_id
     
     # Initialize all project paths
-    global _project_dir, _project_id, _main_log_path, _user_intent_path, _working_plan_path, _runs_path, _original_intent_file, _working_plan_file
+    global _project_dir, _project_id, _audit_log_path, _user_intent_path, _working_plan_path, _original_intent_file, _working_plan_file
     
     _project_dir = project_dir
     _project_id = project_id
     _user_intent_path = project_dir / "user_intent"
     _working_plan_path = project_dir / "working_plan"
-    _runs_path = project_dir / "runs"
-    _main_log_path = _runs_path / f"{project_id}.log"
+    _audit_log_path = _project_dir / f"{project_id}.log"
     _original_intent_file = _user_intent_path / "original_plan.json"
     _working_plan_file = _working_plan_path / "current_plan.json"
     
+
+    # Copy file at task_plan_path into _original_intent_file and _working_plan_file
+    task_plan_file = Path(task_plan_path)
+    if not task_plan_file.exists():
+        raise FileNotFoundError(f"Task plan file not found: {task_plan_path}")
+
     # Create project directories
     _user_intent_path.mkdir(parents=True, exist_ok=True)
     _working_plan_path.mkdir(parents=True, exist_ok=True)
-    _runs_path.mkdir(parents=True, exist_ok=True)
+    
+    # Copy task plan to both original intent and working plan files
+    shutil.copy2(task_plan_file, _original_intent_file)
+    shutil.copy2(task_plan_file, _working_plan_file)
     
     # Initialize audit log
     _init_audit_log()
 
 
-def execute_project(environment_path: str, task_plan_path: str) -> None:
+def execute_project(environment_path: str) -> None:
     """Execute the complete project plan using the task framework."""
-    # Load and validate task tree from plan
-    task_tree = TaskTree.load_from_file(task_plan_path)
-    
-    # Preserve original user intent on first run
-    task_tree.save_to_file(str(_original_intent_file))
+    # Load and validate task tree from working plan (already copied during init)
+    task_tree = TaskTree.load_from_file(str(_working_plan_file))
     
     execute_task(task_tree.root, environment_path)
 
@@ -82,6 +88,7 @@ def execute_task(task_tree: TaskNode, environment_path: str) -> None:
         # Act (atomic only)
         execution_result = None
         if not task.children:
+            # TODO: We need to to pass environment_path in to all the stages, so it knows where to do work (pass into sdk?) and diff, etc.
             execution_result = execute(task)
             # Record with detailed execution info
             record(f"ACT: {task.id}", phase="ACT", 
@@ -99,7 +106,7 @@ def execute_task(task_tree: TaskNode, environment_path: str) -> None:
         updated_tree = adapt(task, assessment, task_tree)
         if updated_tree:
             # Update the tree with adapted changes
-            _update_task_tree(task_tree, updated_tree)
+            task_tree = updated_tree
             # Save evolving working plan
             _save_working_plan(task_tree)
             adapt_details = "Plan updated with modifications"
@@ -127,18 +134,6 @@ def find_next_task(tree: TaskNode) -> TaskNode | None:
                 return next_task
 
     return None
-
-
-def _update_task_tree(original: TaskNode, updated: TaskNode) -> None:
-    """Helper to update original task tree with adapted changes."""
-    # For now, just update the root properties
-    # In a more sophisticated implementation, we'd do a proper merge
-    original.id = updated.id
-    original.description = updated.description
-    original.status = updated.status
-    original.failure_threshold = updated.failure_threshold
-    if updated.children:
-        original.children = updated.children
 
 
 def execute(task: TaskNode) -> ExecutionResult:
@@ -244,10 +239,9 @@ Quality Perspective:
 # These are guaranteed to be initialized by execute_project_plan() before any other functions are called
 _project_dir: Path
 _project_id: str
-_main_log_path: Path
+_audit_log_path: Path
 _user_intent_path: Path
 _working_plan_path: Path
-_runs_path: Path
 _original_intent_file: Path
 _working_plan_file: Path
 
@@ -267,7 +261,7 @@ def _init_audit_log() -> None:
     """Initialize audit log file for the current project."""
     from datetime import datetime
     
-    with open(_main_log_path, 'w') as f:
+    with open(_audit_log_path, 'w') as f:
         f.write(f"# TEF Light Execution Log - Project {_project_id}\n")
         f.write(f"# Started: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n")
 
@@ -313,7 +307,7 @@ def record(msg: str, phase: Optional[str] = None, details: Optional[str] = None)
     log_entry = f"[{timestamp}] {phase}: {details}\n" if (phase and details) else f"[{timestamp}] {msg}\n"
     
     # Write to main execution log
-    with open(_main_log_path, 'a') as f:
+    with open(_audit_log_path, 'a') as f:
         f.write(log_entry)
     
     # Also write to task-specific log if we have a task ID
@@ -321,7 +315,7 @@ def record(msg: str, phase: Optional[str] = None, details: Optional[str] = None)
         parts = msg.split(': ', 1)
         if len(parts) == 2:
             task_id = parts[1]
-            task_log_path = _runs_path / f"{task_id}.log"
+            task_log_path = _project_dir / f"{task_id}.log"
             with open(task_log_path, 'a') as f:
                 f.write(log_entry)
 
@@ -335,6 +329,5 @@ def record(msg: str, phase: Optional[str] = None, details: Optional[str] = None)
 
 
 if __name__ == "__main__":
-    base_path = "./projects/todo_app"
-    _init_project(base_path)
-    execute_project(base_path, "todo_app.json")
+    _init_project("./tef_light/projects/todo_app", "todo_app.json")
+    execute_project("./tef_light/projects/todo_app/take1")
