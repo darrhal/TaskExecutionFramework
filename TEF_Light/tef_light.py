@@ -34,10 +34,14 @@ def execute_project_plan(environment_path: str,
     # Create project directories
     (project_dir / "user_intent").mkdir(parents=True, exist_ok=True)
     (project_dir / "working_plan").mkdir(parents=True, exist_ok=True)
+    (project_dir / "runs").mkdir(parents=True, exist_ok=True)
     
     # Store project directory globally for other functions
     global _current_project_dir
     _current_project_dir = project_dir
+    
+    # Initialize audit log
+    _init_audit_log()
     
     # Load and validate task tree from plan
     task_tree = TaskTree.load_from_file(task_plan_path)
@@ -65,10 +69,18 @@ def execute_task(task_tree: TaskNode, environment_path: str) -> None:
         execution_result = None
         if not task.children:
             execution_result = execute(task)
-            record(f"ACT: {task.id}")
+            # Record with detailed execution info
+            act_details = f"Executed task: {task.description}"
+            if execution_result:
+                act_details += f" | Status: {execution_result.status} | Files: {len(execution_result.files_modified)} | Changes: {execution_result.changes_made}"
+            record(f"ACT: {task.id}", phase="ACT", details=act_details)
 
         # Assess (all tasks)
         assessment = assess(task, task_tree, execution_result)
+        
+        # Record assessment summary
+        assess_details = f"Build: {'✓' if assessment.build.feasible else '✗'}, Requirements: {'✓' if assessment.requirements.feasible else '✗'}, Integration: {'✓' if assessment.integration.feasible else '✗'}, Quality: {'✓' if assessment.quality.feasible else '✗'}"
+        record(f"ASSESS: {task.id}", phase="ASSESS", details=assess_details)
 
         # Adapt (all tasks)
         updated_tree = adapt(task, assessment, task_tree)
@@ -77,10 +89,14 @@ def execute_task(task_tree: TaskNode, environment_path: str) -> None:
             _update_task_tree(task_tree, updated_tree)
             # Save evolving working plan
             _save_working_plan(task_tree)
+            adapt_details = "Plan updated with modifications"
+        else:
+            adapt_details = "No changes needed, proceeding as planned"
+        
+        record(f"ADAPT: {task.id}", phase="ADAPT", details=adapt_details)
 
         # Mark task as completed
         task.status = "completed"
-        record(f"ADAPT: {task.id}")
 
 
 # Task tree navigation
@@ -241,9 +257,32 @@ def _save_working_plan(root_task: TaskNode) -> None:
         print(f"Warning: Failed to save working plan: {e}")
 
 
-def record(msg: str) -> None:
+def _init_audit_log() -> None:
+    """Initialize audit log file for the current project."""
+    from datetime import datetime
+    log_path = _current_project_dir / "runs/execution.log"
+    
+    with open(log_path, 'w') as f:
+        f.write(f"# TEF Light Execution Log\n")
+        f.write(f"# Started: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n")
+
+
+def record(msg: str, phase: Optional[str] = None, details: Optional[str] = None) -> None:
     """Record progress with both logging and git commits"""
+    from datetime import datetime
+    
     print(msg)
+    
+    # Write to audit log if we have a project directory
+    if _current_project_dir:
+        log_path = _current_project_dir / "runs/execution.log"
+        timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        
+        with open(log_path, 'a') as f:
+            if phase and details:
+                f.write(f"[{timestamp}] {phase}: {details}\n")
+            else:
+                f.write(f"[{timestamp}] {msg}\n")
 
     try:
         # Stage all changes
