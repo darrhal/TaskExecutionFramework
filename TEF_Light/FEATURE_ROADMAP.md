@@ -7,29 +7,51 @@ This document captures major upcoming features for TEF Light, maintaining the "l
 
 ### 1. Stateless Plan Re-evaluation 🎯 **SIMPLIFIED APPROACH**
 
-**Vision**: Pathfinder performs complete stateless re-evaluation of the entire plan each time, using natural language reasoning to decide what should change.
+**Vision**: Pathfinder performs complete stateless re-evaluation using natural language reasoning, considering ALL available context to decide what should change.
 
 **Current Infrastructure**:
 ✅ `TaskNode.description` field supports any natural language  
 ✅ Pathfinder can return modified TaskNodes with refined descriptions  
 ✅ `_update_task_tree()` function exists for applying changes  
 
-**The "Light" Philosophy**:
-Instead of complex maturity tracking or proximity logic, leverage the LLM's natural language capabilities:
-- **Stateless**: Each evaluation looks at EVERYTHING fresh
-- **Full context**: Current task + entire tree + all observations 
-- **Natural reasoning**: Let Pathfinder decide in natural language what needs updating
-- **Progressive refinement**: Near-term tasks get more detail, distant ones stay as sketches
+**Complete Context for Pathfinder** (The missing pieces!):
+- **Current task** being executed
+- **Entire task tree** (working plan)  
+- **Original user intent** (immutable reference - the "north star")
+- **Assessment observations** (from Build/Requirements/Integration/Quality perspectives)
+- **Execution results** (if from Act phase)
+
+**The Four Adapt Phase Evaluators**:
+Pathfinder should employ these perspectives (NOT the Assess observers):
+- **Next Step Evaluator**: "What's the immediate next action needed?"
+- **Plan Coherence Evaluator**: "Do all tasks maintain consistency as a whole?"
+- **Task Refinement Evaluator**: "Which upcoming tasks need more detail?"
+- **Intent Alignment Evaluator**: "How well does the current plan align with original goals?"
+
+**Multiple Strategist Synthesis**:
+- **Technical Strategist**: Evaluates decomposition and implementation approaches
+- **Requirements Strategist**: Ensures alignment with user intent
+- **Risk Strategist**: Identifies potential obstacles and failure modes  
+- **Efficiency Strategist**: Seeks simpler, more direct solutions
+
+**Directory Structure Needed**:
+```
+user_intent/           # Immutable, human-authored specifications
+working_plan/          # Agent-modified, evolving task tree  
+environment/           # The actual repository being modified
+```
 
 **Required Components**:
-- [ ] **Enhanced Pathfinder prompt**: Add explicit guidance for stateless full re-evaluation
-- [ ] **Task Specification Templates**: Standard format for task specifications (no maturity levels needed)
-- [ ] **Simplified tree updates**: Replace entire tree with Pathfinder's output
+- [ ] **Enhanced Pathfinder prompt**: Include the four Adapt evaluators and strategist perspectives
+- [ ] **Original intent preservation**: Separate user_intent from working_plan
+- [ ] **Intent-reality reconciliation**: Always check alignment with original goals
+- [ ] **Task Specification Templates**: Standard format for consistency
 
 **Success Criteria**:
-- Pathfinder can take "Build a todo app" and elaborate it into a reasonable execution plan
-- Each evaluation considers the full context and updates the plan accordingly
-- Near-term tasks become detailed, distant tasks remain appropriately sketched
+- Pathfinder considers original user intent in all decisions
+- Each evaluation uses the four Adapt evaluator perspectives
+- Plans evolve while maintaining alignment with original goals
+- "Pause and amend" capability through immutable intent reference
 
 ---
 
@@ -71,31 +93,36 @@ runs/2025-01-24_15-30-45/
 
 ### 3. Pathfinder's Plan Updates 🧭 **NATURAL LANGUAGE DRIVEN**
 
-**Vision**: Let the Pathfinder use natural language reasoning to completely re-evaluate and update the entire plan.
+**Vision**: Let the Pathfinder use natural language reasoning to completely re-evaluate and update the entire plan using proper Adapt phase perspectives.
 
-**Current Understanding**: 
-The Adapt step is NOT about merging trees programmatically - it's about the Pathfinder taking into account EVERY SINGLE THING and updating the plan based on its judgment.
+**Corrected Understanding**: 
+The Adapt step uses DIFFERENT evaluators than the Assess step! Pathfinder should employ the four Adapt evaluators, not mix in the Assess observer perspectives.
 
-**The "Light" Approach**:
-- Pathfinder receives full context: current task + entire tree + all observations
-- Uses natural language reasoning to decide what should change
-- Refines near-term tasks with more detail
-- Re-sketches distant tasks as needed
-- Returns a complete updated plan
+**Complete Pathfinder Context**:
+- Current task + entire tree + **original user intent** + assessment observations + execution results
+
+**Proper Adapt Phase Process**:
+1. **Intent Alignment Evaluation**: Check against original user goals
+2. **Plan Coherence Evaluation**: Ensure all tasks work together consistently  
+3. **Next Step Evaluation**: Identify immediate actions needed
+4. **Task Refinement Evaluation**: Determine which tasks need more detail
+5. **Strategist Synthesis**: Combine Technical/Requirements/Risk/Efficiency perspectives
 
 **Required Changes**:
 - [ ] **Enhanced Pathfinder System Prompt**: 
-  - "Take into account EVERYTHING: current task, entire task tree, all observations"
-  - "Use natural language reasoning to decide what should change about the plan" 
-  - "Refine near-term tasks, re-sketch distant ones per your judgment"
-- [ ] **Simplified _update_task_tree()**: 
-  - Just replace the entire tree with Pathfinder's output
-  - No complex merging - Pathfinder already considered everything
+  - Include the four Adapt evaluators (not Assess observers)
+  - Always reference original user intent as the "north star"
+  - Incorporate multiple strategist perspectives for decision synthesis
+  - Emphasize intent-reality reconciliation
+- [ ] **Template Updates**: 
+  - Pass original user intent to Pathfinder
+  - Separate assessment observations from adaptation evaluation
 
 **Success Criteria**:
-- Pathfinder can intelligently update entire plans based on full context
-- Natural language instructions can be almost directly embedded in the agent
-- Plans evolve sensibly with detailed near-term tasks and sketched distant ones
+- Pathfinder uses correct Adapt evaluators, not Assess observers
+- All decisions reference original user intent for alignment
+- Plans evolve while maintaining coherence and intent alignment
+- Multiple strategist perspectives inform robust decision-making
 
 ---
 
