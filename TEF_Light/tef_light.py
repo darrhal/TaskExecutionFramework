@@ -17,6 +17,7 @@ from models import ExecutionResult, AssessmentResult, TaskNode, TaskTree
 from templates import template_manager
 
 
+
 # Initialize specialized agents
 task_executor = TaskExecutor()
 task_assessor = TaskAssessor()
@@ -27,25 +28,28 @@ def execute_project_plan(environment_path: str,
                          task_plan_path: str = "sample_project_plan.json") -> None:
     """Execute the complete project plan using the task framework."""
     # Create unique project directory structure
-    from datetime import datetime
     project_id = datetime.now().strftime("%Y%m%d_%H%M%S")
-    project_dir = Path(f"projects/{project_id}")
-    
-    # Store project directory and derived paths globally
-    global _current_project_dir, _project_id, _main_log_path
     
     # Validate project setup before creation
     if not project_id or not project_id.strip():
         raise RuntimeError("Project ID cannot be empty")
     
-    # Create project directories
-    (project_dir / "user_intent").mkdir(parents=True, exist_ok=True)
-    (project_dir / "working_plan").mkdir(parents=True, exist_ok=True)
-    (project_dir / "runs").mkdir(parents=True, exist_ok=True)
+    project_dir = Path("projects") / project_id
     
-    _current_project_dir = project_dir
+    # Initialize all project paths
+    global _project_dir, _project_id, _main_log_path, _user_intent_path, _working_plan_path, _runs_path
+    
+    _project_dir = project_dir
     _project_id = project_id
-    _main_log_path = project_dir / f"runs/{project_id}.log"
+    _user_intent_path = project_dir / "user_intent"
+    _working_plan_path = project_dir / "working_plan"
+    _runs_path = project_dir / "runs"
+    _main_log_path = _runs_path / f"{project_id}.log"
+    
+    # Create project directories
+    _user_intent_path.mkdir(parents=True, exist_ok=True)
+    _working_plan_path.mkdir(parents=True, exist_ok=True)
+    _runs_path.mkdir(parents=True, exist_ok=True)
     
     # Initialize audit log
     _init_audit_log()
@@ -54,10 +58,10 @@ def execute_project_plan(environment_path: str,
     task_tree = TaskTree.load_from_file(task_plan_path)
     
     # Preserve original user intent on first run (inline implementation)
-    original_intent_path = project_dir / "user_intent/original_plan.json"
-    if not original_intent_path.exists():
-        task_tree.save_to_file(str(original_intent_path))
-        print(f"Preserved original user intent: {original_intent_path}")
+    original_intent_file = _user_intent_path / "original_plan.json"
+    if not original_intent_file.exists():
+        task_tree.save_to_file(str(original_intent_file))
+        print(f"Preserved original user intent: {original_intent_file}")
 
     execute_task(task_tree.root, environment_path)
 
@@ -235,33 +239,36 @@ Quality Perspective:
     return pathfinder.find_path(prompt)
 
 # Global variables to track current project state
-_current_project_dir: Path
+_project_dir: Path
 _project_id: str
 _main_log_path: Path
+_user_intent_path: Path
+_working_plan_path: Path
+_runs_path: Path
 
 
 def _load_original_intent() -> str:
     """Load original user intent as raw JSON data for template."""
-    original_intent_path = _current_project_dir / "user_intent/original_plan.json"
+    original_intent_file = _user_intent_path / "original_plan.json"
     
-    if not original_intent_path.exists():
+    if not original_intent_file.exists():
         return "No original intent preserved (legacy execution)"
     
     try:
         # Just return the raw JSON content - no pretty formatting needed
-        return original_intent_path.read_text()
+        return original_intent_file.read_text()
     except Exception as e:
         return f"Error loading original intent: {e}"
 
 def _save_working_plan(root_task: TaskNode) -> None:
     """Save current working plan to working_plan directory."""
-    working_plan_path = _current_project_dir / "working_plan/current_plan.json"
+    working_plan_file = _working_plan_path / "current_plan.json"
     
     try:
         # Create a TaskTree wrapper for consistent saving
         current_tree = TaskTree(root=root_task)
-        current_tree.save_to_file(str(working_plan_path))
-        print(f"Saved working plan: {working_plan_path}")
+        current_tree.save_to_file(str(working_plan_file))
+        print(f"Saved working plan: {working_plan_file}")
     except Exception as e:
         print(f"Warning: Failed to save working plan: {e}")
 
@@ -295,7 +302,7 @@ def record(msg: str, phase: Optional[str] = None, details: Optional[str] = None)
             parts = msg.split(': ', 1)
             if len(parts) == 2:
                 task_id = parts[1]
-                task_log_path = _current_project_dir / f"runs/{task_id}.log"
+                task_log_path = _runs_path / f"{task_id}.log"
                 with open(task_log_path, 'a') as f:
                     f.write(log_entry)
 

@@ -382,6 +382,9 @@ One more thing - we need to note about the pathfinder functionality - we had pla
 
 
 
+I want to re-organize this code with the following goals: The length of each method should be rougly equal. Maybe another way to state this is, that the call tree should be balanced. The purpose is for to minimize the "expression" I have to create in my head for how to reason about the flow, if that makes sense. I want to do this in 2 steps so I can verify intermediate progress. Step 1, just move code around within functions, such that things that **could** belong together are actually close. Notably, no logic should change, at all, unless it's determined that could really help. After doing this, assuming my review passes,  Step 2 would be to try do actually move things around, again, just for the sake of organization and a balanced (breadth and depth wise) tree.
+
+
 
 
 
