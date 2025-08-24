@@ -48,7 +48,7 @@ class PromptTemplate:
 class TemplateManager:
     """Manages loading, caching, and rendering of prompt templates."""
     
-    def __init__(self, template_dir: str = "templates"):
+    def __init__(self, template_dir: str = "prompt-templates"):
         self.template_dir = Path(template_dir)
         self._cache: Dict[str, PromptTemplate] = {}
     
