@@ -1,0 +1,61 @@
+{
+  "root": {
+    "id": "todo-project",
+    "description": "Build a simple todo list application with file persistence",
+    "status": "pending", 
+    "failure_threshold": 0.0,
+    "children": [
+      {
+        "id": "todo-core",
+        "description": "Implement core todo functionality",
+        "status": "pending",
+        "failure_threshold": 0.0,
+        "children": [
+          {
+            "id": "todo-001",
+            "description": "Create todo_model.py with Todo class (id, description, completed, created_date)",
+            "status": "pending",
+            "failure_threshold": 0.0,
+            "children": null
+          },
+          {
+            "id": "todo-002", 
+            "description": "Create todo_manager.py with TodoManager class for CRUD operations",
+            "status": "pending",
+            "failure_threshold": 0.0,
+            "children": null
+          }
+        ]
+      },
+      {
+        "id": "todo-persistence",
+        "description": "Add file persistence functionality",
+        "status": "pending",
+        "failure_threshold": 0.0,
+        "children": [
+          {
+            "id": "todo-003",
+            "description": "Add JSON file save/load methods to TodoManager",
+            "status": "pending", 
+            "failure_threshold": 0.0,
+            "children": null
+          },
+          {
+            "id": "todo-004",
+            "description": "Create error handling for file operations (missing file, corrupt JSON, etc.)",
+            "status": "pending",
+            "failure_threshold": 0.0, 
+            "children": null
+          }
+        ]
+      },
+      {
+        "id": "todo-005",
+        "description": "Create main.py with command-line interface for adding, listing, completing, and deleting todos",
+        "status": "pending",
+        "failure_threshold": 0.0,
+        "children": null
+      }
+    ]
+  }
+}

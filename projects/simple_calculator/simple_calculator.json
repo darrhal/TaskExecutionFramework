@@ -1,0 +1,31 @@
+{
+  "root": {
+    "id": "calc-project",
+    "description": "Create a simple calculator application with basic arithmetic operations",
+    "status": "pending",
+    "failure_threshold": 0.0,
+    "children": [
+      {
+        "id": "calc-001",
+        "description": "Create calculator.py with basic arithmetic functions (add, subtract, multiply, divide)",
+        "status": "pending",
+        "failure_threshold": 0.0,
+        "children": null
+      },
+      {
+        "id": "calc-002", 
+        "description": "Add input validation and error handling for division by zero",
+        "status": "pending",
+        "failure_threshold": 0.0,
+        "children": null
+      },
+      {
+        "id": "calc-003",
+        "description": "Create a simple command-line interface that allows users to input numbers and operations",
+        "status": "pending", 
+        "failure_threshold": 0.0,
+        "children": null
+      }
+    ]
+  }
+}

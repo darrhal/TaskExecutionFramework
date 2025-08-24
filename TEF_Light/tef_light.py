@@ -335,6 +335,6 @@ def record(msg: str, phase: Optional[str] = None, details: Optional[str] = None)
 
 
 if __name__ == "__main__":
-    base_path = "."
+    base_path = "./projects/todo_app"
     _init_project(base_path)
-    execute_project(base_path, "sample_project_plan.json")
+    execute_project(base_path, "todo_app.json")
