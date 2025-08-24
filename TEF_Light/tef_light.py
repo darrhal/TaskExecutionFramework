@@ -24,13 +24,12 @@ task_assessor = TaskAssessor()
 pathfinder = Pathfinder()
 
 
-def execute_project_plan(environment_path: str,
-                         task_plan_path: str = "sample_project_plan.json") -> None:
-    """Execute the complete project plan using the task framework."""
-    # Create unique project directory structure
-    project_id = datetime.now().strftime("%Y%m%d_%H%M%S")
+def _init_project(project_id: Optional[str] = None) -> None:
+    """Initialize project structure and global paths."""
+    if project_id is None:
+        project_id = datetime.now().strftime("%Y%m%d_%H%M%S")
     
-    # Validate project setup before creation
+    # Validate project setup
     if not project_id or not project_id.strip():
         raise RuntimeError("Project ID cannot be empty")
     
@@ -53,11 +52,19 @@ def execute_project_plan(environment_path: str,
     
     # Initialize audit log
     _init_audit_log()
+
+
+def execute_project_plan(environment_path: str,
+                         task_plan_path: str = "sample_project_plan.json",
+                         project_id: Optional[str] = None) -> None:
+    """Execute the complete project plan using the task framework."""
+    # Initialize project structure
+    _init_project(project_id)
     
     # Load and validate task tree from plan
     task_tree = TaskTree.load_from_file(task_plan_path)
     
-    # Preserve original user intent on first run (inline implementation)
+    # Preserve original user intent on first run
     original_intent_file = _user_intent_path / "original_plan.json"
     if not original_intent_file.exists():
         task_tree.save_to_file(str(original_intent_file))
@@ -239,6 +246,7 @@ Quality Perspective:
     return pathfinder.find_path(prompt)
 
 # Global variables to track current project state
+# These are guaranteed to be initialized by execute_project_plan() before any other functions are called
 _project_dir: Path
 _project_id: str
 _main_log_path: Path
@@ -288,23 +296,22 @@ def record(msg: str, phase: Optional[str] = None, details: Optional[str] = None)
     
     print(msg)
     
-    # Write to audit log if we have a project directory
-    if _main_log_path:
-        timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        log_entry = f"[{timestamp}] {phase}: {details}\n" if (phase and details) else f"[{timestamp}] {msg}\n"
-        
-        # Write to main execution log
-        with open(_main_log_path, 'a') as f:
-            f.write(log_entry)
-        
-        # Also write to task-specific log if we have a task ID
-        if ':' in msg:  # Format: "PHASE: task-id" or "ACT: task-id", etc.
-            parts = msg.split(': ', 1)
-            if len(parts) == 2:
-                task_id = parts[1]
-                task_log_path = _runs_path / f"{task_id}.log"
-                with open(task_log_path, 'a') as f:
-                    f.write(log_entry)
+    # Write to audit log
+    timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    log_entry = f"[{timestamp}] {phase}: {details}\n" if (phase and details) else f"[{timestamp}] {msg}\n"
+    
+    # Write to main execution log
+    with open(_main_log_path, 'a') as f:
+        f.write(log_entry)
+    
+    # Also write to task-specific log if we have a task ID
+    if ':' in msg:  # Format: "PHASE: task-id" or "ACT: task-id", etc.
+        parts = msg.split(': ', 1)
+        if len(parts) == 2:
+            task_id = parts[1]
+            task_log_path = _runs_path / f"{task_id}.log"
+            with open(task_log_path, 'a') as f:
+                f.write(log_entry)
 
     try:
         # Stage all changes
