@@ -61,6 +61,13 @@ def execute_project_plan(environment_path: str,
     # Initialize project structure
     _init_project(project_id)
     
+    # Load task tree and execute
+    task_tree = _load_and_preserve_task_plan(task_plan_path)
+    execute_task(task_tree.root, environment_path)
+
+
+def _load_and_preserve_task_plan(task_plan_path: str) -> TaskTree:
+    """Load task tree from plan and preserve original intent."""
     # Load and validate task tree from plan
     task_tree = TaskTree.load_from_file(task_plan_path)
     
@@ -69,8 +76,8 @@ def execute_project_plan(environment_path: str,
     if not original_intent_file.exists():
         task_tree.save_to_file(str(original_intent_file))
         print(f"Preserved original user intent: {original_intent_file}")
-
-    execute_task(task_tree.root, environment_path)
+    
+    return task_tree
 
 
 def execute_task(task_tree: TaskNode, environment_path: str) -> None:
