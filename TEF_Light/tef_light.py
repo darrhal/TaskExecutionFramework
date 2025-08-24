@@ -24,7 +24,7 @@ task_assessor = TaskAssessor()
 pathfinder = Pathfinder()
 
 
-def _init_project(project_id: Optional[str] = None) -> None:
+def _init_project(base_path: str = ".", project_id: Optional[str] = None) -> None:
     """Initialize project structure and global paths."""
     if project_id is None:
         project_id = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -33,7 +33,7 @@ def _init_project(project_id: Optional[str] = None) -> None:
     if not project_id or not project_id.strip():
         raise RuntimeError("Project ID cannot be empty")
     
-    project_dir = Path("projects") / project_id
+    project_dir = Path(base_path) / "projects" / project_id
     
     # Initialize all project paths
     global _project_dir, _project_id, _main_log_path, _user_intent_path, _working_plan_path, _runs_path
@@ -54,13 +54,8 @@ def _init_project(project_id: Optional[str] = None) -> None:
     _init_audit_log()
 
 
-def execute_project_plan(environment_path: str,
-                         task_plan_path: str = "sample_project_plan.json",
-                         project_id: Optional[str] = None) -> None:
+def execute_project_plan(environment_path: str, task_plan_path: str) -> None:
     """Execute the complete project plan using the task framework."""
-    # Initialize project structure
-    _init_project(project_id)
-    
     # Load task tree and execute
     task_tree = _load_and_preserve_task_plan(task_plan_path)
     execute_task(task_tree.root, environment_path)
@@ -330,4 +325,6 @@ def record(msg: str, phase: Optional[str] = None, details: Optional[str] = None)
 
 
 if __name__ == "__main__":
-    execute_project_plan(".")
+    base_path = "."
+    _init_project(base_path)
+    execute_project_plan(base_path, "sample_project_plan.json")
