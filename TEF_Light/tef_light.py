@@ -34,7 +34,7 @@ def _init_project(base_path: str, project_id: Optional[str] = None) -> None:
     if not project_id or not project_id.strip():
         raise RuntimeError("Project ID cannot be empty")
     
-    project_dir = Path(base_path) / "projects" / project_id
+    project_dir = Path(base_path) / "runs" / project_id
     
     # Initialize all project paths
     global _project_dir, _project_id, _main_log_path, _user_intent_path, _working_plan_path, _runs_path, _original_intent_file, _working_plan_file
