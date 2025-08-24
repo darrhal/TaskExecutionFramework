@@ -36,9 +36,11 @@ def execute_project_plan(environment_path: str,
     (project_dir / "working_plan").mkdir(parents=True, exist_ok=True)
     (project_dir / "runs").mkdir(parents=True, exist_ok=True)
     
-    # Store project directory globally for other functions
-    global _current_project_dir
+    # Store project directory and derived paths globally
+    global _current_project_dir, _project_id, _main_log_path
     _current_project_dir = project_dir
+    _project_id = project_id
+    _main_log_path = project_dir / f"runs/{project_id}.log"
     
     # Initialize audit log
     _init_audit_log()
@@ -227,8 +229,10 @@ Quality Perspective:
 
     return pathfinder.find_path(prompt)
 
-# Global variable to track current project directory
-_current_project_dir: Path = None
+# Global variables to track current project state
+_current_project_dir: Optional[Path] = None
+_project_id: Optional[str] = None
+_main_log_path: Optional[Path] = None
 
 
 def _load_original_intent() -> str:
@@ -260,10 +264,9 @@ def _save_working_plan(root_task: TaskNode) -> None:
 def _init_audit_log() -> None:
     """Initialize audit log file for the current project."""
     from datetime import datetime
-    log_path = _current_project_dir / "runs/execution.log"
     
-    with open(log_path, 'w') as f:
-        f.write(f"# TEF Light Execution Log\n")
+    with open(_main_log_path, 'w') as f:
+        f.write(f"# TEF Light Execution Log - Project {_project_id}\n")
         f.write(f"# Started: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n")
 
 
@@ -274,16 +277,13 @@ def record(msg: str, phase: Optional[str] = None, details: Optional[str] = None)
     print(msg)
     
     # Write to audit log if we have a project directory
-    if _current_project_dir:
+    if _main_log_path:
         timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        log_entry = f"[{timestamp}] {phase}: {details}\n" if (phase and details) else f"[{timestamp}] {msg}\n"
         
         # Write to main execution log
-        main_log_path = _current_project_dir / "runs/execution.log"
-        with open(main_log_path, 'a') as f:
-            if phase and details:
-                f.write(f"[{timestamp}] {phase}: {details}\n")
-            else:
-                f.write(f"[{timestamp}] {msg}\n")
+        with open(_main_log_path, 'a') as f:
+            f.write(log_entry)
         
         # Also write to task-specific log if we have a task ID
         if ':' in msg:  # Format: "PHASE: task-id" or "ACT: task-id", etc.
@@ -292,10 +292,7 @@ def record(msg: str, phase: Optional[str] = None, details: Optional[str] = None)
                 task_id = parts[1]
                 task_log_path = _current_project_dir / f"runs/{task_id}.log"
                 with open(task_log_path, 'a') as f:
-                    if phase and details:
-                        f.write(f"[{timestamp}] {phase}: {details}\n")
-                    else:
-                        f.write(f"[{timestamp}] {msg}\n")
+                    f.write(log_entry)
 
     try:
         # Stage all changes
