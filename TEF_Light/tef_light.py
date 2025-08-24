@@ -31,13 +31,18 @@ def execute_project_plan(environment_path: str,
     project_id = datetime.now().strftime("%Y%m%d_%H%M%S")
     project_dir = Path(f"projects/{project_id}")
     
+    # Store project directory and derived paths globally
+    global _current_project_dir, _project_id, _main_log_path
+    
+    # Validate project setup before creation
+    if not project_id or not project_id.strip():
+        raise RuntimeError("Project ID cannot be empty")
+    
     # Create project directories
     (project_dir / "user_intent").mkdir(parents=True, exist_ok=True)
     (project_dir / "working_plan").mkdir(parents=True, exist_ok=True)
     (project_dir / "runs").mkdir(parents=True, exist_ok=True)
     
-    # Store project directory and derived paths globally
-    global _current_project_dir, _project_id, _main_log_path
     _current_project_dir = project_dir
     _project_id = project_id
     _main_log_path = project_dir / f"runs/{project_id}.log"
@@ -230,9 +235,9 @@ Quality Perspective:
     return pathfinder.find_path(prompt)
 
 # Global variables to track current project state
-_current_project_dir: Optional[Path] = None
-_project_id: Optional[str] = None
-_main_log_path: Optional[Path] = None
+_current_project_dir: Path
+_project_id: str
+_main_log_path: Path
 
 
 def _load_original_intent() -> str:
