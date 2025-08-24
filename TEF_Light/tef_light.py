@@ -18,13 +18,14 @@ from templates import template_manager
 
 
 
+
 # Initialize specialized agents
 task_executor = TaskExecutor()
 task_assessor = TaskAssessor()
 pathfinder = Pathfinder()
 
 
-def _init_project(base_path: str = ".", project_id: Optional[str] = None) -> None:
+def _init_project(base_path: str, project_id: Optional[str] = None) -> None:
     """Initialize project structure and global paths."""
     if project_id is None:
         project_id = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -36,7 +37,7 @@ def _init_project(base_path: str = ".", project_id: Optional[str] = None) -> Non
     project_dir = Path(base_path) / "projects" / project_id
     
     # Initialize all project paths
-    global _project_dir, _project_id, _main_log_path, _user_intent_path, _working_plan_path, _runs_path
+    global _project_dir, _project_id, _main_log_path, _user_intent_path, _working_plan_path, _runs_path, _original_intent_file, _working_plan_file
     
     _project_dir = project_dir
     _project_id = project_id
@@ -44,6 +45,8 @@ def _init_project(base_path: str = ".", project_id: Optional[str] = None) -> Non
     _working_plan_path = project_dir / "working_plan"
     _runs_path = project_dir / "runs"
     _main_log_path = _runs_path / f"{project_id}.log"
+    _original_intent_file = _user_intent_path / "original_plan.json"
+    _working_plan_file = _working_plan_path / "current_plan.json"
     
     # Create project directories
     _user_intent_path.mkdir(parents=True, exist_ok=True)
@@ -54,25 +57,16 @@ def _init_project(base_path: str = ".", project_id: Optional[str] = None) -> Non
     _init_audit_log()
 
 
-def execute_project_plan(environment_path: str, task_plan_path: str) -> None:
+def execute_project(environment_path: str, task_plan_path: str) -> None:
     """Execute the complete project plan using the task framework."""
-    # Load task tree and execute
-    task_tree = _load_and_preserve_task_plan(task_plan_path)
-    execute_task(task_tree.root, environment_path)
-
-
-def _load_and_preserve_task_plan(task_plan_path: str) -> TaskTree:
-    """Load task tree from plan and preserve original intent."""
     # Load and validate task tree from plan
     task_tree = TaskTree.load_from_file(task_plan_path)
     
     # Preserve original user intent on first run
-    original_intent_file = _user_intent_path / "original_plan.json"
-    if not original_intent_file.exists():
-        task_tree.save_to_file(str(original_intent_file))
-        print(f"Preserved original user intent: {original_intent_file}")
+    task_tree.save_to_file(str(_original_intent_file))
     
-    return task_tree
+    execute_task(task_tree.root, environment_path)
+
 
 
 def execute_task(task_tree: TaskNode, environment_path: str) -> None:
@@ -255,30 +249,28 @@ _main_log_path: Path
 _user_intent_path: Path
 _working_plan_path: Path
 _runs_path: Path
+_original_intent_file: Path
+_working_plan_file: Path
 
 
 def _load_original_intent() -> str:
     """Load original user intent as raw JSON data for template."""
-    original_intent_file = _user_intent_path / "original_plan.json"
-    
-    if not original_intent_file.exists():
+    if not _original_intent_file.exists():
         return "No original intent preserved (legacy execution)"
     
     try:
         # Just return the raw JSON content - no pretty formatting needed
-        return original_intent_file.read_text()
+        return _original_intent_file.read_text()
     except Exception as e:
         return f"Error loading original intent: {e}"
 
 def _save_working_plan(root_task: TaskNode) -> None:
     """Save current working plan to working_plan directory."""
-    working_plan_file = _working_plan_path / "current_plan.json"
-    
     try:
         # Create a TaskTree wrapper for consistent saving
         current_tree = TaskTree(root=root_task)
-        current_tree.save_to_file(str(working_plan_file))
-        print(f"Saved working plan: {working_plan_file}")
+        current_tree.save_to_file(str(_working_plan_file))
+        print(f"Saved working plan: {_working_plan_file}")
     except Exception as e:
         print(f"Warning: Failed to save working plan: {e}")
 
@@ -327,4 +319,4 @@ def record(msg: str, phase: Optional[str] = None, details: Optional[str] = None)
 if __name__ == "__main__":
     base_path = "."
     _init_project(base_path)
-    execute_project_plan(base_path, "sample_project_plan.json")
+    execute_project(base_path, "sample_project_plan.json")
