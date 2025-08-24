@@ -1,5 +1,9 @@
 """
 Task assessment agent - provides objective observations from multiple perspectives.
+
+This agent implements the Observer pattern described in the TEF specifications,
+gathering information from four critical perspectives (Build, Requirements, 
+Integration, Quality) without making decisions - that's the Pathfinder's job.
 """
 
 from .base import BaseClaudeAgent

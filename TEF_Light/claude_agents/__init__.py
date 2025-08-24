@@ -6,6 +6,6 @@ Each agent has a specific role and system prompt, following single responsibilit
 
 from .task_executor import TaskExecutor
 from .task_assessor import TaskAssessor
-from .plan_adapter import PlanAdapter
+from .pathfinder import Pathfinder
 
-__all__ = ["TaskExecutor", "TaskAssessor", "PlanAdapter"]
+__all__ = ["TaskExecutor", "TaskAssessor", "Pathfinder"]

@@ -1,5 +1,5 @@
 """
-Plan adaptation agent - makes strategic decisions about project plan modifications.
+Pathfinder agent - the strategic navigator for searching optimal paths through the solution space.
 """
 
 from typing import Optional
@@ -7,13 +7,13 @@ from .base import BaseClaudeAgent
 from models import TaskNode
 
 
-class PlanAdapter(BaseClaudeAgent):
-    """Strategic navigator agent for adapting project plans."""
+class Pathfinder(BaseClaudeAgent):
+    """Strategic pathfinder agent that searches for optimal paths through the solution space."""
     
     @property
     def SYSTEM_PROMPT(self) -> str:
         """System prompt for plan adaptation tasks."""
-        return """You are a strategic navigator responsible for adapting project plans based on execution observations and assessment findings.
+        return """You are a strategic pathfinder responsible for searching optimal paths through the solution space based on execution observations and assessment findings.
 
 Your expertise includes:
 - Analyzing multi-perspective assessment data to identify adaptation needs
@@ -37,8 +37,8 @@ You have these adaptation tools:
 
 Make strategic decisions that optimize the path forward while maintaining project integrity and quality standards."""
     
-    def adapt(self, prompt: str) -> Optional[TaskNode]:
-        """Adapt a plan and return updated task structure if changes are needed."""
+    def find_path(self, prompt: str) -> Optional[TaskNode]:
+        """Search for optimal path modifications and return updated task structure if changes are needed."""
         result = self._call_with_schema(
             prompt=prompt,
             validator_name="plan_update",
@@ -50,7 +50,7 @@ Make strategic decisions that optimize the path forward while maintaining projec
 
         # Handle errors - return None to indicate no plan update
         if "error" in result:
-            print(f"Plan adaptation failed: {result['error']}")
+            print(f"Pathfinding failed: {result['error']}")
             return None
 
         # Pydantic will validate the structure

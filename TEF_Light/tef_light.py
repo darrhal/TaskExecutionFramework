@@ -9,7 +9,7 @@ with structured outputs for reliable task orchestration.
 import json
 import subprocess
 
-from claude_agents import TaskExecutor, TaskAssessor, PlanAdapter
+from claude_agents import TaskExecutor, TaskAssessor, Pathfinder
 from models import ExecutionResult, AssessmentResult, TaskNode, TaskTree
 from templates import template_manager
 
@@ -17,7 +17,7 @@ from templates import template_manager
 # Initialize specialized agents
 task_executor = TaskExecutor()
 task_assessor = TaskAssessor()
-plan_adapter = PlanAdapter()
+pathfinder = Pathfinder()
 
 
 def execute_project_plan(environment_path: str,
@@ -181,7 +181,7 @@ Quality Perspective:
         task_tree=json.dumps(tree.model_dump(), indent=2)
     )
 
-    return plan_adapter.adapt(prompt)
+    return pathfinder.find_path(prompt)
 
 
 def record(msg: str) -> None:

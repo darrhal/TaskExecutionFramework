@@ -8,7 +8,8 @@
       "Bash(py:*)",
       "Bash(pip install:*)",
       "WebFetch(domain:github.com)",
-      "Read(C:\\Users\\dhalz\\repos\\github.com\\darrhal\\TaskExecutionFramework\\**)"
+      "Read(C:\\Users\\dhalz\\repos\\github.com\\darrhal\\TaskExecutionFramework\\**)",
+      "Bash(move plan_adapter.py pathfinder.py)"
     ],
     "deny": [],
     "ask": []
