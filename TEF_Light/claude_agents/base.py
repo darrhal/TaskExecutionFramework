@@ -4,8 +4,8 @@ Base class for Claude agents with shared functionality.
 
 import anthropic
 from abc import ABC, abstractmethod
-from anthropic.types import MessageParam, ToolParam, ToolUseBlock, TextBlock
-from typing import Dict, Any, List, Optional, cast
+from anthropic.types import ToolParam, ToolUseBlock, TextBlock
+from typing import Dict, Any, List
 
 
 class BaseClaudeAgent(ABC):

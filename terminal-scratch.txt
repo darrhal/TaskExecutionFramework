@@ -344,6 +344,15 @@ I think we should try to utilize system prompts since we are using the sdk, whic
 
 
 
+Do our models match the structures we talked about in the specs?
+We should move forward with "pathfinder" terminology. Update everything to match. Note though that the pathfinder/navigator was intended to be a part of the "Adapt" step, so we still want that terminology.
+I support this recommendation: "Recommendation: Clarify in documentation that the TaskAssessor implements the observer pattern described in specifications."
+Some of these differences exist intentionally because of the "light" nature of it.
+Let's pay attention to this line: "Spec Requirement: Tasks evolve from sketches to complete specifications as they approach execution". I acknowledge that it isn't complete yet, but I hope the infrastructure is there for it. What is missing right now? Mark this as a major "feature-level" todo, if you will.
+Dual-purpose commit strategy: I think this kind of is there, in that I believe we call "record" after Act and Adapt. But I do want to incorporate the "4.2 State Management and Artifacts"  piece into this. Can this still slot into the "record"? Either way, this is another major upcoming feature to capture.
+We can add a very simple failure thresholds implementation too, as a feature. But it's not my highest priority.
+The current implementation is closer to what I want than the "Single Entry Point Consistency". We should massage the original spec to clean this up.
+
 
 
 
