@@ -7,7 +7,7 @@ for structured, maintainable prompt generation.
 
 from string import Template
 from dataclasses import dataclass
-from typing import Dict, Any, Optional
+from typing import Dict, Any
 from pathlib import Path
 
 
@@ -48,8 +48,8 @@ class PromptTemplate:
 class TemplateManager:
     """Manages loading, caching, and rendering of prompt templates."""
     
-    def __init__(self, template_dir: str = "prompt-templates"):
-        self.template_dir = Path(template_dir)
+    def __init__(self, template_dir: Path):
+        self.template_dir = template_dir
         self._cache: Dict[str, PromptTemplate] = {}
     
     def load_template(self, name: str) -> PromptTemplate:
@@ -78,7 +78,3 @@ class TemplateManager:
         """Check if a template file exists."""
         template_path = self.template_dir / f"{name}.md"
         return template_path.exists()
-
-
-# Global template manager instance
-template_manager = TemplateManager()

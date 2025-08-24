@@ -15,7 +15,7 @@ from typing import Optional
 
 from claude_agents import TaskExecutor, TaskAssessor, Pathfinder
 from models import ExecutionResult, AssessmentResult, TaskNode, TaskTree
-from templates import template_manager
+from templates import TemplateManager
 
 
 
@@ -35,10 +35,13 @@ def _init_project(base_path: str, task_plan_path: str, project_id: Optional[str]
     if not project_id or not project_id.strip():
         raise RuntimeError("Project ID cannot be empty")
     
-    project_dir = Path(base_path) / "runs" / project_id
+    base_dir = Path(base_path)
+    project_dir = base_dir / "runs" / project_id
     
     # Initialize all project paths
-    global _project_dir, _project_id, _audit_log_path, _user_intent_path, _working_plan_path, _original_intent_file, _working_plan_file
+    global _template_manager, _project_dir, _project_id, _audit_log_path, _user_intent_path, _working_plan_path, _original_intent_file, _working_plan_file
+    
+    _template_manager = TemplateManager(base_dir / "prompt-templates")
     
     _project_dir = project_dir
     _project_id = project_id
@@ -49,8 +52,7 @@ def _init_project(base_path: str, task_plan_path: str, project_id: Optional[str]
     _working_plan_file = _working_plan_path / "current_plan.json"
     
 
-    # Copy file at task_plan_path into _original_intent_file and _working_plan_file
-    task_plan_file = Path(task_plan_path)
+    task_plan_file = base_dir / task_plan_path
     if not task_plan_file.exists():
         raise FileNotFoundError(f"Task plan file not found: {task_plan_path}")
 
@@ -58,7 +60,6 @@ def _init_project(base_path: str, task_plan_path: str, project_id: Optional[str]
     _user_intent_path.mkdir(parents=True, exist_ok=True)
     _working_plan_path.mkdir(parents=True, exist_ok=True)
     
-    # Copy task plan to both original intent and working plan files
     shutil.copy2(task_plan_file, _original_intent_file)
     shutil.copy2(task_plan_file, _working_plan_file)
     
@@ -88,22 +89,21 @@ def execute_task(task_tree: TaskNode, environment_path: str) -> None:
         # Act (atomic only)
         execution_result = None
         if not task.children:
-            # TODO: We need to to pass environment_path in to all the stages, so it knows where to do work (pass into sdk?) and diff, etc.
-            execution_result = execute(task)
+            execution_result = execute(task, environment_path)
             # Record with detailed execution info
             record(f"ACT: {task.id}", phase="ACT", 
                   details=_format_execution_report(task, execution_result))
 
         # Assess (all tasks)
         # TODO: we need to adjust this eventually to assess parent/non-atomic tasks after all their children are done, with some diff of what changed
-        assessment = assess(task, task_tree, execution_result)
+        assessment = assess(task, task_tree, execution_result, environment_path)
         
         # Record assessment summary
         record(f"ASSESS: {task.id}", phase="ASSESS", 
               details=_format_assessment_report(task, assessment))
 
         # Adapt (all tasks)
-        updated_tree = adapt(task, assessment, task_tree)
+        updated_tree = adapt(task, assessment, task_tree, environment_path)
         if updated_tree:
             # Update the tree with adapted changes
             task_tree = updated_tree
@@ -136,16 +136,16 @@ def find_next_task(tree: TaskNode) -> TaskNode | None:
     return None
 
 
-def execute(task: TaskNode) -> ExecutionResult:
+def execute(task: TaskNode, environment_path: str) -> ExecutionResult:
     """Execute an atomic task and return comprehensive results."""
     print(f"Executing: {task.description}")
 
     # Render prompt using template system
-    prompt = template_manager.render(
+    prompt = _template_manager.render(
         "task_execution",
         task_id=task.id,
         task_description=task.description,
-        working_directory="./",
+        working_directory=environment_path,
         additional_context=""  # Can be extended for future use
     )
 
@@ -156,7 +156,7 @@ def execute(task: TaskNode) -> ExecutionResult:
     if not execution_result.git_diff:
         try:
             git_diff = subprocess.run(['git', 'diff', 'HEAD'],
-                                      capture_output=True, text=True, check=True)
+                                      capture_output=True, text=True, check=True, cwd=environment_path)
             execution_result.git_diff = git_diff.stdout
         except subprocess.CalledProcessError:
             execution_result.git_diff = "Error capturing git diff"
@@ -164,7 +164,7 @@ def execute(task: TaskNode) -> ExecutionResult:
     return execution_result
 
 
-def assess(task: TaskNode, tree: TaskNode, execution_result: ExecutionResult | None) -> AssessmentResult:
+def assess(task: TaskNode, tree: TaskNode, execution_result: ExecutionResult | None, environment_path: str) -> AssessmentResult:
     """Assess from multiple perspectives using Claude."""
     
     # Format execution info if available
@@ -183,18 +183,19 @@ Errors: {execution_result.errors}
 """
 
     # Render prompt using template system
-    prompt = template_manager.render(
+    prompt = _template_manager.render(
         "task_assessment",
         task_id=task.id,
         task_description=task.description,
         execution_info=execution_info,
-        task_tree_context=f"Full task tree: {json.dumps(tree.model_dump(), indent=2)}"
+        task_tree_context=f"Full task tree: {json.dumps(tree.model_dump(), indent=2)}",
+        environment_path=environment_path
     )
 
     return task_assessor.assess(prompt)
 
 
-def adapt(task: TaskNode, obs: AssessmentResult, tree: TaskNode) -> TaskNode | None:
+def adapt(task: TaskNode, obs: AssessmentResult, tree: TaskNode, environment_path: str) -> TaskNode | None:
     """Navigate/adapt the plan based on observations."""
     
     # Load original user intent for "north star" reference
@@ -224,19 +225,22 @@ Quality Perspective:
 """
 
     # Render prompt using template system
-    prompt = template_manager.render(
+    prompt = _template_manager.render(
         "plan_adaptation",
         task_id=task.id,
         task_description=task.description,
         original_user_intent=original_intent,
         observations=observations_text,
-        task_tree=json.dumps(tree.model_dump(), indent=2)
+        task_tree=json.dumps(tree.model_dump(), indent=2),
+        environment_path=environment_path
     )
 
     return pathfinder.find_path(prompt)
 
 # Global variables to track current project state
 # These are guaranteed to be initialized by execute_project_plan() before any other functions are called
+
+_template_manager: TemplateManager
 _project_dir: Path
 _project_id: str
 _audit_log_path: Path
