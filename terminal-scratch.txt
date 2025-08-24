@@ -378,7 +378,7 @@ Also...I really don't know where you got the idea that I wanted you to FREAKING 
 
 
 
-
+One more thing - we need to note about the pathfinder functionality - we had planned to take into account more than just the plan. The thing I know you forgot about was the "original user intent" part, but there may be others. That's the kind of stuff we really nailed down when we discussed this before, so why don't you go ahead an re-read the original overview, and take another peak at the light overview, and suggest some improvements to our roadmap.
 
 
 
