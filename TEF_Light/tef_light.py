@@ -79,7 +79,7 @@ def execute_task(task_tree: TaskNode, environment_path: str) -> None:
         assessment = assess(task, task_tree, execution_result)
         
         # Record assessment summary
-        assess_details = f"Build: {'✓' if assessment.build.feasible else '✗'}, Requirements: {'✓' if assessment.requirements.feasible else '✗'}, Integration: {'✓' if assessment.integration.feasible else '✗'}, Quality: {'✓' if assessment.quality.feasible else '✗'}"
+        assess_details = f"Build: {'pass' if assessment.build.feasible else 'fail'}, Requirements: {'pass' if assessment.requirements.feasible else 'fail'}, Integration: {'pass' if assessment.integration.feasible else 'fail'}, Quality: {'pass' if assessment.quality.feasible else 'fail'}"
         record(f"ASSESS: {task.id}", phase="ASSESS", details=assess_details)
 
         # Adapt (all tasks)
