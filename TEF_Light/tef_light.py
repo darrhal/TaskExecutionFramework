@@ -84,17 +84,16 @@ def execute_task(task_tree: TaskNode, environment_path: str) -> None:
         if not task.children:
             execution_result = execute(task)
             # Record with detailed execution info
-            act_details = f"Executed task: {task.description}"
-            if execution_result:
-                act_details += f" | Status: {execution_result.status} | Files: {len(execution_result.files_modified)} | Changes: {execution_result.changes_made}"
-            record(f"ACT: {task.id}", phase="ACT", details=act_details)
+            record(f"ACT: {task.id}", phase="ACT", 
+                  details=_format_execution_report(task, execution_result))
 
         # Assess (all tasks)
+        # TODO: we need to adjust this eventually to assess parent/non-atomic tasks after all their children are done, with some diff of what changed
         assessment = assess(task, task_tree, execution_result)
         
         # Record assessment summary
-        assess_details = f"Build: {'pass' if assessment.build.feasible else 'fail'}, Requirements: {'pass' if assessment.requirements.feasible else 'fail'}, Integration: {'pass' if assessment.integration.feasible else 'fail'}, Quality: {'pass' if assessment.quality.feasible else 'fail'}"
-        record(f"ASSESS: {task.id}", phase="ASSESS", details=assess_details)
+        record(f"ASSESS: {task.id}", phase="ASSESS", 
+              details=_format_assessment_report(task, assessment))
 
         # Adapt (all tasks)
         updated_tree = adapt(task, assessment, task_tree)
@@ -204,7 +203,7 @@ def adapt(task: TaskNode, obs: AssessmentResult, tree: TaskNode) -> TaskNode | N
     """Navigate/adapt the plan based on observations."""
     
     # Load original user intent for "north star" reference
-    original_intent = _load_original_intent()
+    original_intent = _original_intent_file.read_text()
     
     # Format observations for template
     observations_text = f"""
@@ -253,17 +252,6 @@ _original_intent_file: Path
 _working_plan_file: Path
 
 
-def _load_original_intent() -> str:
-    """Load original user intent as raw JSON data for template."""
-    if not _original_intent_file.exists():
-        return "No original intent preserved (legacy execution)"
-    
-    try:
-        # Just return the raw JSON content - no pretty formatting needed
-        return _original_intent_file.read_text()
-    except Exception as e:
-        return f"Error loading original intent: {e}"
-
 def _save_working_plan(root_task: TaskNode) -> None:
     """Save current working plan to working_plan directory."""
     try:
@@ -282,6 +270,36 @@ def _init_audit_log() -> None:
     with open(_main_log_path, 'w') as f:
         f.write(f"# TEF Light Execution Log - Project {_project_id}\n")
         f.write(f"# Started: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n")
+
+
+def _format_execution_report(task: TaskNode, execution_result: ExecutionResult) -> str:
+    """Format execution results into human-readable report."""
+    report = f"Executed task: {task.description}"
+    report += f" | Status: {execution_result.status}"
+    report += f" | Files: {len(execution_result.files_modified)}"
+    report += f" | Changes: {execution_result.changes_made[:100]}"
+    if execution_result.errors:
+        report += f" | Errors: {len(execution_result.errors)}"
+    return report
+
+
+def _format_assessment_report(task: TaskNode, assessment_result: AssessmentResult) -> str:
+    """Format assessment results into human-readable report."""
+    report = f"Assessment completed for task: {task.description}"
+    
+    # Format the 4 assessment perspectives
+    perspectives = []
+    for name, assessment in [
+        ("Build", assessment_result.build),
+        ("Requirements", assessment_result.requirements), 
+        ("Integration", assessment_result.integration),
+        ("Quality", assessment_result.quality)
+    ]:
+        status = "pass" if assessment.feasible else "fail"
+        perspectives.append(f"{name}={status}")
+    
+    report += f" | Assessment: {', '.join(perspectives)}"
+    return report
 
 
 def record(msg: str, phase: Optional[str] = None, details: Optional[str] = None) -> None:
