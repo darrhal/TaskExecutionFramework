@@ -275,14 +275,27 @@ def record(msg: str, phase: Optional[str] = None, details: Optional[str] = None)
     
     # Write to audit log if we have a project directory
     if _current_project_dir:
-        log_path = _current_project_dir / "runs/execution.log"
         timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         
-        with open(log_path, 'a') as f:
+        # Write to main execution log
+        main_log_path = _current_project_dir / "runs/execution.log"
+        with open(main_log_path, 'a') as f:
             if phase and details:
                 f.write(f"[{timestamp}] {phase}: {details}\n")
             else:
                 f.write(f"[{timestamp}] {msg}\n")
+        
+        # Also write to task-specific log if we have a task ID
+        if ':' in msg:  # Format: "PHASE: task-id" or "ACT: task-id", etc.
+            parts = msg.split(': ', 1)
+            if len(parts) == 2:
+                task_id = parts[1]
+                task_log_path = _current_project_dir / f"runs/{task_id}.log"
+                with open(task_log_path, 'a') as f:
+                    if phase and details:
+                        f.write(f"[{timestamp}] {phase}: {details}\n")
+                    else:
+                        f.write(f"[{timestamp}] {msg}\n")
 
     try:
         # Stage all changes
